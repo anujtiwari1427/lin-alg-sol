@@ -77,7 +77,7 @@ linear-algebra-solver/
 ├── database/               # Database Connection & Schema Setup
 │   ├── app.db
 │   └── db.py
-├── templates/              # Jinja2 Templates
+├── frontend/               # Jinja2 Templates (HTML Views)
 │   ├── base.html           # Master Layout Template
 │   ├── landing.html        # Animated SaaS Landing Page
 │   ├── dashboard.html      # Glassmorphic User Dashboard

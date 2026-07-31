@@ -12,7 +12,7 @@ from controllers.eigen_controller import eigen_bp
 
 def create_app(config_class=Config):
     """Application factory — register all blueprints and initialize DB."""
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder='frontend')
     app.config.from_object(config_class)
 
     # Propagate runtime DB path to the model layer for test isolation

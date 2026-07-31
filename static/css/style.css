@@ -685,3 +685,69 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ---------------------------------------------------------
+   COMPREHENSIVE RESPONSIVE SYSTEM (Mobile, Tablet, Desktop)
+   --------------------------------------------------------- */
+
+/* MathJax & LaTeX Equation Overflow Handling for Mobile */
+.mjx-chtml, .MathJax, .step-latex, .MathJax_Display, .step-body {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Tablet & Mobile Screens (< 992px) */
+@media (max-width: 991.98px) {
+  .hero-section {
+    padding: 3.5rem 1.5rem 3rem !important;
+  }
+}
+
+/* Mobile Devices (< 768px) */
+@media (max-width: 767.98px) {
+  .main-content {
+    padding: 1rem 0.75rem !important;
+  }
+  .top-navbar {
+    padding: 0 0.85rem !important;
+  }
+  .app-footer {
+    padding: 1rem 0.75rem !important;
+    text-align: center;
+  }
+  .control-bar {
+    gap: 0.4rem;
+  }
+  .control-bar .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
+
+/* Small Phones (< 576px) */
+@media (max-width: 575.98px) {
+  .search-bar-container {
+    width: 160px;
+  }
+  .search-input {
+    font-size: 0.78rem;
+    padding-left: 2.1rem;
+    padding-right: 0.5rem;
+  }
+  .search-icon {
+    left: 0.65rem;
+  }
+  .badge {
+    font-size: 0.7rem !important;
+    padding: 0.35em 0.65em !important;
+  }
+  .hero-title {
+    font-size: 1.75rem !important;
+  }
+  .hero-subtitle {
+    font-size: 0.95rem !important;
+  }
+}
+

@@ -8,8 +8,12 @@ class Config:
     # Base directory
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
     
-    # Database
-    DATABASE_PATH = os.path.join(BASE_DIR, 'database', 'app.db')
+    # Database (use /tmp/app.db in serverless read-only environments like Vercel)
+    if os.environ.get('VERCEL') == '1':
+        DATABASE_PATH = '/tmp/app.db'
+    else:
+        DATABASE_PATH = os.environ.get('DATABASE_PATH', os.path.join(BASE_DIR, 'database', 'app.db'))
+        
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{DATABASE_PATH}"
     
     # Application Settings

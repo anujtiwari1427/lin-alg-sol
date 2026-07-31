@@ -17,15 +17,28 @@ def get_db_connection(db_path=None):
 
     # Only create directories for real file paths, not ':memory:'
     if db_path != ':memory:':
-        dir_path = os.path.dirname(db_path)
-        if dir_path:
-            os.makedirs(dir_path, exist_ok=True)
+        try:
+            dir_path = os.path.dirname(db_path)
+            if dir_path:
+                os.makedirs(dir_path, exist_ok=True)
+
+            conn = sqlite3.connect(db_path)
+            conn.row_factory = sqlite3.Row
+            # Enable WAL mode for better concurrent access on file DBs
+            try:
+                conn.execute('PRAGMA journal_mode=WAL;')
+            except sqlite3.OperationalError:
+                pass
+            return conn
+        except Exception:
+            # Fallback to /tmp if current directory is read-only (e.g., Vercel / AWS Lambda)
+            tmp_db_path = '/tmp/app.db'
+            conn = sqlite3.connect(tmp_db_path)
+            conn.row_factory = sqlite3.Row
+            return conn
 
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
-    # Enable WAL mode for better concurrent access on file DBs
-    if db_path != ':memory:':
-        conn.execute('PRAGMA journal_mode=WAL;')
     return conn
 
 

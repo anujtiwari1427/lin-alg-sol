@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Linear Algebra Solver | Next-Gen Educational SaaS{% endblock %}
+
+{% block content %}
+<!-- Animated Hero Section -->
+<section class="hero-section glass-panel mb-5">
+  <div class="container py-4">
+    <div class="badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-30 rounded-pill px-3 py-2 mb-3">
+      <i class="fas fa-sparkles me-1"></i> Production-Ready Linear Algebra Engine
+    </div>
+    <h1 class="hero-title">
+      Master Linear Algebra with <br>
+      <span class="gradient-text">Step-by-Step Solver</span>
+    </h1>
+    <p class="hero-subtitle">
+      Perform matrix operations, calculate determinants, solve linear systems, and analyze vectors with instant, comprehensive mathematical proofs and visualizations.
+    </p>
+
+    <div class="d-flex justify-content-center gap-3 mb-4">
+      <a href="{{ url_for('main.dashboard') }}" class="btn-primary-custom btn-lg fs-6">
+        <i class="fas fa-rocket me-1"></i> Launch Dashboard
+      </a>
+      <a href="#modules" class="btn-secondary-custom btn-lg fs-6">
+        <i class="fas fa-layer-group me-1"></i> Explore Modules
+      </a>
+    </div>
+
+    <!-- Animated Teaser Matrix Card -->
+    <div class="row justify-content-center mt-5">
+      <div class="col-lg-8">
+        <div class="glass-panel p-4 animate-float text-start">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-30 px-3 py-1">
+              <i class="fas fa-check-circle me-1"></i> Live Calculation Example
+            </span>
+            <small class="text-muted"><i class="fas fa-clock me-1"></i> Computed in 0.002s</small>
+          </div>
+          <div class="row align-items-center">
+            <div class="col-md-6 mb-3 mb-md-0">
+              <h6 class="text-secondary mb-2">Input Matrix \(A\):</h6>
+              <div class="p-3 bg-secondary bg-opacity-40 rounded border border-secondary text-center font-monospace fs-5">
+                $$\begin{bmatrix} 4 & 2 \\ 1 & 3 \end{bmatrix}$$
+              </div>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-secondary mb-2">Eigenvalues \(\lambda\):</h6>
+              <div class="p-3 bg-primary bg-opacity-20 border border-primary border-opacity-30 rounded text-center">
+                <span class="fw-bold fs-5 text-primary-accent">\(\lambda_1 = 5, \quad \lambda_2 = 2\)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modules Grid Section -->
+<section id="modules" class="mb-5">
+  <div class="text-center mb-4">
+    <h2 class="fw-bold">Powered by Advanced Solvers</h2>
+    <p class="text-secondary">Designed for students, researchers, and professional engineers</p>
+  </div>
+
+  <div class="row g-4">
+    <!-- Matrix Operations -->
+    <div class="col-md-6 col-lg-4">
+      <div class="glass-panel feature-card">
+        <div>
+          <div class="feature-icon"><i class="fas fa-th"></i></div>
+          <h5 class="fw-bold mb-2">Matrix Operations</h5>
+          <p class="text-secondary fs-6">Dynamic generator supporting 2x2, 3x3, 4x4, and NxN matrices. Compute sums, products, transpose, rank, and trace instantly.</p>
+        </div>
+        <a href="{{ url_for('matrix.matrix_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center">
+          Open Matrix Tool <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Determinants -->
+    <div class="col-md-6 col-lg-4">
+      <div class="glass-panel feature-card">
+        <div>
+          <div class="feature-icon"><i class="fas fa-square-root-variable"></i></div>
+          <h5 class="fw-bold mb-2">Determinants</h5>
+          <p class="text-secondary fs-6">Step-by-step determinant solver using cofactor expansion, Laplace expansion, and row operations with MathJax formulas.</p>
+        </div>
+        <a href="{{ url_for('determinant.determinant_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center">
+          Calculate Determinant <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Inverse Matrix -->
+    <div class="col-md-6 col-lg-4">
+      <div class="glass-panel feature-card">
+        <div>
+          <div class="feature-icon"><i class="fas fa-rotate-left"></i></div>
+          <h5 class="fw-bold mb-2">Inverse Matrix</h5>
+          <p class="text-secondary fs-6">Full derivation of cofactor matrices, adjoint matrices, and inverse matrix validation with non-zero determinant check.</p>
+        </div>
+        <a href="{{ url_for('inverse.inverse_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center">
+          Invert Matrix <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Vectors -->
+    <div class="col-md-6 col-lg-4">
+      <div class="glass-panel feature-card">
+        <div>
+          <div class="feature-icon"><i class="fas fa-location-arrow"></i></div>
+          <h5 class="fw-bold mb-2">Vector Calculator</h5>
+          <p class="text-secondary fs-6">Dot product, cross product, magnitude, projections, vector angles, and 2D/3D visual vector charts.</p>
+        </div>
+        <a href="{{ url_for('vector.vector_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center">
+          Analyze Vectors <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Linear Systems -->
+    <div class="col-md-6 col-lg-4">
+      <div class="glass-panel feature-card">
+        <div>
+          <div class="feature-icon"><i class="fas fa-equals"></i></div>
+          <h5 class="fw-bold mb-2">Linear System Solver</h5>
+          <p class="text-secondary fs-6">Solve system of linear equations using Gaussian Elimination timeline, Cramer's Rule, and Matrix Inverse method.</p>
+        </div>
+        <a href="{{ url_for('linear_equations.linear_equations_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center">
+          Solve Systems <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Eigenvalues -->
+    <div class="col-md-6 col-lg-4">
+      <div class="glass-panel feature-card">
+        <div>
+          <div class="feature-icon"><i class="fas fa-wave-square"></i></div>
+          <h5 class="fw-bold mb-2">Eigenvalues & Vectors</h5>
+          <p class="text-secondary fs-6">Characteristic polynomial solver, roots computation, eigenspaces, and step-by-step mathematical proofs.</p>
+        </div>
+        <a href="{{ url_for('eigen.eigen_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center">
+          Compute Eigen <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SaaS Features & Stats -->
+<section class="glass-panel p-4 p-md-5 mb-5 text-center">
+  <div class="row g-4">
+    <div class="col-md-3">
+      <h2 class="gradient-text fw-bold">100%</h2>
+      <p class="text-secondary mb-0">Step-by-Step LaTeX Proofs</p>
+    </div>
+    <div class="col-md-3">
+      <h2 class="gradient-text fw-bold">NxN</h2>
+      <p class="text-secondary mb-0">Dynamic Dimensions</p>
+    </div>
+    <div class="col-md-3">
+      <h2 class="gradient-text fw-bold">NumPy</h2>
+      <p class="text-secondary mb-0">High Performance Backend</p>
+    </div>
+    <div class="col-md-3">
+      <h2 class="gradient-text fw-bold">SQLite</h2>
+      <p class="text-secondary mb-0">Calculation History</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

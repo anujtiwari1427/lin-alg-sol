@@ -1,0 +1,64 @@
+import sqlite3
+import os
+
+
+def get_db_connection(db_path=None):
+    """
+    Create and return a SQLite database connection.
+    
+    Args:
+        db_path: Optional path to database. Defaults to the path from Config.
+                 Pass ':memory:' for in-memory test databases.
+    """
+    if db_path is None:
+        # Lazy import to avoid circular import issues
+        from config import Config
+        db_path = Config.DATABASE_PATH
+
+    # Only create directories for real file paths, not ':memory:'
+    if db_path != ':memory:':
+        dir_path = os.path.dirname(db_path)
+        if dir_path:
+            os.makedirs(dir_path, exist_ok=True)
+
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    # Enable WAL mode for better concurrent access on file DBs
+    if db_path != ':memory:':
+        conn.execute('PRAGMA journal_mode=WAL;')
+    return conn
+
+
+def init_db(db_path=None):
+    """
+    Initialize database tables.
+    
+    Args:
+        db_path: Optional path override. Defaults to Config.DATABASE_PATH.
+    """
+    conn = get_db_connection(db_path)
+    cursor = conn.cursor()
+
+    # Calculation history table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS calculation_history (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            module      TEXT NOT NULL,
+            operation   TEXT NOT NULL,
+            input_data  TEXT NOT NULL,
+            result_data TEXT NOT NULL,
+            steps_json  TEXT,
+            created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # User settings / preferences table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user_settings (
+            key   TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )
+    ''')
+
+    conn.commit()
+    conn.close()

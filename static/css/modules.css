@@ -1,0 +1,204 @@
+/* =========================================================
+   LINEAR ALGEBRA SOLVER — MODULE SHARED STYLES
+   PALETTE:
+   - Green: #79C131
+   - Black: #161616
+   - Light Yellow: #EDE1AC
+   ========================================================= */
+
+/* ----- Matrix Grid Input ----- */
+.matrix-grid-wrap {
+  overflow-x: auto;
+  display: inline-block;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+  background: var(--bg-secondary);
+}
+
+.matrix-grid-wrap table { border-collapse: separate; border-spacing: 6px; }
+
+.matrix-cell {
+  width: 68px;
+  height: 44px;
+  text-align: center;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: 'Fira Code', monospace;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -moz-appearance: textfield;
+}
+.matrix-cell::-webkit-inner-spin-button,
+.matrix-cell::-webkit-outer-spin-button { -webkit-appearance: none; }
+.matrix-cell:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 2px rgba(121, 193, 49, 0.30);
+  background: var(--bg-secondary);
+}
+
+/* ----- Vector Input Row ----- */
+.vector-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+/* ----- Result Matrix Display ----- */
+.result-matrix-wrap {
+  overflow-x: auto;
+  display: inline-block;
+  padding: 1rem 1.5rem;
+  background: rgba(121, 193, 49, 0.10);
+  border: 1px solid rgba(121, 193, 49, 0.30);
+  border-radius: var(--radius-md);
+}
+.result-matrix-wrap table { border-collapse: separate; border-spacing: 8px; }
+.result-cell {
+  min-width: 70px;
+  height: 42px;
+  text-align: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-highlight);
+  border-radius: 6px;
+  font-family: 'Fira Code', monospace;
+  font-weight: 600;
+  color: var(--primary-accent);
+  font-size: 1rem;
+  padding: 0 0.5rem;
+}
+
+/* ----- Step Accordion ----- */
+.step-item {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.step-item:hover { border-color: var(--border-highlight); }
+
+.step-header {
+  padding: 0.7rem 1rem;
+  background: var(--bg-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.step-header i { transition: transform 0.25s ease; font-size: 0.8rem; color: var(--text-muted); }
+.step-header.open i { transform: rotate(180deg); }
+
+.step-body {
+  padding: 0.9rem 1rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+  font-size: 0.875rem;
+  display: none;
+}
+.step-body.open { display: block; }
+.step-body .step-latex { margin-top: 0.75rem; font-size: 1rem; }
+
+/* ----- Module Page Header ----- */
+.module-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.module-header-icon {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  background: var(--primary-gradient);
+  display: flex; align-items: center; justify-content: center;
+  color: #161616; font-size: 1.5rem;
+  box-shadow: 0 4px 16px rgba(121, 193, 49, 0.35);
+  flex-shrink: 0;
+}
+
+/* ----- Control Bar ----- */
+.control-bar {
+  display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 1.25rem;
+}
+
+/* ----- Scalar Input ----- */
+.scalar-input {
+  width: 100px; height: 40px;
+  padding: 0 0.75rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: inherit; font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+.scalar-input:focus { outline: none; border-color: var(--primary-accent); }
+
+/* ----- Error / Success Alerts ----- */
+.calc-alert {
+  padding: 0.85rem 1.1rem;
+  border-radius: var(--radius-sm);
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  display: flex; align-items: flex-start; gap: 0.6rem;
+}
+.calc-alert-error {
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #fca5a5;
+}
+.calc-alert-success {
+  background: rgba(121, 193, 49, 0.15);
+  border: 1px solid rgba(121, 193, 49, 0.35);
+  color: #79C131;
+}
+
+/* ----- Loading Spinner ----- */
+.spinner-btn { display: none; }
+.btn-loading .spinner-btn { display: inline-block; }
+.btn-loading .btn-label { display: none; }
+
+/* ----- Solution Card (Linear Equations) ----- */
+.solution-card {
+  display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem;
+}
+.solution-var {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-highlight);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1.25rem;
+  text-align: center;
+  min-width: 110px;
+}
+.solution-var .var-name { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.solution-var .var-val  { font-size: 1.35rem; font-weight: 700; color: var(--primary-accent); font-family: 'Fira Code', monospace; }
+
+/* ----- Eigenvalue / Eigenvector Cards ----- */
+.eigen-pair-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 1rem;
+  transition: border-color 0.2s;
+}
+.eigen-pair-card:hover { border-color: var(--border-highlight); }
+.eigen-val-header {
+  padding: 0.6rem 1rem;
+  background: rgba(121, 193, 49, 0.16);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--primary-accent);
+}
+.eigen-vec-body {
+  padding: 0.75rem 1rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.88rem;
+}
+
+/* Responsive tweaks */
+@media (max-width: 575.98px) {
+  .matrix-cell { width: 52px; height: 40px; font-size: 0.85rem; }
+  .result-cell { min-width: 52px; font-size: 0.85rem; }
+}

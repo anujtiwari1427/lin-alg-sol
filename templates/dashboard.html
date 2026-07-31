@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | Linear Algebra Solver{% endblock %}
+
+{% block content %}
+
+{# ---- Phase / Module Notice Banner ---------------------------------------- #}
+{% if notice %}
+<div class="alert glass-panel d-flex align-items-start gap-3 mb-4 border-0"
+     style="border-left: 4px solid var(--primary-accent) !important; border-radius: var(--radius-md);"
+     role="alert">
+  <i class="fas fa-circle-info fs-4 mt-1" style="color: var(--primary-accent);"></i>
+  <div>
+    <strong>Phase Notification:</strong> {{ notice }}
+  </div>
+</div>
+{% endif %}
+
+{# ---- Page Header ---------------------------------------------------------- #}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+  <div>
+    <h3 class="fw-bold mb-1">
+      <i class="fas fa-chart-pie me-2" style="color: var(--primary-accent);"></i>
+      Workspace Dashboard
+    </h3>
+    <p class="text-secondary mb-0 small">Overview of solvers, recent calculations, and analytics.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('matrix.matrix_page') }}" class="btn-primary-custom" id="btn-new-solve">
+      <i class="fas fa-plus"></i> New Calculation
+    </a>
+  </div>
+</div>
+
+{# ---- KPI Metric Cards ----------------------------------------------------- #}
+<div class="row g-3 mb-4">
+  {# Total Calculations #}
+  <div class="col-6 col-lg-3">
+    <div class="glass-panel p-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <span class="text-muted small fw-semibold text-uppercase" style="font-size:0.7rem; letter-spacing:0.06em;">Total Solves</span>
+          <h3 class="fw-bold mt-1 mb-0">{{ stats.total_calculations if stats else 0 }}</h3>
+        </div>
+        <div class="p-2 rounded-3" style="background: rgba(99,102,241,0.15);">
+          <i class="fas fa-calculator fs-4" style="color: var(--primary-accent);"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Engine Status #}
+  <div class="col-6 col-lg-3">
+    <div class="glass-panel p-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <span class="text-muted small fw-semibold text-uppercase" style="font-size:0.7rem; letter-spacing:0.06em;">Engine</span>
+          <h3 class="fw-bold mt-1 mb-0 text-success">Online</h3>
+        </div>
+        <div class="p-2 rounded-3" style="background: rgba(34,197,94,0.15);">
+          <i class="fas fa-server fs-4 text-success"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Active Modules #}
+  <div class="col-6 col-lg-3">
+    <div class="glass-panel p-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <span class="text-muted small fw-semibold text-uppercase" style="font-size:0.7rem; letter-spacing:0.06em;">Modules</span>
+          <h3 class="fw-bold mt-1 mb-0">6</h3>
+        </div>
+        <div class="p-2 rounded-3" style="background: rgba(14,165,233,0.15);">
+          <i class="fas fa-cubes fs-4 text-info"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Math Renderer #}
+  <div class="col-6 col-lg-3">
+    <div class="glass-panel p-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <span class="text-muted small fw-semibold text-uppercase" style="font-size:0.7rem; letter-spacing:0.06em;">Renderer</span>
+          <h3 class="fw-bold mt-1 mb-0 text-primary-accent">MathJax 3</h3>
+        </div>
+        <div class="p-2 rounded-3" style="background: rgba(245,158,11,0.15);">
+          <i class="fas fa-square-root-variable fs-4 text-warning"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ---- Analytics Chart + Quick Launch --------------------------------------- #}
+<div class="row g-4 mb-4">
+  {# Activity Chart #}
+  <div class="col-lg-8">
+    <div class="glass-panel p-4 h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">
+          <i class="fas fa-chart-line me-2" style="color: var(--primary-accent);"></i>Calculation Activity
+        </h5>
+        <span class="badge bg-secondary rounded-pill">Weekly</span>
+      </div>
+      <div style="height: 250px; position: relative;">
+        <canvas id="activityChart" aria-label="Calculation activity chart" role="img"></canvas>
+      </div>
+    </div>
+  </div>
+
+  {# Quick Launch #}
+  <div class="col-lg-4">
+    <div class="glass-panel p-4 h-100">
+      <h5 class="fw-bold mb-3">
+        <i class="fas fa-bolt text-warning me-2"></i>Quick Launch
+      </h5>
+      <div class="d-flex flex-column gap-2">
+        <a href="{{ url_for('matrix.matrix_page') }}"
+           class="btn-secondary-custom justify-content-between" id="quick-matrix">
+          <span><i class="fas fa-th me-2" style="color: var(--primary-accent);"></i>Matrix Operations</span>
+          <i class="fas fa-chevron-right small text-muted"></i>
+        </a>
+        <a href="{{ url_for('determinant.determinant_page') }}"
+           class="btn-secondary-custom justify-content-between" id="quick-det">
+          <span><i class="fas fa-square-root-variable me-2 text-info"></i>Determinants (NxN)</span>
+          <i class="fas fa-chevron-right small text-muted"></i>
+        </a>
+        <a href="{{ url_for('inverse.inverse_page') }}"
+           class="btn-secondary-custom justify-content-between" id="quick-inv">
+          <span><i class="fas fa-rotate-left me-2 text-success"></i>Matrix Inverse</span>
+          <i class="fas fa-chevron-right small text-muted"></i>
+        </a>
+        <a href="{{ url_for('vector.vector_page') }}"
+           class="btn-secondary-custom justify-content-between" id="quick-vec">
+          <span><i class="fas fa-location-arrow me-2 text-warning"></i>Vector Calculator</span>
+          <i class="fas fa-chevron-right small text-muted"></i>
+        </a>
+        <a href="{{ url_for('linear_equations.linear_equations_page') }}"
+           class="btn-secondary-custom justify-content-between" id="quick-sys">
+          <span><i class="fas fa-equals me-2 text-danger"></i>Linear Systems</span>
+          <i class="fas fa-chevron-right small text-muted"></i>
+        </a>
+        <a href="{{ url_for('eigen.eigen_page') }}"
+           class="btn-secondary-custom justify-content-between" id="quick-eigen">
+          <span><i class="fas fa-wave-square me-2" style="color:#d946ef;"></i>Eigenvalues</span>
+          <i class="fas fa-chevron-right small text-muted"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ---- Recent History Table ------------------------------------------------- #}
+<div class="glass-panel p-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0">
+      <i class="fas fa-clock-rotate-left text-info me-2"></i>
+      {% if active_module == 'history' %}Full Calculation History{% else %}Recent Calculations{% endif %}
+    </h5>
+    {% if active_module != 'history' %}
+    <a href="{{ url_for('main.history_page') }}"
+       class="text-decoration-none small fw-semibold" style="color: var(--primary-accent);">
+      View All <i class="fas fa-arrow-right ms-1"></i>
+    </a>
+    {% endif %}
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0" id="historyTable">
+      <thead>
+        <tr>
+          <th style="width:60px;">#ID</th>
+          <th>Module</th>
+          <th>Operation</th>
+          <th>Input</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set display_list = history if (active_module == 'history' and history) else recent_history %}
+        {% if display_list %}
+          {% for item in display_list %}
+          <tr>
+            <td class="font-monospace text-muted small">#{{ item.id }}</td>
+            <td>
+              <span class="badge rounded-pill px-2 py-1"
+                    style="background: rgba(99,102,241,0.18); color: var(--primary-accent); border: 1px solid rgba(99,102,241,0.25);">
+                {{ item.module | capitalize }}
+              </span>
+            </td>
+            <td class="fw-semibold small">{{ item.operation }}</td>
+            <td class="font-monospace small text-secondary">
+              {{ item.input_data | string | truncate(42) }}
+            </td>
+            <td class="text-muted small">{{ item.created_at }}</td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="5" class="text-center py-5">
+              <div class="d-flex flex-column align-items-center gap-2 text-muted">
+                <i class="fas fa-calculator fs-1 opacity-25"></i>
+                <p class="mb-1 fw-semibold">No calculations yet</p>
+                <p class="small mb-0">
+                  Use any module above to perform your first calculation — it will appear here automatically.
+                </p>
+              </div>
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}Linear Equation Solver | Linear Algebra Solver{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modules.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="module-header">
+  <div class="module-header-icon">
+    <i class="fas fa-equals"></i>
+  </div>
+  <div>
+    <h3 class="fw-bold mb-1">Linear System Solver</h3>
+    <p class="text-secondary mb-0 small">Solve system of linear equations using Gaussian Elimination timeline, Cramer's Rule, and Matrix Inverse method.</p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="glass-panel p-4 h-100">
+      <h5 class="fw-bold mb-3"><i class="fas fa-sliders text-primary me-2"></i>System Setup</h5>
+
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Number of Variables</label>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-sm btn-secondary-custom vars-btn active" data-vars="2">2 Variables (x, y)</button>
+          <button type="button" class="btn btn-sm btn-secondary-custom vars-btn" data-vars="3">3 Variables (x, y, z)</button>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Solver Method</label>
+        <select id="methodSelect" class="form-select bg-secondary border-secondary text-white">
+          <option value="gaussian" selected>Gaussian Elimination</option>
+          <option value="cramer">Cramer's Rule</option>
+          <option value="matrix">Matrix Inverse Method (x = A⁻¹b)</option>
+        </select>
+      </div>
+
+      <label class="form-label small fw-semibold text-secondary mb-2">Equations Matrix [ A | b ]</label>
+      <div id="systemGridContainer" class="matrix-grid-wrap mb-4"></div>
+
+      <div class="d-flex gap-2">
+        <button id="btnCalculate" class="btn-primary-custom w-100 justify-content-center">
+          <span class="btn-label"><i class="fas fa-calculator me-1"></i> Solve Linear System</span>
+          <span class="spinner-btn"><i class="fas fa-spinner fa-spin me-1"></i> Solving...</span>
+        </button>
+        <button id="btnReset" class="btn-secondary-custom"><i class="fas fa-undo"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="glass-panel p-4 h-100">
+      <div class="text-center py-5 text-muted" id="placeholderResult">
+        <i class="fas fa-equals fs-1 mb-3 opacity-25"></i>
+        <h6>No System Solved Yet</h6>
+        <p class="small">Setup equations and click <strong>Solve Linear System</strong>.</p>
+      </div>
+
+      <div id="outputContent" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0 text-success"><i class="fas fa-check-circle me-2"></i>System Solution</h5>
+        </div>
+
+        <div id="solutionCardsContainer" class="solution-card"></div>
+
+        <div class="text-center mb-4">
+          <div id="mathJaxResult" class="fs-4 my-2"></div>
+        </div>
+
+        <h6 class="fw-bold mb-2 text-secondary"><i class="fas fa-list-ol me-2"></i>Step-by-Step Elimination Timeline</h6>
+        <div id="stepsAccordion"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  let varsCount = 2;
+  const grid = document.getElementById('systemGridContainer');
+
+  function renderSystemGrid() {
+    let html = '<table>';
+    const defaultsA = [
+      [2, 1, 5],
+      [1, -1, 1],
+      [1, 2, 3]
+    ];
+    const defaultsB = [8, 1, 14];
+
+    for (let r = 0; r < varsCount; r++) {
+      html += '<tr>';
+      for (let c = 0; c < varsCount; c++) {
+        const val = defaultsA[r][c] || 1;
+        html += `<td><input type="number" step="any" class="matrix-cell" id="coeff_${r}_${c}" value="${val}"></td>`;
+      }
+      html += `<td class="px-2 text-muted fw-bold">=</td>`;
+      html += `<td><input type="number" step="any" class="matrix-cell border-info text-info" id="const_${r}" value="${defaultsB[r] || 0}"></td>`;
+      html += '</tr>';
+    }
+    html += '</table>';
+    grid.innerHTML = html;
+  }
+
+  document.querySelectorAll('.vars-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.vars-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      varsCount = parseInt(btn.dataset.vars);
+      renderSystemGrid();
+    });
+  });
+
+  function getSystemData() {
+    const coeffs = [];
+    const consts = [];
+    for (let r = 0; r < varsCount; r++) {
+      const row = [];
+      for (let c = 0; c < varsCount; c++) {
+        row.push(parseFloat(document.getElementById(`coeff_${r}_${c}`).value) || 0);
+      }
+      coeffs.push(row);
+      consts.push(parseFloat(document.getElementById(`const_${r}`).value) || 0);
+    }
+    return { coeffs, consts };
+  }
+
+  document.getElementById('btnCalculate').addEventListener('click', () => {
+    const { coeffs, consts } = getSystemData();
+    const method = document.getElementById('methodSelect').value;
+
+    document.getElementById('btnCalculate').classList.add('btn-loading');
+
+    fetch('/api/linear-equations/calculate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ method, coefficients: coeffs, constants: consts })
+    })
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('btnCalculate').classList.remove('btn-loading');
+      if (data.success) {
+        document.getElementById('placeholderResult').style.display = 'none';
+        document.getElementById('outputContent').style.display = 'block';
+
+        const solCards = document.getElementById('solutionCardsContainer');
+        solCards.innerHTML = Object.entries(data.solution).map(([key, val]) => `
+          <div class="solution-var">
+            <div class="var-name">${key}</div>
+            <div class="var-val">${val}</div>
+          </div>
+        `).join('');
+
+        document.getElementById('mathJaxResult').innerHTML = `\\[ ${data.result_latex} \\]`;
+
+        const accordion = document.getElementById('stepsAccordion');
+        accordion.innerHTML = data.steps.map((step, idx) => `
+          <div class="step-item">
+            <div class="step-header ${idx === 0 ? 'open' : ''}" onclick="toggleStep(this)">
+              <span>${step.title}</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="step-body ${idx === 0 ? 'open' : ''}">
+              ${step.text ? `<p class="mb-2 text-secondary">${step.text}</p>` : ''}
+              ${step.latex ? `<div class="step-latex">\\[ ${step.latex} \\]</div>` : ''}
+            </div>
+          </div>
+        `).join('');
+
+        if (window.MathJax && window.MathJax.typeset) window.MathJax.typeset();
+      } else {
+        showToast(data.error, 'danger');
+      }
+    })
+    .catch(() => {
+      document.getElementById('btnCalculate').classList.remove('btn-loading');
+      showToast('Error communicating with backend.', 'danger');
+    });
+  });
+
+  document.getElementById('btnReset').addEventListener('click', () => {
+    renderSystemGrid();
+    document.getElementById('placeholderResult').style.display = 'block';
+    document.getElementById('outputContent').style.display = 'none';
+  });
+
+  renderSystemGrid();
+});
+
+function toggleStep(el) {
+  el.classList.toggle('open');
+  el.nextElementSibling.classList.toggle('open');
+  if (window.MathJax && window.MathJax.typeset) window.MathJax.typeset();
+}
+</script>
+{% endblock %}

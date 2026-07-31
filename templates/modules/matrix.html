@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+
+{% block title %}Matrix Operations | Linear Algebra Solver{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modules.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="module-header">
+  <div class="module-header-icon">
+    <i class="fas fa-th"></i>
+  </div>
+  <div>
+    <h3 class="fw-bold mb-1">Matrix Operations</h3>
+    <p class="text-secondary mb-0 small">Perform addition, subtraction, multiplication, scalar multiplication, transpose, trace, and rank calculations with step-by-step proofs.</p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Input Configuration Panel -->
+  <div class="col-lg-6">
+    <div class="glass-panel p-4 h-100">
+      <h5 class="fw-bold mb-3"><i class="fas fa-sliders text-primary me-2"></i>Matrix Setup</h5>
+      
+      <!-- Preset Dimension Selector -->
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Matrix Dimensions</label>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-sm btn-secondary-custom dim-btn active" data-rows="2" data-cols="2">2×2</button>
+          <button type="button" class="btn btn-sm btn-secondary-custom dim-btn" data-rows="3" data-cols="3">3×3</button>
+          <button type="button" class="btn btn-sm btn-secondary-custom dim-btn" data-rows="4" data-cols="4">4×4</button>
+          <button type="button" class="btn btn-sm btn-secondary-custom dim-btn" data-rows="2" data-cols="3">2×3</button>
+          <button type="button" class="btn btn-sm btn-secondary-custom dim-btn" data-rows="3" data-cols="2">3×2</button>
+        </div>
+      </div>
+
+      <!-- Matrix Inputs -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="fw-bold text-primary-accent">Matrix A</span>
+            <button class="btn btn-sm text-secondary p-0" id="randomMatA" title="Fill Random"><i class="fas fa-dice me-1"></i>Random</button>
+          </div>
+          <div id="gridContainerA" class="matrix-grid-wrap"></div>
+        </div>
+
+        <div class="col-md-6" id="matrixBSection">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="fw-bold text-info">Matrix B</span>
+            <button class="btn btn-sm text-secondary p-0" id="randomMatB" title="Fill Random"><i class="fas fa-dice me-1"></i>Random</button>
+          </div>
+          <div id="gridContainerB" class="matrix-grid-wrap"></div>
+        </div>
+      </div>
+
+      <!-- Scalar Input (Conditional) -->
+      <div class="mb-3" id="scalarInputGroup" style="display: none;">
+        <label class="form-label small fw-semibold text-secondary">Scalar Multiplier (k)</label>
+        <input type="number" id="scalarVal" class="scalar-input" value="2" step="any">
+      </div>
+
+      <!-- Operation Selector -->
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Select Operation</label>
+        <select id="operationSelect" class="form-select bg-secondary border-secondary text-white">
+          <option value="add">Matrix Addition (A + B)</option>
+          <option value="subtract">Matrix Subtraction (A − B)</option>
+          <option value="multiply" selected>Matrix Multiplication (A × B)</option>
+          <option value="scalar">Scalar Multiplication (k · A)</option>
+          <option value="transpose">Transpose (Aᵀ)</option>
+          <option value="trace">Trace (tr(A))</option>
+          <option value="rank">Rank (rank(A))</option>
+        </select>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button id="btnCalculate" class="btn-primary-custom w-100 justify-content-center">
+          <span class="btn-label"><i class="fas fa-calculator me-1"></i> Calculate Result</span>
+          <span class="spinner-btn"><i class="fas fa-spinner fa-spin me-1"></i> Calculating...</span>
+        </button>
+        <button id="btnReset" class="btn-secondary-custom"><i class="fas fa-undo"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result & Step-by-Step Proof Output -->
+  <div class="col-lg-6">
+    <div class="glass-panel p-4 h-100" id="resultContainer">
+      <div class="text-center py-5 text-muted" id="placeholderResult">
+        <i class="fas fa-square-root-variable fs-1 mb-3 opacity-25"></i>
+        <h6>No Result Generated Yet</h6>
+        <p class="small">Configure your matrix inputs on the left and click <strong>Calculate Result</strong>.</p>
+      </div>
+
+      <div id="outputContent" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0 text-success"><i class="fas fa-check-circle me-2"></i>Result Output</h5>
+          <button class="btn btn-sm btn-secondary-custom" id="btnCopyResult"><i class="fas fa-copy me-1"></i>Copy</button>
+        </div>
+
+        <div class="text-center mb-4">
+          <div id="mathJaxResult" class="fs-4 my-2"></div>
+        </div>
+
+        <h6 class="fw-bold mb-2 text-secondary"><i class="fas fa-list-ol me-2"></i>Step-by-Step Solution Proof</h6>
+        <div id="stepsAccordion"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  let rowsA = 2, colsA = 2;
+  let rowsB = 2, colsB = 2;
+
+  const gridA = document.getElementById('gridContainerA');
+  const gridB = document.getElementById('gridContainerB');
+  const opSelect = document.getElementById('operationSelect');
+  const matBSection = document.getElementById('matrixBSection');
+  const scalarGroup = document.getElementById('scalarInputGroup');
+
+  function renderGrid(container, rows, cols, prefix) {
+    let html = '<table>';
+    for (let r = 0; r < rows; r++) {
+      html += '<tr>';
+      for (let c = 0; c < cols; c++) {
+        const val = (r === c) ? 1 : 0;
+        html += `<td><input type="number" step="any" class="matrix-cell" id="${prefix}_${r}_${c}" value="${val}"></td>`;
+      }
+      html += '</tr>';
+    }
+    html += '</table>';
+    container.innerHTML = html;
+  }
+
+  function updateGrids() {
+    renderGrid(gridA, rowsA, colsA, 'A');
+    renderGrid(gridB, rowsB, colsB, 'B');
+  }
+
+  // Dimension buttons
+  document.querySelectorAll('.dim-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.dim-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      rowsA = parseInt(btn.dataset.rows);
+      colsA = parseInt(btn.dataset.cols);
+      rowsB = rowsA; colsB = colsA;
+      updateGrids();
+    });
+  });
+
+  // Operation change listener
+  opSelect.addEventListener('change', () => {
+    const op = opSelect.value;
+    if (op === 'scalar') {
+      matBSection.style.display = 'none';
+      scalarGroup.style.display = 'block';
+    } else if (['transpose', 'trace', 'rank'].includes(op)) {
+      matBSection.style.display = 'none';
+      scalarGroup.style.display = 'none';
+    } else {
+      matBSection.style.display = 'block';
+      scalarGroup.style.display = 'none';
+    }
+  });
+
+  // Random fillers
+  document.getElementById('randomMatA').addEventListener('click', () => fillRandom('A', rowsA, colsA));
+  document.getElementById('randomMatB').addEventListener('click', () => fillRandom('B', rowsB, colsB));
+
+  function fillRandom(prefix, r, c) {
+    for (let i = 0; i < r; i++) {
+      for (let j = 0; j < c; j++) {
+        const el = document.getElementById(`${prefix}_${i}_${j}`);
+        if (el) el.value = Math.floor(Math.random() * 10) - 3;
+      }
+    }
+  }
+
+  function getMatrixValues(prefix, r, c) {
+    const mat = [];
+    for (let i = 0; i < r; i++) {
+      const row = [];
+      for (let j = 0; j < c; j++) {
+        const val = parseFloat(document.getElementById(`${prefix}_${i}_${j}`).value) || 0;
+        row.push(val);
+      }
+      mat.push(row);
+    }
+    return mat;
+  }
+
+  // Calculate Action
+  document.getElementById('btnCalculate').addEventListener('click', () => {
+    const op = opSelect.value;
+    const matA = getMatrixValues('A', rowsA, colsA);
+    const matB = getMatrixValues('B', rowsB, colsB);
+    const scalar = parseFloat(document.getElementById('scalarVal').value) || 1;
+
+    const payload = { operation: op, matrix_a: matA, matrix_b: matB, scalar: scalar };
+
+    document.getElementById('btnCalculate').classList.add('btn-loading');
+
+    fetch('/api/matrix/calculate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('btnCalculate').classList.remove('btn-loading');
+      if (data.success) {
+        displayResults(data);
+      } else {
+        showToast(data.error || 'Calculation failed.', 'danger');
+      }
+    })
+    .catch(err => {
+      document.getElementById('btnCalculate').classList.remove('btn-loading');
+      showToast('Network error occurred.', 'danger');
+    });
+  });
+
+  function displayResults(data) {
+    document.getElementById('placeholderResult').style.display = 'none';
+    const output = document.getElementById('outputContent');
+    output.style.display = 'block';
+
+    const mathJaxDiv = document.getElementById('mathJaxResult');
+    mathJaxDiv.innerHTML = `\\[ ${data.result_latex} \\]`;
+
+    // Accordion steps
+    const accordion = document.getElementById('stepsAccordion');
+    accordion.innerHTML = data.steps.map((step, idx) => `
+      <div class="step-item">
+        <div class="step-header ${idx === 0 ? 'open' : ''}" onclick="toggleStep(this)">
+          <span>${step.title}</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="step-body ${idx === 0 ? 'open' : ''}">
+          ${step.text ? `<p class="mb-2 text-secondary">${step.text}</p>` : ''}
+          ${step.list ? `<ul class="small font-monospace mb-2">${step.list.map(l => `<li>${l}</li>`).join('')}</ul>` : ''}
+          ${step.latex ? `<div class="step-latex">\\[ ${step.latex} \\]</div>` : ''}
+        </div>
+      </div>
+    `).join('');
+
+    if (window.MathJax && window.MathJax.typeset) {
+      window.MathJax.typeset();
+    }
+  }
+
+  document.getElementById('btnReset').addEventListener('click', () => {
+    updateGrids();
+    document.getElementById('placeholderResult').style.display = 'block';
+    document.getElementById('outputContent').style.display = 'none';
+  });
+
+  updateGrids();
+});
+
+function toggleStep(el) {
+  el.classList.toggle('open');
+  const body = el.nextElementSibling;
+  body.classList.toggle('open');
+  if (window.MathJax && window.MathJax.typeset) {
+    window.MathJax.typeset();
+  }
+}
+</script>
+{% endblock %}

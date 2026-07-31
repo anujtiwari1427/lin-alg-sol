@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}Inverse Matrix Calculator | Linear Algebra Solver{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modules.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="module-header">
+  <div class="module-header-icon">
+    <i class="fas fa-rotate-left"></i>
+  </div>
+  <div>
+    <h3 class="fw-bold mb-1">Matrix Inverse Solver</h3>
+    <p class="text-secondary mb-0 small">Compute cofactor matrix, adjugate matrix, and inverse matrix A⁻¹ = adj(A) / det(A) with non-singular checks.</p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="glass-panel p-4 h-100">
+      <h5 class="fw-bold mb-3"><i class="fas fa-sliders text-primary me-2"></i>Matrix Input</h5>
+
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Matrix Size</label>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-sm btn-secondary-custom dim-btn active" data-size="2">2×2</button>
+          <button type="button" class="btn btn-sm btn-secondary-custom dim-btn" data-size="3">3×3</button>
+          <button type="button" class="btn btn-sm btn-secondary-custom dim-btn" data-size="4">4×4</button>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="fw-bold text-primary-accent">Matrix A</span>
+        <button class="btn btn-sm text-secondary p-0" id="btnRandom"><i class="fas fa-dice me-1"></i>Random</button>
+      </div>
+
+      <div id="gridContainer" class="matrix-grid-wrap mb-4"></div>
+
+      <div class="d-flex gap-2">
+        <button id="btnCalculate" class="btn-primary-custom w-100 justify-content-center">
+          <span class="btn-label"><i class="fas fa-calculator me-1"></i> Calculate A⁻¹</span>
+          <span class="spinner-btn"><i class="fas fa-spinner fa-spin me-1"></i> Calculating...</span>
+        </button>
+        <button id="btnReset" class="btn-secondary-custom"><i class="fas fa-undo"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="glass-panel p-4 h-100">
+      <div class="text-center py-5 text-muted" id="placeholderResult">
+        <i class="fas fa-rotate-left fs-1 mb-3 opacity-25"></i>
+        <h6>No Inverse Calculated Yet</h6>
+        <p class="small">Enter a non-singular matrix and click <strong>Calculate A⁻¹</strong>.</p>
+      </div>
+
+      <div id="outputContent" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0 text-success"><i class="fas fa-check-circle me-2"></i>Inverse Result</h5>
+        </div>
+
+        <div class="text-center mb-4">
+          <div id="mathJaxResult" class="fs-4 my-2"></div>
+        </div>
+
+        <h6 class="fw-bold mb-2 text-secondary"><i class="fas fa-list-ol me-2"></i>Derivation Steps</h6>
+        <div id="stepsAccordion"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  let size = 2;
+  const grid = document.getElementById('gridContainer');
+
+  function renderGrid() {
+    let html = '<table>';
+    for (let r = 0; r < size; r++) {
+      html += '<tr>';
+      for (let c = 0; c < size; c++) {
+        const val = (r === c) ? (r + 2) : 1;
+        html += `<td><input type="number" step="any" class="matrix-cell" id="cell_${r}_${c}" value="${val}"></td>`;
+      }
+      html += '</tr>';
+    }
+    html += '</table>';
+    grid.innerHTML = html;
+  }
+
+  document.querySelectorAll('.dim-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.dim-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      size = parseInt(btn.dataset.size);
+      renderGrid();
+    });
+  });
+
+  document.getElementById('btnRandom').addEventListener('click', () => {
+    for (let i = 0; i < size; i++) {
+      for (let j = 0; j < size; j++) {
+        document.getElementById(`cell_${i}_${j}`).value = (i === j ? 3 : 1) + Math.floor(Math.random() * 4);
+      }
+    }
+  });
+
+  document.getElementById('btnCalculate').addEventListener('click', () => {
+    const mat = [];
+    for (let i = 0; i < size; i++) {
+      const row = [];
+      for (let j = 0; j < size; j++) {
+        row.push(parseFloat(document.getElementById(`cell_${i}_${j}`).value) || 0);
+      }
+      mat.push(row);
+    }
+
+    document.getElementById('btnCalculate').classList.add('btn-loading');
+
+    fetch('/api/inverse/calculate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ matrix: mat })
+    })
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('btnCalculate').classList.remove('btn-loading');
+      if (data.success) {
+        document.getElementById('placeholderResult').style.display = 'none';
+        document.getElementById('outputContent').style.display = 'block';
+
+        document.getElementById('mathJaxResult').innerHTML = `\\[ ${data.result_latex} \\]`;
+
+        const accordion = document.getElementById('stepsAccordion');
+        accordion.innerHTML = data.steps.map((step, idx) => `
+          <div class="step-item">
+            <div class="step-header ${idx === 0 ? 'open' : ''}" onclick="toggleStep(this)">
+              <span>${step.title}</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="step-body ${idx === 0 ? 'open' : ''}">
+              ${step.text ? `<p class="mb-2 text-secondary">${step.text}</p>` : ''}
+              ${step.latex ? `<div class="step-latex">\\[ ${step.latex} \\]</div>` : ''}
+            </div>
+          </div>
+        `).join('');
+
+        if (window.MathJax && window.MathJax.typeset) window.MathJax.typeset();
+      } else {
+        showToast(data.error, 'danger');
+      }
+    })
+    .catch(() => {
+      document.getElementById('btnCalculate').classList.remove('btn-loading');
+      showToast('Error communicating with backend.', 'danger');
+    });
+  });
+
+  document.getElementById('btnReset').addEventListener('click', () => {
+    renderGrid();
+    document.getElementById('placeholderResult').style.display = 'block';
+    document.getElementById('outputContent').style.display = 'none';
+  });
+
+  renderGrid();
+});
+
+function toggleStep(el) {
+  el.classList.toggle('open');
+  el.nextElementSibling.classList.toggle('open');
+  if (window.MathJax && window.MathJax.typeset) window.MathJax.typeset();
+}
+</script>
+{% endblock %}

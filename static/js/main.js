@@ -44,47 +44,15 @@ function applyTheme(theme, save = true) {
     }
   });
 
-  if (window._activityChart) {
-    let tickClr = '#79C131';
-    if (theme === 'purple') tickClr = '#a0d2eb';
-    if (theme === 'sand') tickClr = '#e1b382';
-    if (theme === 'light') tickClr = '#8458B3';
-
-    window._activityChart.options.scales.x.ticks.color = tickClr;
-    window._activityChart.options.scales.y.ticks.color = tickClr;
-    window._activityChart.update('none');
+  // Update the dashboard chart if it exists
+  if (typeof window.updateChartTheme === 'function') {
+    window.updateChartTheme(theme);
   }
 }
 
 function initSidebar() {
-  const toggleBtn = document.getElementById('sidebarToggle');
-  const sidebar   = document.getElementById('appSidebar');
-  const overlay   = document.getElementById('sidebarOverlay');
-
-  if (!toggleBtn || !sidebar) return;
-
-  toggleBtn.addEventListener('click', () => openSidebar(sidebar, overlay));
-  if (overlay) {
-    overlay.addEventListener('click', () => closeSidebar(sidebar, overlay));
-  }
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && sidebar.classList.contains('active')) {
-      closeSidebar(sidebar, overlay);
-    }
-  });
-}
-
-function openSidebar(sidebar, overlay) {
-  sidebar.classList.add('active');
-  if (overlay) overlay.classList.add('active');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeSidebar(sidebar, overlay) {
-  sidebar.classList.remove('active');
-  if (overlay) overlay.classList.remove('active');
-  document.body.style.overflow = '';
+  // Mobile sidebar is handled by Bootstrap Offcanvas via data-bs-toggle in navbar.html.
+  // This function is kept as a hook for any future custom sidebar behaviour.
 }
 
 function highlightActiveNavLink() {

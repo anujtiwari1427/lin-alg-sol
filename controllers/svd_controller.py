@@ -1,17 +1,17 @@
 from flask import Blueprint, render_template, request, jsonify
-from services.determinant_service import DeterminantService
+from services.svd_service import SVDService
 from models.calculation import CalculationModel
 from utils.validators import validate_matrix
 
-determinant_bp = Blueprint('determinant', __name__)
+svd_bp = Blueprint('svd', __name__)
 
 
-@determinant_bp.route('/determinant')
-def determinant_page():
-    return render_template('modules/determinant.html', active_module='determinant')
+@svd_bp.route('/svd')
+def svd_page():
+    return render_template('modules/svd.html', active_module='svd')
 
 
-@determinant_bp.route('/api/determinant/calculate', methods=['POST'])
+@svd_bp.route('/api/svd/calculate', methods=['POST'])
 def calculate():
     data = request.get_json(silent=True)
     if not data:
@@ -23,12 +23,15 @@ def calculate():
         return jsonify({'success': False, 'error': err, 'error_code': 'VALIDATION_ERROR'}), 422
 
     try:
-        result = DeterminantService.calculate(matrix)
+        result = SVDService.decompose(matrix)
         if result.get('success'):
             CalculationModel.save(
-                module='Determinant', operation='det(A)',
+                module='SVD', operation='A = UΣVᵀ',
                 input_data={'matrix': matrix},
-                result_data={'determinant': result.get('result_display')}
+                result_data={
+                    'rank': result.get('rank'),
+                    'singular_values': result.get('singular_values')
+                }
             )
         return jsonify(result)
     except Exception as exc:

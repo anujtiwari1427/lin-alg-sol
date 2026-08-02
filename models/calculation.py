@@ -100,6 +100,28 @@ class CalculationModel:
         }
 
     @classmethod
+    def get_weekly_counts(cls):
+        """
+        Return a 7-element list [Mon, Tue, Wed, Thu, Fri, Sat, Sun]
+        counting calculations in the past 7 days.
+        SQLite's %w: 0=Sunday … 6=Saturday.
+        """
+        conn = get_db_connection(cls._get_path())
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT strftime('%w', created_at) AS dow, COUNT(*) AS cnt
+                FROM calculation_history
+                WHERE created_at >= date('now', '-6 days')
+                GROUP BY dow
+            """)
+            rows = {r['dow']: r['cnt'] for r in cursor.fetchall()}
+        finally:
+            conn.close()
+        # Remap SQLite %w (0=Sun) → Mon-indexed list
+        return [rows.get(str((i + 1) % 7), 0) for i in range(7)]
+
+    @classmethod
     def delete_all(cls):
         conn = get_db_connection(cls._get_path())
         try:

@@ -1,74 +1,113 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="green">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Linear Algebra Solver — Production-ready educational SaaS for matrices, determinants, vectors, linear equations, and eigenvalues with step-by-step explanations.">
-  <meta name="theme-color" content="#0f172a">
-  <title>{% block title %}Linear Algebra Solver | Production SaaS{% endblock %}</title>
 
-  <!-- Bootstrap 5 CSS -->
+  {# ── SEO Meta ─────────────────────────────────────────────────────── #}
+  <meta name="description" content="{% block meta_description %}Linear Algebra Solver — step-by-step matrices, determinants, eigenvalues, linear systems, and vectors with LaTeX proofs.{% endblock %}">
+  <meta name="theme-color" content="#161616">
+  <link rel="canonical" href="{{ request.url }}">
+
+  {# ── Open Graph ───────────────────────────────────────────────────── #}
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="{{ request.url }}">
+  <meta property="og:title"       content="{% block og_title %}Linear Algebra Solver{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Free step-by-step linear algebra calculator — matrices, determinants, eigenvalues, vectors and more with LaTeX proofs.{% endblock %}">
+  <meta property="og:image"       content="{{ url_for('static', filename='img/og-cover.png', _external=True) if False else '' }}">
+
+  {# ── Twitter Card ─────────────────────────────────────────────────── #}
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="{% block twitter_title %}Linear Algebra Solver{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}Free step-by-step linear algebra calculator — matrices, eigenvalues, vectors and more.{% endblock %}">
+
+  <title>{% block title %}Linear Algebra Solver | Free Step-by-Step Math Calculator{% endblock %}</title>
+
+  {# ── JSON-LD Structured Data ──────────────────────────────────────── #}
+  {% block jsonld %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Linear Algebra Solver",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "description": "Free step-by-step linear algebra calculator for matrices, determinants, eigenvalues, vectors, LU and SVD decompositions with LaTeX proofs.",
+    "featureList": ["Matrix operations","Determinants","Eigenvalues","Eigenvectors","LU Decomposition","SVD","Vector Calculator","Linear System Solver"],
+    "keywords": "linear algebra solver, matrix calculator, eigenvalue calculator, step by step math"
+  }
+  </script>
+  {% endblock %}
+
+  {# ── Stylesheets ──────────────────────────────────────────────────── #}
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome 6 Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <!-- Google Fonts (Inter + Fira Code) loaded inside style.css via @import -->
-  <!-- Custom Glassmorphism Styles -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
   {% block extra_css %}{% endblock %}
 
-  <!-- MathJax 3 — configure BEFORE the script loads -->
+  {# ── MathJax config (must be before the script tag) ──────────────── #}
   <script>
     window.MathJax = {
       tex: {
         inlineMath:  [['\\(', '\\)']],
         displayMath: [['$$', '$$'], ['\\[', '\\]']],
-        packages: {'[+]': ['ams']}
+        packages:    {'[+]': ['ams']}
       },
       options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] },
-      startup: { typeset: false }     // We call MathJax.typeset() manually after dynamic content
+      startup:  { typeset: false }   // We call MathJax.typeset() manually after dynamic content
     };
   </script>
 </head>
+
 <body>
-  <!-- Mobile sidebar overlay (backdrop) -->
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  {# ── Mobile sidebar (Bootstrap 5 Offcanvas) ───────────────────────── #}
+  <div class="offcanvas offcanvas-start d-lg-none" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
+    <div class="offcanvas-header" style="border-bottom:1px solid var(--border-color);">
+      <a href="{{ url_for('main.landing') }}" class="brand-logo text-decoration-none" id="mobileSidebarLabel">
+        <div class="brand-icon"><i class="fas fa-calculator"></i></div>
+        <div><span>LinAlg</span><span class="gradient-text ms-1">Solver</span></div>
+      </a>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+      {% include 'components/sidebar_nav.html' %}
+    </div>
+  </div>
 
   <div class="app-wrapper">
-    <!-- Sidebar navigation -->
+    {# ── Desktop sidebar ──────────────────────────────────────────── #}
     {% include 'components/sidebar.html' %}
 
-    <!-- Main page area -->
+    {# ── Main page area ───────────────────────────────────────────── #}
     <div class="w-100">
-      <!-- Top navigation bar -->
       {% include 'components/navbar.html' %}
 
-      <!-- Page content -->
       <main class="main-content">
         {% block content %}{% endblock %}
-
-        <!-- Shared footer -->
         {% include 'components/footer.html' %}
       </main>
     </div>
   </div>
 
-  <!-- Bootstrap 5 JS Bundle (includes Popper) -->
+  {# ── Mobile search FAB (shown only on very small screens) ─────────── #}
+  <button class="d-md-none mobile-search-fab" id="mobileSearchFab" aria-label="Search"
+          onclick="document.getElementById('globalSearchInput').scrollIntoView({behavior:'smooth'});
+                   setTimeout(()=>document.getElementById('globalSearchInput').focus(),300)">
+    <i class="fas fa-search"></i>
+  </button>
+
+  {# ── Scripts ──────────────────────────────────────────────────────── #}
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-  <!-- MathJax 3 (async) -->
-  <script id="MathJax-script" async
-          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <!-- Core application JS -->
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
   {% block extra_js %}{% endblock %}
 
-  <!-- Trigger MathJax typesetting after all scripts have been initialised -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Re-run MathJax after dynamic content might have been injected
       if (window.MathJax && window.MathJax.typeset) {
         window.MathJax.typeset();
       }

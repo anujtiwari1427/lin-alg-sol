@@ -1,6 +1,24 @@
 {% extends 'base.html' %}
 
-{% block title %}Eigenvalues & Eigenvectors | Linear Algebra Solver{% endblock %}
+{% block title %}Eigenvalue & Eigenvector Calculator — Characteristic Polynomial | Linear Algebra Solver{% endblock %}
+{% block meta_description %}Free eigenvalue and eigenvector calculator. Solves the characteristic polynomial, computes eigenspaces, and shows step-by-step LaTeX proofs for any square matrix.{% endblock %}
+{% block og_title %}Eigenvalue & Eigenvector Calculator | Linear Algebra Solver{% endblock %}
+
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Eigenvalue & Eigenvector Calculator",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free step-by-step eigenvalue and eigenvector calculator. Solves characteristic polynomial, computes eigenspaces, and shows full LaTeX proofs.",
+  "keywords": "eigenvalue calculator, eigenvector solver, characteristic polynomial, eigenspace"
+}
+</script>
+{% endblock %}
+
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/modules.css') }}">

@@ -1,6 +1,24 @@
 {% extends 'base.html' %}
 
-{% block title %}Inverse Matrix Calculator | Linear Algebra Solver{% endblock %}
+{% block title %}Matrix Inverse Calculator — Adjoint & Cofactor Method | Linear Algebra Solver{% endblock %}
+{% block meta_description %}Free matrix inverse calculator using the adjoint/cofactor method. Shows full derivation with non-zero determinant check and step-by-step LaTeX proofs.{% endblock %}
+{% block og_title %}Matrix Inverse Calculator | Linear Algebra Solver{% endblock %}
+
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Matrix Inverse Calculator",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free matrix inverse calculator using the adjoint and cofactor method with step-by-step LaTeX proofs.",
+  "keywords": "matrix inverse calculator, inverse matrix, adjoint matrix, cofactor matrix"
+}
+</script>
+{% endblock %}
+
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/modules.css') }}">

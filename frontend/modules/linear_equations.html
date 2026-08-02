@@ -1,6 +1,24 @@
 {% extends 'base.html' %}
 
-{% block title %}Linear Equation Solver | Linear Algebra Solver{% endblock %}
+{% block title %}Linear System Solver — Gaussian Elimination, Cramer's Rule | Linear Algebra Solver{% endblock %}
+{% block meta_description %}Free linear system solver using Gaussian elimination, Cramer's Rule, and matrix inverse method. Supports NxN systems with step-by-step LaTeX proofs.{% endblock %}
+{% block og_title %}Linear System Solver | Linear Algebra Solver{% endblock %}
+
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Linear System Solver",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free linear system solver supporting Gaussian elimination, Cramer's Rule, and matrix inverse method with step-by-step LaTeX proofs.",
+  "keywords": "linear system solver, Gaussian elimination, Cramer's Rule, system of equations calculator"
+}
+</script>
+{% endblock %}
+
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/modules.css') }}">

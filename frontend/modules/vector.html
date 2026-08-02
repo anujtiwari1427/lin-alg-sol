@@ -1,6 +1,24 @@
 {% extends 'base.html' %}
 
-{% block title %}Vector Calculator | Linear Algebra Solver{% endblock %}
+{% block title %}Vector Calculator — Dot Product, Cross Product, Projection | Linear Algebra Solver{% endblock %}
+{% block meta_description %}Free vector calculator. Compute dot product, cross product, magnitude, unit vector, projection, angle between vectors, and Euclidean distance with step-by-step proofs.{% endblock %}
+{% block og_title %}Vector Calculator | Linear Algebra Solver{% endblock %}
+
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Vector Calculator",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free vector calculator for dot product, cross product, magnitude, projection and angle with step-by-step LaTeX proofs.",
+  "keywords": "vector calculator, dot product calculator, cross product calculator, vector magnitude, vector projection"
+}
+</script>
+{% endblock %}
+
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/modules.css') }}">

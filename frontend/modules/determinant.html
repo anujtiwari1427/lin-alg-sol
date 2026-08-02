@@ -1,6 +1,24 @@
 {% extends 'base.html' %}
 
-{% block title %}Determinant Calculator | Linear Algebra Solver{% endblock %}
+{% block title %}Determinant Calculator — Cofactor Expansion & Laplace (NxN) | Linear Algebra Solver{% endblock %}
+{% block meta_description %}Free NxN determinant calculator with step-by-step cofactor expansion and Laplace expansion. Shows every sub-determinant with full LaTeX proofs.{% endblock %}
+{% block og_title %}Determinant Calculator | Linear Algebra Solver{% endblock %}
+
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Matrix Determinant Calculator",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free NxN determinant calculator using cofactor expansion and Laplace expansion with full step-by-step LaTeX proofs.",
+  "keywords": "determinant calculator, cofactor expansion, Laplace expansion, matrix determinant"
+}
+</script>
+{% endblock %}
+
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/modules.css') }}">

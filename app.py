@@ -1,6 +1,6 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, make_response, request, g
 from config import Config
-from database.db import init_db
+from database.db import get_db_connection, init_db
 from controllers.main_controller import main_bp
 from controllers.matrix_controller import matrix_bp
 from controllers.determinant_controller import determinant_bp
@@ -8,6 +8,9 @@ from controllers.inverse_controller import inverse_bp
 from controllers.vector_controller import vector_bp
 from controllers.linear_equations_controller import linear_equations_bp
 from controllers.eigen_controller import eigen_bp
+from controllers.lu_controller import lu_bp
+from controllers.svd_controller import svd_bp
+from datetime import date
 
 
 def create_app(config_class=Config):
@@ -16,20 +19,27 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
 
     # Propagate runtime DB path to the model layer for test isolation
-    db_path = getattr(config_class, 'DATABASE_PATH', None)
-    if db_path:
-        from models.calculation import CalculationModel
-        CalculationModel._db_path = db_path
+    from models.calculation import CalculationModel
+    CalculationModel._db_path = config_class.get_db_path()
 
     # Initialize SQLite schema
-    init_db(db_path)
+    init_db(config_class.get_db_path())
 
     # Register all blueprints
     for bp in (main_bp, matrix_bp, determinant_bp, inverse_bp,
-               vector_bp, linear_equations_bp, eigen_bp):
+               vector_bp, linear_equations_bp, eigen_bp,
+               lu_bp, svd_bp):
         app.register_blueprint(bp)
 
-    # Error handlers
+    # ── Request-scoped DB connection via Flask g ──────────────────────
+    def teardown_db(exception):
+        db = g.pop('db', None)
+        if db is not None:
+            db.close()
+
+    app.teardown_appcontext(teardown_db)
+
+    # ── Error handlers ────────────────────────────────────────────────
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template('errors/404.html'), 404
@@ -38,10 +48,58 @@ def create_app(config_class=Config):
     def internal_server_error(e):
         return render_template('errors/500.html'), 500
 
-    # Health-check
+    # ── Health-check ──────────────────────────────────────────────────
     @app.route('/health')
     def health_check():
-        return jsonify({'status': 'healthy', 'version': app.config.get('APP_VERSION', '1.0.0')}), 200
+        return jsonify({
+            'status':  'healthy',
+            'version': app.config.get('APP_VERSION', '2.0.0')
+        }), 200
+
+    # ── Weekly activity data for dashboard chart ──────────────────────
+    @app.route('/api/stats/weekly')
+    def weekly_stats():
+        try:
+            from models.calculation import CalculationModel
+            counts = CalculationModel.get_weekly_counts()
+        except Exception:
+            counts = [0] * 7
+        return jsonify({'counts': counts})
+
+    # ── Sitemap ───────────────────────────────────────────────────────
+    SITEMAP_URLS = [
+        ('/',                  '1.0', 'weekly'),
+        ('/dashboard',         '0.8', 'daily'),
+        ('/matrix',            '0.9', 'monthly'),
+        ('/determinant',       '0.9', 'monthly'),
+        ('/inverse',           '0.9', 'monthly'),
+        ('/vector',            '0.9', 'monthly'),
+        ('/linear-equations',  '0.9', 'monthly'),
+        ('/eigen',             '0.9', 'monthly'),
+        ('/lu',                '0.9', 'monthly'),
+        ('/svd',               '0.9', 'monthly'),
+        ('/learning',          '0.7', 'monthly'),
+    ]
+
+    @app.route('/sitemap.xml')
+    def sitemap():
+        base  = request.url_root.rstrip('/')
+        today = date.today().isoformat()
+        urls  = '\n'.join(
+            f"""  <url>\n    <loc>{base}{loc}</loc>\n    <lastmod>{today}</lastmod>"""
+            f"""\n    <changefreq>{freq}</changefreq>\n    <priority>{pri}</priority>\n  </url>"""
+            for loc, pri, freq in SITEMAP_URLS
+        )
+        xml = f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}\n</urlset>'
+        resp = make_response(xml)
+        resp.headers['Content-Type'] = 'application/xml'
+        return resp
+
+    @app.route('/robots.txt')
+    def robots():
+        base = request.url_root.rstrip('/')
+        txt  = f'User-agent: *\nAllow: /\nSitemap: {base}/sitemap.xml\n'
+        return make_response(txt, 200, {'Content-Type': 'text/plain'})
 
     return app
 

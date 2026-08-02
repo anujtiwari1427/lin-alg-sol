@@ -1,5 +1,5 @@
-<!-- Sidebar Navigation Component -->
-<aside class="sidebar" id="appSidebar">
+<!-- Sidebar Navigation Component (desktop) -->
+<aside class="sidebar d-none d-lg-flex" id="appSidebar">
   <div class="sidebar-header">
     <a href="{{ url_for('main.landing') }}" class="brand-logo">
       <div class="brand-icon">
@@ -11,51 +11,5 @@
     </a>
   </div>
 
-  <div class="sidebar-nav">
-    <div class="nav-section-title">Overview</div>
-    <a href="{{ url_for('main.dashboard') }}" class="sidebar-link {% if request.path == '/dashboard' %}active{% endif %}">
-      <i class="fas fa-chart-pie"></i>
-      <span>Dashboard</span>
-    </a>
-    <a href="{{ url_for('main.landing') }}" class="sidebar-link {% if request.path == '/' %}active{% endif %}">
-      <i class="fas fa-compass"></i>
-      <span>Landing Page</span>
-    </a>
-
-    <div class="nav-section-title">Core Modules</div>
-    <a href="{{ url_for('matrix.matrix_page') }}" class="sidebar-link {% if request.path == '/matrix' %}active{% endif %}">
-      <i class="fas fa-th"></i>
-      <span>Matrix Operations</span>
-    </a>
-    <a href="{{ url_for('determinant.determinant_page') }}" class="sidebar-link {% if request.path == '/determinant' %}active{% endif %}">
-      <i class="fas fa-square-root-variable"></i>
-      <span>Determinants</span>
-    </a>
-    <a href="{{ url_for('inverse.inverse_page') }}" class="sidebar-link {% if request.path == '/inverse' %}active{% endif %}">
-      <i class="fas fa-rotate-left"></i>
-      <span>Matrix Inverse</span>
-    </a>
-    <a href="{{ url_for('vector.vector_page') }}" class="sidebar-link {% if request.path == '/vector' %}active{% endif %}">
-      <i class="fas fa-location-arrow"></i>
-      <span>Vector Calculator</span>
-    </a>
-    <a href="{{ url_for('linear_equations.linear_equations_page') }}" class="sidebar-link {% if request.path == '/linear-equations' %}active{% endif %}">
-      <i class="fas fa-equals"></i>
-      <span>Linear Systems</span>
-    </a>
-    <a href="{{ url_for('eigen.eigen_page') }}" class="sidebar-link {% if request.path == '/eigen' %}active{% endif %}">
-      <i class="fas fa-wave-square"></i>
-      <span>Eigenvalues & Vectors</span>
-    </a>
-
-    <div class="nav-section-title">Resources & Analytics</div>
-    <a href="{{ url_for('main.learning_module') }}" class="sidebar-link {% if request.path == '/learning' %}active{% endif %}">
-      <i class="fas fa-graduation-cap"></i>
-      <span>Learning Center</span>
-    </a>
-    <a href="{{ url_for('main.history_page') }}" class="sidebar-link {% if request.path == '/history' %}active{% endif %}">
-      <i class="fas fa-history"></i>
-      <span>Calculation History</span>
-    </a>
-  </div>
+  {% include 'components/sidebar_nav.html' %}
 </aside>

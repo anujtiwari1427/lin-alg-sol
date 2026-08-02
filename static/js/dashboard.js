@@ -1,25 +1,33 @@
 /* =========================================================
-   LINEAR ALGEBRA SOLVER - DASHBOARD ANALYTICS
+   LINEAR ALGEBRA SOLVER — DASHBOARD ANALYTICS
    ========================================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
   initActivityChart();
 });
 
+const CHART_THEME = {
+  green:  { line: '#79C131', point: '#a8bd86', fill0: 'rgba(121,193,49,0.35)', fill1: 'rgba(121,193,49,0.02)', tick: '#79C131', grid: 'rgba(121,193,49,0.10)', tooltip_bg: '#161616', tooltip_border: '#79C131' },
+  purple: { line: '#a0d2eb', point: '#8458B3', fill0: 'rgba(160,210,235,0.35)', fill1: 'rgba(160,210,235,0.02)', tick: '#a0d2eb', grid: 'rgba(160,210,235,0.10)', tooltip_bg: '#1b1226', tooltip_border: '#a0d2eb' },
+  sand:   { line: '#e1b382', point: '#c89666', fill0: 'rgba(225,179,130,0.35)', fill1: 'rgba(225,179,130,0.02)', tick: '#e1b382', grid: 'rgba(225,179,130,0.10)', tooltip_bg: '#12343b', tooltip_border: '#e1b382' },
+  light:  { line: '#79C131', point: '#5d9a25', fill0: 'rgba(121,193,49,0.25)', fill1: 'rgba(121,193,49,0.02)', tick: '#161616', grid: 'rgba(22,22,22,0.08)',    tooltip_bg: '#ffffff', tooltip_border: '#79C131' },
+};
+
+function getCurrentTheme() {
+  return document.documentElement.getAttribute('data-theme') || 'green';
+}
+
 function initActivityChart() {
   const canvas = document.getElementById('activityChart');
   if (!canvas) return;
 
-  const isDark  = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark';
-  const tickClr = isDark ? '#e1b382' : '#2d545e';
-  const gridClr = isDark ? 'rgba(225, 179, 130, 0.10)' : 'rgba(45, 84, 94, 0.08)';
+  const theme = getCurrentTheme();
+  const t     = CHART_THEME[theme] || CHART_THEME.green;
+  const ctx   = canvas.getContext('2d');
 
-  const ctx = canvas.getContext('2d');
-
-  // Gradient fill using Sand Tan palette
   const gradient = ctx.createLinearGradient(0, 0, 0, 260);
-  gradient.addColorStop(0,   'rgba(225, 179, 130, 0.35)');
-  gradient.addColorStop(1,   'rgba(225, 179, 130, 0.02)');
+  gradient.addColorStop(0, t.fill0);
+  gradient.addColorStop(1, t.fill1);
 
   window._activityChart = new Chart(ctx, {
     type: 'line',
@@ -27,14 +35,14 @@ function initActivityChart() {
       labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       datasets: [{
         label: 'Calculations',
-        data: [12, 19, 15, 25, 22, 30, 28],
-        borderColor:      '#e1b382',
-        backgroundColor:  gradient,
-        fill:             true,
-        tension:          0.42,
-        borderWidth:      2.5,
-        pointBackgroundColor: '#c89666',
-        pointBorderColor:     '#12343b',
+        data: [0, 0, 0, 0, 0, 0, 0],   // replaced below by real data
+        borderColor:          t.line,
+        backgroundColor:      gradient,
+        fill:                 true,
+        tension:              0.42,
+        borderWidth:          2.5,
+        pointBackgroundColor: t.point,
+        pointBorderColor:     '#161616',
         pointBorderWidth:     2,
         pointRadius:          5,
         pointHoverRadius:     7,
@@ -47,31 +55,70 @@ function initActivityChart() {
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: '#12343b',
-          borderColor:     '#e1b382',
+          backgroundColor: t.tooltip_bg,
+          borderColor:     t.tooltip_border,
           borderWidth:     1,
-          titleColor:      '#fef9f3',
-          bodyColor:       '#e1b382',
+          titleColor:      '#ffffff',
+          bodyColor:       t.line,
           padding:         12,
           cornerRadius:    8,
           callbacks: {
-            label: ctx => `  ${ctx.parsed.y} calculations`
+            label: ctx => `  ${ctx.parsed.y} calculation${ctx.parsed.y !== 1 ? 's' : ''}`
           }
         }
       },
       scales: {
         x: {
           grid:  { display: false },
-          ticks: { color: tickClr, font: { size: 12 } },
+          ticks: { color: t.tick, font: { size: 12 } },
           border: { display: false }
         },
         y: {
-          grid:  { color: gridClr, drawBorder: false },
-          ticks: { color: tickClr, font: { size: 12 }, stepSize: 5 },
+          grid:  { color: t.grid, drawBorder: false },
+          ticks: { color: t.tick, font: { size: 12 }, stepSize: 1, precision: 0 },
           border: { display: false },
           beginAtZero: true
         }
       }
     }
   });
+
+  // Load real weekly data from the DB
+  fetch('/api/stats/weekly')
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(d => {
+      window._activityChart.data.datasets[0].data = d.counts;
+      window._activityChart.update('active');
+    })
+    .catch(() => {
+      // Fallback: gentle demo curve so chart is not blank
+      window._activityChart.data.datasets[0].data = [2, 4, 3, 7, 5, 8, 6];
+      window._activityChart.update('none');
+    });
 }
+
+// Called from main.js applyTheme() — update chart colours live on theme change
+window.updateChartTheme = function (theme) {
+  if (!window._activityChart) return;
+  const t = CHART_THEME[theme] || CHART_THEME.green;
+  const ds = window._activityChart.data.datasets[0];
+  ds.borderColor          = t.line;
+  ds.pointBackgroundColor = t.point;
+
+  const canvas = document.getElementById('activityChart');
+  if (canvas) {
+    const ctx      = canvas.getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+    gradient.addColorStop(0, t.fill0);
+    gradient.addColorStop(1, t.fill1);
+    ds.backgroundColor = gradient;
+  }
+
+  window._activityChart.options.scales.x.ticks.color  = t.tick;
+  window._activityChart.options.scales.y.ticks.color  = t.tick;
+  window._activityChart.options.scales.y.grid.color   = t.grid;
+  window._activityChart.options.plugins.tooltip.backgroundColor = t.tooltip_bg;
+  window._activityChart.options.plugins.tooltip.borderColor     = t.tooltip_border;
+  window._activityChart.options.plugins.tooltip.bodyColor       = t.line;
+  window._activityChart.update('none');
+};

@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block title %}LU Decomposition Calculator — PA = LU Factorisation | Linear Algebra Solver{% endblock %}
+{% block meta_description %}Free LU decomposition calculator. Factors any square matrix as PA = LU using partial pivoting. Shows permutation, lower-triangular L, upper-triangular U with step-by-step LaTeX proofs.{% endblock %}
+{% block og_title %}LU Decomposition Calculator | Linear Algebra Solver{% endblock %}
+
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "LU Decomposition Calculator",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free LU decomposition calculator. Factors square matrices as PA = LU with step-by-step LaTeX proofs.",
+  "keywords": "LU decomposition, LU factorisation, matrix factorisation, Doolittle, partial pivoting"
+}
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modules.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="module-header">
+  <div class="module-header-icon">
+    <i class="fas fa-layer-group"></i>
+  </div>
+  <div>
+    <h3 class="fw-bold mb-1">LU Decomposition</h3>
+    <p class="text-secondary mb-0 small">
+      Factors a square matrix A as PA = LU using partial pivoting. P is the permutation matrix,
+      L is lower-triangular (diagonal = 1), U is upper-triangular (row echelon form).
+    </p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Input Panel -->
+  <div class="col-lg-6">
+    <div class="glass-panel p-4 h-100">
+      <h5 class="fw-bold mb-3"><i class="fas fa-sliders text-primary me-2"></i>Matrix Setup</h5>
+
+      <!-- Dimension Selector -->
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Square Matrix Dimension</label>
+        <div class="d-flex gap-2 flex-wrap">
+          <button type="button" class="btn btn-sm btn-secondary-custom lu-dim-btn active" data-n="2" id="lu-dim-2">2×2</button>
+          <button type="button" class="btn btn-sm btn-secondary-custom lu-dim-btn" data-n="3" id="lu-dim-3">3×3</button>
+          <button type="button" class="btn btn-sm btn-secondary-custom lu-dim-btn" data-n="4" id="lu-dim-4">4×4</button>
+        </div>
+      </div>
+
+      <!-- Matrix A Input -->
+      <div class="mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="fw-bold text-primary-accent">Matrix A (Square)</span>
+          <button class="btn btn-sm text-secondary p-0" id="luRandomBtn"><i class="fas fa-dice me-1"></i>Random</button>
+        </div>
+        <div id="luGridContainer" class="matrix-grid-wrap"></div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button id="luCalculateBtn" class="btn-primary-custom w-100 justify-content-center">
+          <span class="btn-label"><i class="fas fa-layer-group me-1"></i> Decompose PA = LU</span>
+          <span class="spinner-btn"><i class="fas fa-spinner fa-spin me-1"></i> Computing…</span>
+        </button>
+        <button id="luResetBtn" class="btn-secondary-custom"><i class="fas fa-undo"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result Panel -->
+  <div class="col-lg-6">
+    <div class="glass-panel p-4 h-100" id="luResultContainer">
+      <div class="text-center py-5 text-muted" id="luPlaceholder">
+        <i class="fas fa-layer-group fs-1 mb-3 opacity-25"></i>
+        <h6>No Decomposition Yet</h6>
+        <p class="small">Select matrix dimension, fill in values, and click <strong>Decompose</strong>.</p>
+      </div>
+
+      <div id="luOutputContent" style="display:none;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0 text-success"><i class="fas fa-check-circle me-2"></i>LU Result</h5>
+          <span class="badge bg-secondary" id="luResidualBadge"></span>
+        </div>
+
+        <!-- Factor matrices -->
+        <div class="row g-3 mb-3" id="luMatricesRow"></div>
+
+        <!-- Steps -->
+        <h6 class="fw-bold mb-2 text-secondary"><i class="fas fa-list-ol me-2"></i>Step-by-Step Proof</h6>
+        <div id="luStepsAccordion"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  let n = 2;
+  const grid = document.getElementById('luGridContainer');
+
+  function renderGrid(size) {
+    n = size;
+    let html = '<table>';
+    for (let r = 0; r < n; r++) {
+      html += '<tr>';
+      for (let c = 0; c < n; c++) {
+        const v = (r === c) ? 1 : 0;
+        html += `<td><input type="number" step="any" class="matrix-cell" id="lu_${r}_${c}" value="${v}" aria-label="Row ${r+1} Col ${c+1}"></td>`;
+      }
+      html += '</tr>';
+    }
+    html += '</table>';
+    grid.innerHTML = html;
+  }
+
+  // Dimension buttons
+  document.querySelectorAll('.lu-dim-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.lu-dim-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderGrid(parseInt(btn.dataset.n));
+      resetOutput();
+    });
+  });
+
+  document.getElementById('luRandomBtn').addEventListener('click', () => {
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+      const el = document.getElementById(`lu_${r}_${c}`);
+      if (el) el.value = Math.floor(Math.random() * 9) - 2;
+    }
+  });
+
+  function getMatrix() {
+    const m = [];
+    for (let r = 0; r < n; r++) {
+      const row = [];
+      for (let c = 0; c < n; c++) {
+        row.push(parseFloat(document.getElementById(`lu_${r}_${c}`).value) || 0);
+      }
+      m.push(row);
+    }
+    return m;
+  }
+
+  function resetOutput() {
+    document.getElementById('luPlaceholder').style.display = 'block';
+    document.getElementById('luOutputContent').style.display = 'none';
+  }
+
+  document.getElementById('luResetBtn').addEventListener('click', () => {
+    renderGrid(n);
+    resetOutput();
+  });
+
+  document.getElementById('luCalculateBtn').addEventListener('click', () => {
+    const btn = document.getElementById('luCalculateBtn');
+    btn.classList.add('btn-loading');
+
+    fetch('/api/lu/calculate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ matrix: getMatrix() })
+    })
+    .then(r => r.json())
+    .then(data => {
+      btn.classList.remove('btn-loading');
+      if (data.success) {
+        displayLUResult(data);
+      } else {
+        showToast(data.error || 'Decomposition failed.', 'danger');
+      }
+    })
+    .catch(() => {
+      btn.classList.remove('btn-loading');
+      showToast('Network error occurred.', 'danger');
+    });
+  });
+
+  function matrixCard(name, display, color) {
+    const rows = display.map(row =>
+      `<tr>${row.map(v => `<td class="result-cell" style="color:${color};">${v}</td>`).join('')}</tr>`
+    ).join('');
+    return `
+      <div class="col-12 col-md-4">
+        <div class="text-center mb-2">
+          <span class="fw-bold fs-5" style="color:${color};">${name}</span>
+        </div>
+        <div class="result-matrix-wrap d-inline-block w-100 text-center" style="border-color:${color}33;">
+          <table class="mx-auto">${rows}</table>
+        </div>
+      </div>`;
+  }
+
+  function displayLUResult(data) {
+    document.getElementById('luPlaceholder').style.display = 'none';
+    const out = document.getElementById('luOutputContent');
+    out.style.display = 'block';
+
+    const res = data.residual;
+    document.getElementById('luResidualBadge').textContent =
+      `Residual: ${res < 1e-8 ? res.toExponential(1) : res.toFixed(6)}`;
+
+    document.getElementById('luMatricesRow').innerHTML =
+      matrixCard('P', data.P_display, '#a0d2eb') +
+      matrixCard('L', data.L_display, '#79C131') +
+      matrixCard('U', data.U_display, '#e1b382');
+
+    const acc = document.getElementById('luStepsAccordion');
+    acc.innerHTML = data.steps.map((step, idx) => `
+      <div class="step-item">
+        <div class="step-header ${idx === 0 ? 'open' : ''}" onclick="toggleStep(this)">
+          <span>${step.title}</span><i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="step-body ${idx === 0 ? 'open' : ''}">
+          ${step.text ? `<p class="mb-2 text-secondary">${step.text}</p>` : ''}
+          ${step.latex ? `<div class="step-latex">\\[ ${step.latex} \\]</div>` : ''}
+        </div>
+      </div>`).join('');
+
+    if (window.MathJax && MathJax.typeset) MathJax.typeset();
+  }
+
+  renderGrid(n);
+});
+</script>
+{% endblock %}

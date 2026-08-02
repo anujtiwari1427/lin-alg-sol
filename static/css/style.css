@@ -176,7 +176,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .glass-panel:hover {
   border-color: var(--border-highlight);
-  box-shadow: 0 12px 40px rgba(121, 193, 49, 0.22);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
 }
 
 .glass-nav {
@@ -298,29 +298,15 @@ h1, h2, h3, h4, h5, h6 {
   overflow-y: auto;
 }
 
+/* Desktop sidebar is always visible; mobile uses Bootstrap Offcanvas */
 @media (max-width: 991.98px) {
   .sidebar {
-    transform: translateX(-100%);
-    box-shadow: none;
-  }
-  .sidebar.active {
-    transform: translateX(0);
-    box-shadow: 4px 0 30px rgba(0, 0, 0, 0.5);
+    display: none !important;
   }
 }
 
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(22, 22, 22, 0.75);
-  z-index: 1005;
-  backdrop-filter: blur(3px);
-}
+.sidebar-overlay { display: none; }
 
-.sidebar-overlay.active {
-  display: block;
-}
 
 .sidebar-header {
   height: var(--navbar-height);
@@ -664,6 +650,15 @@ h1, h2, h3, h4, h5, h6 {
   animation: fadeInUp 0.5s ease forwards;
 }
 
+/* Page-enter staggered animation for main content children */
+.main-content > * {
+  animation: fadeInUp 0.45s ease both;
+}
+.main-content > *:nth-child(2) { animation-delay: 0.07s; }
+.main-content > *:nth-child(3) { animation-delay: 0.14s; }
+.main-content > *:nth-child(4) { animation-delay: 0.21s; }
+.main-content > *:nth-child(5) { animation-delay: 0.28s; }
+
 /* ---------------------------------------------------------
    Utility
    --------------------------------------------------------- */
@@ -751,3 +746,51 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+/* Very small phones < 420px: hide search bar, show FAB instead */
+@media (max-width: 420px) {
+  .search-bar-container {
+    display: none;
+  }
+  .top-navbar {
+    gap: 0.5rem !important;
+  }
+}
+
+/* ---------------------------------------------------------
+   Mobile Search FAB
+   --------------------------------------------------------- */
+.mobile-search-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  z-index: 1060;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--primary-gradient);
+  border: none;
+  box-shadow: 0 4px 20px rgba(121, 193, 49, 0.50);
+  color: #161616;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.mobile-search-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 28px rgba(121, 193, 49, 0.70);
+}
+
+/* ---------------------------------------------------------
+   Bootstrap Offcanvas sidebar dark theming
+   --------------------------------------------------------- */
+.offcanvas {
+  background: var(--bg-glass) !important;
+  border-right: 1px solid var(--border-color) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  max-width: 280px;
+}
+.offcanvas .btn-close { filter: invert(1); }

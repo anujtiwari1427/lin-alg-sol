@@ -18,5 +18,10 @@ class Config:
     
     # Application Settings
     APP_NAME = "Linear Algebra Solver"
-    APP_VERSION = "1.0.0"
-    THEME_DEFAULT = "dark"
+    APP_VERSION = "2.0.0"
+    THEME_DEFAULT = "green"
+
+    @classmethod
+    def get_db_path(cls):
+        """Return the resolved database path for use by models."""
+        return cls.DATABASE_PATH

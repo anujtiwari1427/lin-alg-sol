@@ -1,17 +1,17 @@
 from flask import Blueprint, render_template, request, jsonify
-from services.determinant_service import DeterminantService
+from services.lu_service import LUService
 from models.calculation import CalculationModel
 from utils.validators import validate_matrix
 
-determinant_bp = Blueprint('determinant', __name__)
+lu_bp = Blueprint('lu', __name__)
 
 
-@determinant_bp.route('/determinant')
-def determinant_page():
-    return render_template('modules/determinant.html', active_module='determinant')
+@lu_bp.route('/lu')
+def lu_page():
+    return render_template('modules/lu.html', active_module='lu')
 
 
-@determinant_bp.route('/api/determinant/calculate', methods=['POST'])
+@lu_bp.route('/api/lu/calculate', methods=['POST'])
 def calculate():
     data = request.get_json(silent=True)
     if not data:
@@ -23,12 +23,12 @@ def calculate():
         return jsonify({'success': False, 'error': err, 'error_code': 'VALIDATION_ERROR'}), 422
 
     try:
-        result = DeterminantService.calculate(matrix)
+        result = LUService.decompose(matrix)
         if result.get('success'):
             CalculationModel.save(
-                module='Determinant', operation='det(A)',
+                module='LU', operation='PA = LU',
                 input_data={'matrix': matrix},
-                result_data={'determinant': result.get('result_display')}
+                result_data={'L': result.get('L_display'), 'U': result.get('U_display')}
             )
         return jsonify(result)
     except Exception as exc:

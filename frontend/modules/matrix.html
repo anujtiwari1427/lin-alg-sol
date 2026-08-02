@@ -1,6 +1,23 @@
 {% extends 'base.html' %}
 
-{% block title %}Matrix Operations | Linear Algebra Solver{% endblock %}
+{% block title %}Matrix Calculator — Add, Multiply, Transpose, Rank | Linear Algebra Solver{% endblock %}
+{% block meta_description %}Free NxN matrix calculator. Compute matrix addition, subtraction, multiplication, scalar multiplication, transpose, rank, and trace with step-by-step LaTeX proofs.{% endblock %}
+{% block og_title %}Matrix Calculator | Linear Algebra Solver{% endblock %}
+
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Matrix Operations Calculator",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free NxN matrix calculator with step-by-step LaTeX proofs for addition, subtraction, multiplication, transpose, rank and trace.",
+  "keywords": "matrix calculator, matrix multiplication, matrix addition, matrix transpose, rank calculator"
+}
+</script>
+{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/modules.css') }}">

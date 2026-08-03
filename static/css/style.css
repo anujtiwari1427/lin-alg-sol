@@ -96,6 +96,26 @@
 }
 
 /* ---------------------------------------------------------
+   CSS Custom Properties — Rich Turquoise & Sweet Cream Theme
+   --------------------------------------------------------- */
+[data-theme="turquoise"] {
+  --bg-primary:       #06423d;
+  --bg-secondary:     #0a544e;
+  --bg-card:          rgba(10, 84, 78, 0.78);
+  --bg-glass:         rgba(6, 66, 61, 0.88);
+  --border-color:     rgba(255, 234, 207, 0.25);
+  --border-highlight: #FFEACF;
+
+  --text-primary:   #FFEACF;
+  --text-secondary: #5eead4;
+  --text-muted:     #9cd6cf;
+
+  --primary-accent:   #FFEACF;
+  --primary-gradient: linear-gradient(135deg, #0A756C 0%, #2dd4bf 50%, #FFEACF 100%);
+  --hero-gradient:    radial-gradient(ellipse at 50% 0%, rgba(10, 117, 108, 0.50) 0%, rgba(255, 234, 207, 0.22) 50%, #06423d 85%);
+}
+
+/* ---------------------------------------------------------
    CSS Custom Properties — Light Mode Override
    --------------------------------------------------------- */
 [data-theme="light"] {

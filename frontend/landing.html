@@ -7,6 +7,496 @@
 {% block og_title %}Free Linear Algebra Solver — Step-by-Step Math Calculator{% endblock %}
 {% block twitter_title %}Free Linear Algebra Solver — Step-by-Step Math Calculator{% endblock %}
 
+{% block extra_css %}
+<style>
+/* ─── Landing Page Exclusive Styles ─────────────────────────────── */
+
+/* Animated floating particles background */
+.hero-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.hero-particle {
+  position: absolute;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--primary-accent);
+  opacity: 0;
+  animation: particleDrift var(--dur, 8s) var(--delay, 0s) ease-in-out infinite;
+}
+@keyframes particleDrift {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.8); }
+  20%  { opacity: 0.7; }
+  80%  { opacity: 0.5; }
+  100% { opacity: 0; transform: translate(var(--tx, 60px), var(--ty, -120px)) scale(1.2); }
+}
+
+/* Hero section upgrade */
+.hero-landing {
+  position: relative;
+  padding: 6rem 2rem 5rem;
+  text-align: center;
+  background: var(--hero-gradient);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(12px);
+}
+.hero-landing .hero-content { position: relative; z-index: 2; }
+
+/* Animated glowing orbs */
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.35;
+  animation: orbPulse 6s ease-in-out infinite;
+}
+.glow-orb-1 {
+  width: 380px; height: 380px;
+  background: var(--primary-accent);
+  top: -120px; right: -80px;
+  animation-delay: 0s;
+}
+.glow-orb-2 {
+  width: 280px; height: 280px;
+  background: var(--text-primary);
+  bottom: -80px; left: -60px;
+  animation-delay: 3s;
+  opacity: 0.15;
+}
+@keyframes orbPulse {
+  0%, 100% { transform: scale(1); opacity: 0.35; }
+  50%       { transform: scale(1.12); opacity: 0.48; }
+}
+
+/* Hero pill badge */
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.16);
+  backdrop-filter: blur(8px);
+  padding: 0.45rem 1.1rem;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+.hero-pill .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--primary-accent);
+  box-shadow: 0 0 8px var(--primary-accent);
+  animation: dotBlink 2s ease-in-out infinite;
+}
+@keyframes dotBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* Hero title upgrade */
+.hero-landing .hero-title {
+  font-size: clamp(2.4rem, 5.5vw, 4rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.03em;
+}
+
+/* Typewriter underline effect */
+.hero-underline {
+  position: relative;
+  display: inline-block;
+}
+.hero-underline::after {
+  content: '';
+  position: absolute;
+  bottom: 2px; left: 0;
+  width: 100%; height: 3px;
+  background: var(--primary-gradient);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: underlineSlide 1s 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes underlineSlide {
+  to { transform: scaleX(1); }
+}
+
+/* CTA Buttons upgrade */
+.btn-hero-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--primary-gradient);
+  color: #111 !important;
+  border: none;
+  padding: 0.9rem 2rem;
+  border-radius: 100px;
+  font-weight: 800;
+  font-size: 1rem;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25), 0 0 0 0 var(--primary-accent);
+  position: relative;
+  overflow: hidden;
+}
+.btn-hero-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.12);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.btn-hero-primary:hover::before { opacity: 1; }
+.btn-hero-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.3), 0 0 0 4px rgba(var(--primary-accent-rgb, 121,193,49), 0.2);
+}
+.btn-hero-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: transparent;
+  color: var(--text-primary) !important;
+  border: 1.5px solid var(--border-color);
+  padding: 0.9rem 2rem;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 1rem;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(8px);
+}
+.btn-hero-secondary:hover {
+  border-color: var(--primary-accent);
+  color: var(--primary-accent) !important;
+  background: rgba(255,255,255,0.05);
+  transform: translateY(-2px);
+}
+
+/* Demo sandbox card */
+.demo-sandbox {
+  background: var(--bg-card);
+  border: 1px solid var(--border-highlight);
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  padding: 1.75rem;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.05);
+  transition: transform 0.4s ease;
+}
+.demo-sandbox:hover { transform: translateY(-4px); }
+
+/* Matrix cell upgrade */
+.matrix-cell-lg {
+  width: 100%;
+  padding: 0.75rem;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid var(--border-color);
+  border-radius: 10px;
+  color: var(--primary-accent);
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-family: 'Fira Code', monospace;
+  text-align: center;
+  transition: all 0.2s ease;
+  -moz-appearance: textfield;
+}
+.matrix-cell-lg:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 3px rgba(var(--primary-accent-rgb, 121,193,49), 0.2);
+  background: rgba(255,255,255,0.10);
+}
+.matrix-cell-lg::-webkit-inner-spin-button,
+.matrix-cell-lg::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* Result box */
+.result-box {
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+.result-box.has-result {
+  border-color: var(--primary-accent);
+  background: rgba(var(--primary-accent-rgb, 121,193,49), 0.06);
+  box-shadow: 0 0 20px rgba(var(--primary-accent-rgb, 121,193,49), 0.12);
+}
+
+/* Demo op tabs pill style */
+.demo-tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 100px;
+  padding: 4px;
+}
+.demo-tab {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  padding: 0.35rem 0.9rem;
+  border-radius: 100px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.demo-tab.active {
+  background: var(--primary-accent);
+  color: #111;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Feature pillar cards */
+.pillar-card {
+  padding: 1.75rem;
+  border-radius: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(16px);
+  height: 100%;
+  transition: all 0.35s ease;
+  position: relative;
+  overflow: hidden;
+}
+.pillar-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--primary-gradient);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
+  border-radius: 2px 2px 0 0;
+}
+.pillar-card:hover { border-color: var(--border-highlight); transform: translateY(-4px); }
+.pillar-card:hover::before { transform: scaleX(1); }
+
+.pillar-icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  background: rgba(var(--primary-accent-rgb, 121,193,49), 0.12);
+  border: 1px solid rgba(var(--primary-accent-rgb, 121,193,49), 0.25);
+  color: var(--primary-accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+.pillar-card:hover .pillar-icon {
+  background: rgba(var(--primary-accent-rgb, 121,193,49), 0.22);
+  transform: scale(1.08) rotate(4deg);
+}
+
+/* Module cards */
+.module-card {
+  padding: 2rem;
+  border-radius: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(16px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.35s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+.module-card:hover {
+  border-color: var(--border-highlight);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+}
+.module-card .module-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border-color);
+  border-radius: 100px;
+  padding: 0.25rem 0.7rem;
+}
+.module-card .module-icon {
+  width: 56px; height: 56px;
+  border-radius: 16px;
+  background: rgba(var(--primary-accent-rgb, 121,193,49), 0.12);
+  border: 1px solid rgba(var(--primary-accent-rgb, 121,193,49), 0.25);
+  color: var(--primary-accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+.module-card:hover .module-icon {
+  background: rgba(var(--primary-accent-rgb, 121,193,49), 0.22);
+  transform: scale(1.1) rotate(-3deg);
+}
+.module-card .module-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: inherit;
+  text-decoration: none;
+  background: rgba(var(--primary-accent-rgb, 121,193,49), 0.10);
+  color: var(--primary-accent) !important;
+  border: 1px solid rgba(var(--primary-accent-rgb, 121,193,49), 0.3);
+  margin-top: auto;
+  transition: all 0.2s ease;
+  width: 100%;
+  justify-content: center;
+}
+.module-card .module-cta:hover {
+  background: var(--primary-accent);
+  color: #111 !important;
+  border-color: var(--primary-accent);
+  box-shadow: 0 4px 20px rgba(var(--primary-accent-rgb, 121,193,49), 0.35);
+}
+
+/* How it works step */
+.step-item {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+.step-item:hover {
+  border-color: var(--border-highlight);
+  background: rgba(255,255,255,0.06);
+}
+.step-number {
+  flex-shrink: 0;
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  background: var(--primary-gradient);
+  color: #111;
+  font-weight: 900;
+  font-size: 1.15rem;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 15px rgba(var(--primary-accent-rgb, 121,193,49), 0.35);
+}
+
+/* Stats banner */
+.stat-item { position: relative; }
+.stat-item + .stat-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 1px;
+  background: var(--border-color);
+}
+@media (max-width: 575px) {
+  .stat-item + .stat-item::before { display: none; }
+}
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.stat-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+}
+
+/* Section headers */
+.section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--primary-accent);
+  margin-bottom: 0.75rem;
+}
+.section-eyebrow::before, .section-eyebrow::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--primary-accent);
+  opacity: 0.4;
+  width: 24px;
+}
+
+/* CTA section */
+.cta-section {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--hero-gradient);
+  border: 1px solid var(--border-highlight);
+  padding: 4rem 2rem;
+  text-align: center;
+}
+.cta-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--hero-gradient);
+  opacity: 0.5;
+}
+.cta-section > * { position: relative; z-index: 1; }
+
+/* Scroll reveal animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+</style>
+{% endblock %}
+
 {% block jsonld %}
 <script type="application/ld+json">
 {
@@ -17,103 +507,117 @@
   "operatingSystem": "Web",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "description": "Free step-by-step linear algebra calculator for matrices, determinants, eigenvalues, linear systems, and vectors with LaTeX proofs.",
-  "featureList": [
-    "Matrix Operations (NxN)",
-    "Determinants with Cofactor Expansion",
-    "Matrix Inverse",
-    "Eigenvalues & Eigenvectors",
-    "Vector Calculator",
-    "Linear System Solver (Gaussian, Cramer)"
-  ],
+  "featureList": ["Matrix Operations (NxN)","Determinants with Cofactor Expansion","Matrix Inverse","Eigenvalues & Eigenvectors","Vector Calculator","Linear System Solver (Gaussian, Cramer)"],
   "keywords": "linear algebra solver, matrix calculator, eigenvalue calculator, step by step math"
 }
 </script>
 {% endblock %}
 
 {% block content %}
-<!-- ── Hero Section ─────────────────────────────────────────────────── -->
-<section class="hero-section glass-panel mb-5 text-center">
-  <div class="container py-4">
-    <div class="d-inline-flex align-items-center gap-2 badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-30 rounded-pill px-3 py-2 mb-3">
-      <i class="fas fa-sparkles text-warning"></i>
-      <span>6 Specialized Math Solvers · Step-by-Step LaTeX Proofs · Free</span>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HERO SECTION
+════════════════════════════════════════════════════════════════ -->
+<section class="hero-landing mb-5">
+  <!-- Glowing orbs -->
+  <div class="glow-orb glow-orb-1"></div>
+  <div class="glow-orb glow-orb-2"></div>
+
+  <!-- Floating particles -->
+  <div class="hero-particles" id="heroParticles"></div>
+
+  <div class="hero-content">
+    <!-- Eyebrow pill -->
+    <div class="hero-pill">
+      <span class="dot"></span>
+      6 Specialized Solvers &nbsp;·&nbsp; Instant LaTeX Proofs &nbsp;·&nbsp; Completely Free
     </div>
 
+    <!-- Main headline -->
     <h1 class="hero-title">
-      Master Linear Algebra with <br>
-      <span class="gradient-text">Step-by-Step LaTeX Solvers</span>
+      Master Linear Algebra<br>
+      with <span class="gradient-text hero-underline">Instant Step-by-Step</span><br>
+      Proofs &amp; Solvers
     </h1>
 
-    <p class="hero-subtitle">
-      Perform matrix operations, compute determinants, solve linear systems, analyze vectors, and derive eigenvalues with sub-millisecond response times and comprehensive LaTeX visualizations.
+    <p class="hero-subtitle mx-auto" style="max-width: 640px; margin-bottom: 2.5rem;">
+      Compute matrices, eigenvalues, determinants, vector operations &amp; linear systems.
+      Every result rendered in <strong>LaTeX</strong> with complete mathematical derivations.
     </p>
 
-    <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
-      <a href="{{ url_for('main.dashboard') }}" class="btn-primary-custom btn-lg fs-6" id="cta-launch">
-        <i class="fas fa-chart-pie me-1"></i> Launch Workspace Dashboard
+    <!-- CTA Buttons -->
+    <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
+      <a href="{{ url_for('main.dashboard') }}" class="btn-hero-primary" id="cta-launch">
+        <i class="fas fa-rocket"></i> Launch Workspace
       </a>
-      <a href="#demo" class="btn-secondary-custom btn-lg fs-6" id="cta-modules">
-        <i class="fas fa-play me-1"></i> Try Live Interactive Demo
+      <a href="#modules" class="btn-hero-secondary" id="cta-explore">
+        <i class="fas fa-compass"></i> Explore Solvers
       </a>
     </div>
 
-    <!-- ── Live Interactive Multi-Operation Demo ────────────────────────── -->
-    <div id="demo" class="row justify-content-center mt-5">
-      <div class="col-lg-10">
-        <div class="glass-panel p-4 animate-float text-start" style="border-color: var(--border-highlight);">
-          
-          <!-- Top bar with operation selector tabs -->
-          <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <!-- ── Interactive Demo Sandbox ───────────────────────── -->
+    <div class="row justify-content-center" id="demo">
+      <div class="col-lg-9 col-xl-8">
+        <div class="demo-sandbox animate-float">
+          <!-- Sandbox header -->
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
             <div class="d-flex align-items-center gap-2">
-              <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-30 px-3 py-1">
-                <i class="fas fa-bolt me-1"></i> Live Interactive Sandbox
+              <span style="
+                display:inline-flex;align-items:center;gap:6px;
+                font-size:0.78rem;font-weight:700;
+                color: var(--primary-accent);
+              ">
+                <span style="width:8px;height:8px;background:var(--primary-accent);border-radius:50%;box-shadow:0 0 8px var(--primary-accent);animation:dotBlink 2s infinite;"></span>
+                Live Sandbox — Edit Matrix &amp; Switch Operation
               </span>
-              <small class="text-muted d-none d-sm-inline">Edit matrix values in real-time</small>
             </div>
-            
-            <!-- Demo tabs -->
-            <div class="btn-group btn-group-sm" role="group" aria-label="Demo operation switch">
-              <button type="button" class="btn btn-outline-primary active demo-op-btn" data-op="eigen">Eigenvalues</button>
-              <button type="button" class="btn btn-outline-primary demo-op-btn" data-op="determinant">Determinant</button>
-              <button type="button" class="btn btn-outline-primary demo-op-btn" data-op="inverse">Inverse</button>
+            <div class="demo-tabs">
+              <button class="demo-tab active" data-op="eigen">Eigenvalues</button>
+              <button class="demo-tab" data-op="determinant">Determinant</button>
+              <button class="demo-tab" data-op="inverse">Inverse</button>
             </div>
           </div>
 
-          <div class="row align-items-center g-3">
-            <!-- 2x2 Input Matrix -->
+          <!-- Sandbox body -->
+          <div class="row align-items-center g-4">
+            <!-- Matrix inputs -->
             <div class="col-md-5">
-              <label class="small text-secondary fw-semibold mb-2 d-flex justify-content-between">
-                <span>Input 2×2 Matrix A</span>
-                <span class="text-muted font-monospace" id="heroDemoTimer">Computed in 0.0ms</span>
-              </label>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="small text-secondary fw-semibold">Matrix A (2×2)</label>
+                <small class="text-muted font-monospace" id="heroDemoTimer">—</small>
+              </div>
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                <input type="number" class="matrix-cell text-center font-monospace fs-5 fw-bold" id="hd_0_0" value="4" step="any" aria-label="Row 1 Col 1">
-                <input type="number" class="matrix-cell text-center font-monospace fs-5 fw-bold" id="hd_0_1" value="2" step="any" aria-label="Row 1 Col 2">
-                <input type="number" class="matrix-cell text-center font-monospace fs-5 fw-bold" id="hd_1_0" value="1" step="any" aria-label="Row 2 Col 1">
-                <input type="number" class="matrix-cell text-center font-monospace fs-5 fw-bold" id="hd_1_1" value="3" step="any" aria-label="Row 2 Col 2">
+                <input type="number" class="matrix-cell-lg" id="hd_0_0" value="4" step="any" aria-label="a11">
+                <input type="number" class="matrix-cell-lg" id="hd_0_1" value="2" step="any" aria-label="a12">
+                <input type="number" class="matrix-cell-lg" id="hd_1_0" value="1" step="any" aria-label="a21">
+                <input type="number" class="matrix-cell-lg" id="hd_1_1" value="3" step="any" aria-label="a22">
               </div>
             </div>
 
-            <!-- Arrow Indicator -->
-            <div class="col-md-2 text-center my-2 my-md-0">
-              <div class="d-flex flex-column align-items-center">
-                <i class="fas fa-arrow-right fs-3 text-primary d-none d-md-block" style="color:var(--primary-accent)"></i>
-                <i class="fas fa-arrow-down fs-3 text-primary d-md-none" style="color:var(--primary-accent)"></i>
-                <span class="badge bg-secondary rounded-pill mt-1" id="opLabel">Eigenvalues λ</span>
+            <!-- Arrow -->
+            <div class="col-md-2 text-center">
+              <div class="d-flex flex-column align-items-center gap-2">
+                <i class="fas fa-arrow-right fs-3 d-none d-md-block" style="color:var(--primary-accent);"></i>
+                <i class="fas fa-arrow-down fs-3 d-md-none" style="color:var(--primary-accent);"></i>
+                <span id="opLabel" class="badge rounded-pill"
+                      style="background:rgba(var(--primary-accent-rgb,121,193,49),0.15);color:var(--primary-accent);border:1px solid rgba(var(--primary-accent-rgb,121,193,49),0.3);font-size:0.7rem;">
+                  Eigenvalues λ
+                </span>
               </div>
             </div>
 
-            <!-- Output LaTeX Result Box -->
+            <!-- Result -->
             <div class="col-md-5">
-              <label class="small text-secondary fw-semibold mb-2">Live Proof & Calculation Result</label>
-              <div id="heroDemoResult" class="p-3 bg-primary bg-opacity-10 border border-primary border-opacity-30 rounded text-center d-flex align-items-center justify-content-center" style="min-height:90px;">
-                <span class="fw-bold fs-5" id="heroDemoLatex" style="color:var(--primary-accent);">\(\lambda_1 = 5,\;\lambda_2 = 2\)</span>
-              </div>
-              <div class="mt-2 text-end">
-                <a href="{{ url_for('eigen.eigen_page') }}" id="heroModuleLink" class="small fw-semibold text-decoration-none" style="color:var(--primary-accent)">
-                  Open Full Module Proofs <i class="fas fa-chevron-right ms-1"></i>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="small text-secondary fw-semibold">Computed Result</label>
+                <a href="{{ url_for('eigen.eigen_page') }}" id="heroModuleLink"
+                   class="small fw-semibold text-decoration-none" style="color:var(--primary-accent);">
+                  Full Proof <i class="fas fa-external-link-alt ms-1" style="font-size:0.65rem;"></i>
                 </a>
               </div>
+              <div class="result-box has-result">
+                <span class="fw-bold fs-5" id="heroDemoLatex" style="color:var(--primary-accent);">\(\lambda_1 = 5,\;\lambda_2 = 2\)</span>
+              </div>
             </div>
           </div>
 
@@ -123,242 +627,285 @@
   </div>
 </section>
 
-<!-- ── Key Benefits / Features Showcase ─────────────────────────────── -->
-<section class="mb-5 py-3">
-  <div class="row g-4">
-    <div class="col-md-6 col-lg-3">
-      <div class="glass-panel p-4 h-100 text-center">
-        <div class="feature-icon mx-auto mb-3"><i class="fas fa-square-root-variable"></i></div>
-        <h6 class="fw-bold mb-2">Step-by-Step Proofs</h6>
-        <p class="small text-secondary mb-0">Every operation comes with LaTeX mathematical derivations and cofactor/row-reduction steps.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PLATFORM STATS
+════════════════════════════════════════════════════════════════ -->
+<section class="mb-5 reveal">
+  <div class="glass-panel p-4 p-md-5">
+    <div class="row g-4 text-center">
+      <div class="col-6 col-md-3 stat-item">
+        <div class="stat-number gradient-text">100%</div>
+        <div class="stat-label">LaTeX Proof Coverage</div>
+      </div>
+      <div class="col-6 col-md-3 stat-item">
+        <div class="stat-number gradient-text">NxN</div>
+        <div class="stat-label">Dynamic Dimensions</div>
+      </div>
+      <div class="col-6 col-md-3 stat-item">
+        <div class="stat-number gradient-text">6</div>
+        <div class="stat-label">Specialized Solvers</div>
+      </div>
+      <div class="col-6 col-md-3 stat-item">
+        <div class="stat-number gradient-text">&lt;10ms</div>
+        <div class="stat-label">Computation Latency</div>
       </div>
     </div>
-    <div class="col-md-6 col-lg-3">
-      <div class="glass-panel p-4 h-100 text-center">
-        <div class="feature-icon mx-auto mb-3"><i class="fas fa-expand-arrows-alt"></i></div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     WHY USE IT — PLATFORM PILLARS
+════════════════════════════════════════════════════════════════ -->
+<section class="mb-5">
+  <div class="text-center mb-4 reveal">
+    <div class="section-eyebrow">Platform Capabilities</div>
+    <h2 class="fw-bold">Built for Precision &amp; Clarity</h2>
+    <p class="text-secondary mx-auto" style="max-width: 540px;">
+      Every solver is engineered to deliver complete, auditable mathematical derivations — not just answers.
+    </p>
+  </div>
+  <div class="row g-3">
+    <div class="col-md-6 col-lg-3 reveal reveal-delay-1">
+      <div class="pillar-card">
+        <div class="pillar-icon"><i class="fas fa-file-alt"></i></div>
+        <h6 class="fw-bold mb-2">Step-by-Step LaTeX Proofs</h6>
+        <p class="small text-secondary mb-0">Every calculation includes a full mathematical derivation, rendered in MathJax LaTeX — cofactors, row ops, characteristic polynomials and more.</p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3 reveal reveal-delay-2">
+      <div class="pillar-card">
+        <div class="pillar-icon"><i class="fas fa-expand-arrows-alt"></i></div>
         <h6 class="fw-bold mb-2">NxN Dynamic Scale</h6>
-        <p class="small text-secondary mb-0">Flexibly construct 2×2 up to NxN matrices with dynamic dimension controls and row inputs.</p>
+        <p class="small text-secondary mb-0">All matrix tools dynamically expand to any size. Construct custom NxN matrices with row/column controls and real-time validation.</p>
       </div>
     </div>
-    <div class="col-md-6 col-lg-3">
-      <div class="glass-panel p-4 h-100 text-center">
-        <div class="feature-icon mx-auto mb-3"><i class="fas fa-bolt"></i></div>
+    <div class="col-md-6 col-lg-3 reveal reveal-delay-3">
+      <div class="pillar-card">
+        <div class="pillar-icon"><i class="fas fa-bolt"></i></div>
         <h6 class="fw-bold mb-2">Sub-Millisecond Engine</h6>
-        <p class="small text-secondary mb-0">Optimized NumPy/SciPy linear algebra algorithms running on rapid Flask backend endpoints.</p>
+        <p class="small text-secondary mb-0">Powered by optimized NumPy &amp; SciPy routines via Flask. Complex eigenvalue decompositions complete in under 10ms on average.</p>
       </div>
     </div>
-    <div class="col-md-6 col-lg-3">
-      <div class="glass-panel p-4 h-100 text-center">
-        <div class="feature-icon mx-auto mb-3"><i class="fas fa-history"></i></div>
-        <h6 class="fw-bold mb-2">Persistent History</h6>
-        <p class="small text-secondary mb-0">All computations automatically log to your local workspace database for instant review.</p>
+    <div class="col-md-6 col-lg-3 reveal reveal-delay-4">
+      <div class="pillar-card">
+        <div class="pillar-icon"><i class="fas fa-clock-rotate-left"></i></div>
+        <h6 class="fw-bold mb-2">Persistent Calculation History</h6>
+        <p class="small text-secondary mb-0">All calculations auto-save to your workspace database. Review, compare, and revisit any past proof from your dashboard instantly.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── Modules Grid Section ───────────────────────────────────────────── -->
-<section id="modules" class="mb-5 py-3">
-  <div class="text-center mb-5">
-    <span class="badge bg-primary bg-opacity-20 text-primary px-3 py-1 rounded-pill uppercase mb-2">Modules Overview</span>
-    <h2 class="fw-bold display-6">Comprehensive Math Solvers</h2>
-    <p class="text-secondary mx-auto" style="max-width: 600px;">
-      Explore our suite of specialized linear algebra solvers designed for students, researchers, and professional engineers.
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MODULE GRID
+════════════════════════════════════════════════════════════════ -->
+<section id="modules" class="mb-5">
+  <div class="text-center mb-5 reveal">
+    <div class="section-eyebrow">Solver Suite</div>
+    <h2 class="fw-bold">6 Specialized Math Solvers</h2>
+    <p class="text-secondary mx-auto" style="max-width: 560px;">
+      Each module is purpose-built for its domain, with a dedicated interface, method selector, and complete proof system.
     </p>
   </div>
 
   <div class="row g-4">
-    <!-- Matrix Operations -->
-    <div class="col-md-6 col-lg-4">
-      <div class="glass-panel feature-card">
-        <div>
-          <div class="d-flex justify-content-between align-items-start">
-            <div class="feature-icon"><i class="fas fa-th"></i></div>
-            <span class="badge bg-secondary rounded-pill">NxN Matrix</span>
-          </div>
-          <h5 class="fw-bold mb-2">Matrix Operations</h5>
-          <p class="text-secondary fs-6">Perform matrix addition, subtraction, scalar multiplication, matrix product, transpose, rank, and trace calculations with step-by-step proofs.</p>
+    <div class="col-md-6 col-lg-4 reveal reveal-delay-1">
+      <div class="module-card">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div class="module-icon"><i class="fas fa-th"></i></div>
+          <span class="module-badge">NxN Matrices</span>
         </div>
-        <a href="{{ url_for('matrix.matrix_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center" id="card-matrix">
-          Open Matrix Tool <i class="fas fa-arrow-right ms-1"></i>
+        <h5 class="fw-bold mb-2">Matrix Operations</h5>
+        <p class="text-secondary fs-6 mb-3">Add, subtract, multiply, transpose, compute rank and trace. Supports any NxN dimension with full step-by-step row operations shown.</p>
+        <a href="{{ url_for('matrix.matrix_page') }}" class="module-cta" id="card-matrix">
+          Open Matrix Solver <i class="fas fa-arrow-right"></i>
         </a>
       </div>
     </div>
 
-    <!-- Determinants -->
-    <div class="col-md-6 col-lg-4">
-      <div class="glass-panel feature-card">
-        <div>
-          <div class="d-flex justify-content-between align-items-start">
-            <div class="feature-icon"><i class="fas fa-square-root-variable"></i></div>
-            <span class="badge bg-secondary rounded-pill">Det |A|</span>
-          </div>
-          <h5 class="fw-bold mb-2">Determinants</h5>
-          <p class="text-secondary fs-6">Step-by-step determinant calculations using cofactor expansion along any row/column, triangular reduction, and MathJax formula derivations.</p>
+    <div class="col-md-6 col-lg-4 reveal reveal-delay-2">
+      <div class="module-card">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div class="module-icon"><i class="fas fa-square-root-variable"></i></div>
+          <span class="module-badge">det |A|</span>
         </div>
-        <a href="{{ url_for('determinant.determinant_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center" id="card-det">
-          Calculate Determinant <i class="fas fa-arrow-right ms-1"></i>
+        <h5 class="fw-bold mb-2">Determinants</h5>
+        <p class="text-secondary fs-6 mb-3">Compute det(A) via Laplace cofactor expansion along any row/column or triangular reduction. Includes intermediate sub-matrix derivations.</p>
+        <a href="{{ url_for('determinant.determinant_page') }}" class="module-cta" id="card-det">
+          Compute Determinant <i class="fas fa-arrow-right"></i>
         </a>
       </div>
     </div>
 
-    <!-- Inverse -->
-    <div class="col-md-6 col-lg-4">
-      <div class="glass-panel feature-card">
-        <div>
-          <div class="d-flex justify-content-between align-items-start">
-            <div class="feature-icon"><i class="fas fa-rotate-left"></i></div>
-            <span class="badge bg-secondary rounded-pill">A⁻¹ Inverse</span>
-          </div>
-          <h5 class="fw-bold mb-2">Matrix Inverse</h5>
-          <p class="text-secondary fs-6">Full mathematical derivation of cofactor matrices, adjoint (adjugate) matrices, inverse verification, and non-singular determinant checks.</p>
+    <div class="col-md-6 col-lg-4 reveal reveal-delay-3">
+      <div class="module-card">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div class="module-icon"><i class="fas fa-rotate-left"></i></div>
+          <span class="module-badge">A⁻¹ Inverse</span>
         </div>
-        <a href="{{ url_for('inverse.inverse_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center" id="card-inv">
-          Invert Matrix <i class="fas fa-arrow-right ms-1"></i>
+        <h5 class="fw-bold mb-2">Matrix Inverse</h5>
+        <p class="text-secondary fs-6 mb-3">Derive cofactor matrices, adjugate (adjoint) matrix, and verify A·A⁻¹ = I. Singularity checks with determinant pre-validation included.</p>
+        <a href="{{ url_for('inverse.inverse_page') }}" class="module-cta" id="card-inv">
+          Invert Matrix <i class="fas fa-arrow-right"></i>
         </a>
       </div>
     </div>
 
-    <!-- Vectors -->
-    <div class="col-md-6 col-lg-4">
-      <div class="glass-panel feature-card">
-        <div>
-          <div class="d-flex justify-content-between align-items-start">
-            <div class="feature-icon"><i class="fas fa-location-arrow"></i></div>
-            <span class="badge bg-secondary rounded-pill">2D & 3D Vector</span>
-          </div>
-          <h5 class="fw-bold mb-2">Vector Calculator</h5>
-          <p class="text-secondary fs-6">Dot product, cross product, vector magnitude, projection of vector A onto B, inter-vector angles, and interactive 2D/3D canvas charts.</p>
+    <div class="col-md-6 col-lg-4 reveal reveal-delay-1">
+      <div class="module-card">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div class="module-icon"><i class="fas fa-location-arrow"></i></div>
+          <span class="module-badge">2D &amp; 3D Vectors</span>
         </div>
-        <a href="{{ url_for('vector.vector_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center" id="card-vec">
-          Analyze Vectors <i class="fas fa-arrow-right ms-1"></i>
+        <h5 class="fw-bold mb-2">Vector Calculator</h5>
+        <p class="text-secondary fs-6 mb-3">Dot product, cross product, magnitude, unit vector, projection, and inter-vector angle. Includes interactive 2D/3D canvas visualization charts.</p>
+        <a href="{{ url_for('vector.vector_page') }}" class="module-cta" id="card-vec">
+          Analyze Vectors <i class="fas fa-arrow-right"></i>
         </a>
       </div>
     </div>
 
-    <!-- Linear Systems -->
-    <div class="col-md-6 col-lg-4">
-      <div class="glass-panel feature-card">
-        <div>
-          <div class="d-flex justify-content-between align-items-start">
-            <div class="feature-icon"><i class="fas fa-equals"></i></div>
-            <span class="badge bg-secondary rounded-pill">Ax = b</span>
-          </div>
-          <h5 class="fw-bold mb-2">Linear System Solver</h5>
-          <p class="text-secondary fs-6">Solve systems of linear equations using Gaussian Elimination with row operations, Cramer's Rule, and Matrix Inversion methods.</p>
+    <div class="col-md-6 col-lg-4 reveal reveal-delay-2">
+      <div class="module-card">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div class="module-icon"><i class="fas fa-equals"></i></div>
+          <span class="module-badge">Ax = b Systems</span>
         </div>
-        <a href="{{ url_for('linear_equations.linear_equations_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center" id="card-sys">
-          Solve Systems <i class="fas fa-arrow-right ms-1"></i>
+        <h5 class="fw-bold mb-2">Linear System Solver</h5>
+        <p class="text-secondary fs-6 mb-3">Solve systems using Gaussian Elimination (row-reduction), Cramer's Rule, and Matrix Inverse method — each with complete timestamped proof steps.</p>
+        <a href="{{ url_for('linear_equations.linear_equations_page') }}" class="module-cta" id="card-sys">
+          Solve Linear Systems <i class="fas fa-arrow-right"></i>
         </a>
       </div>
     </div>
 
-    <!-- Eigenvalues -->
-    <div class="col-md-6 col-lg-4">
-      <div class="glass-panel feature-card">
-        <div>
-          <div class="d-flex justify-content-between align-items-start">
-            <div class="feature-icon"><i class="fas fa-wave-square"></i></div>
-            <span class="badge bg-secondary rounded-pill">Eigen λ & v</span>
-          </div>
-          <h5 class="fw-bold mb-2">Eigenvalues & Vectors</h5>
-          <p class="text-secondary fs-6">Compute characteristic polynomials det(A − λI) = 0, eigenspace bases, algebraic vs geometric multiplicity, and step-by-step proofs.</p>
+    <div class="col-md-6 col-lg-4 reveal reveal-delay-3">
+      <div class="module-card">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div class="module-icon"><i class="fas fa-wave-square"></i></div>
+          <span class="module-badge">Eigen λ &amp; v</span>
         </div>
-        <a href="{{ url_for('eigen.eigen_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center" id="card-eigen">
-          Compute Eigen <i class="fas fa-arrow-right ms-1"></i>
+        <h5 class="fw-bold mb-2">Eigenvalues &amp; Eigenvectors</h5>
+        <p class="text-secondary fs-6 mb-3">Solve det(A − λI) = 0 characteristic polynomial, find eigenspaces, compute algebraic and geometric multiplicity with full LaTeX derivation.</p>
+        <a href="{{ url_for('eigen.eigen_page') }}" class="module-cta" id="card-eigen">
+          Compute Eigenvalues <i class="fas fa-arrow-right"></i>
         </a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── How It Works Section ─────────────────────────────────────────── -->
-<section class="glass-panel p-4 p-md-5 mb-5">
-  <div class="text-center mb-5">
-    <span class="badge bg-success bg-opacity-20 text-success px-3 py-1 rounded-pill uppercase mb-2">Workflow</span>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HOW IT WORKS
+════════════════════════════════════════════════════════════════ -->
+<section class="mb-5">
+  <div class="text-center mb-5 reveal">
+    <div class="section-eyebrow">Workflow</div>
     <h2 class="fw-bold">How It Works in 3 Steps</h2>
-    <p class="text-secondary">Streamlined calculation workflow designed for clarity and efficiency</p>
+    <p class="text-secondary mx-auto" style="max-width: 520px;">A streamlined workflow designed for clarity, repeatability, and academic rigor.</p>
   </div>
-
-  <div class="row g-4 text-center">
-    <div class="col-md-4">
-      <div class="p-3">
-        <div class="rounded-circle bg-primary bg-opacity-20 text-primary border border-primary border-opacity-30 d-inline-flex align-items-center justify-content-center fs-3 fw-bold mb-3" style="width:64px;height:64px;">
-          1
+  <div class="row g-3">
+    <div class="col-12 reveal reveal-delay-1">
+      <div class="step-item">
+        <div class="step-number">1</div>
+        <div>
+          <h6 class="fw-bold mb-1">Configure Your Matrix or Vector Input</h6>
+          <p class="text-secondary small mb-0">Use the dynamic dimension controls to set your NxN matrix size, then fill each element. All modules support decimal and integer values.</p>
         </div>
-        <h5 class="fw-bold mb-2">Set Dimensions & Values</h5>
-        <p class="text-secondary small mb-0">Input matrix elements or vector components with customizable NxN row/column controls.</p>
       </div>
     </div>
-
-    <div class="col-md-4">
-      <div class="p-3">
-        <div class="rounded-circle bg-primary bg-opacity-20 text-primary border border-primary border-opacity-30 d-inline-flex align-items-center justify-content-center fs-3 fw-bold mb-3" style="width:64px;height:64px;">
-          2
+    <div class="col-12 reveal reveal-delay-2">
+      <div class="step-item">
+        <div class="step-number">2</div>
+        <div>
+          <h6 class="fw-bold mb-1">Select Operation Method</h6>
+          <p class="text-secondary small mb-0">Choose your preferred calculation method — Gaussian Elimination, Cramer's Rule, Cofactor Expansion, Dot/Cross product, and more.</p>
         </div>
-        <h5 class="fw-bold mb-2">Select Operation</h5>
-        <p class="text-secondary small mb-0">Choose your calculation method — Gaussian elimination, Cramer's rule, cofactor expansion, or dot products.</p>
       </div>
     </div>
-
-    <div class="col-md-4">
-      <div class="p-3">
-        <div class="rounded-circle bg-primary bg-opacity-20 text-primary border border-primary border-opacity-30 d-inline-flex align-items-center justify-content-center fs-3 fw-bold mb-3" style="width:64px;height:64px;">
-          3
+    <div class="col-12 reveal reveal-delay-3">
+      <div class="step-item">
+        <div class="step-number">3</div>
+        <div>
+          <h6 class="fw-bold mb-1">Inspect Full LaTeX Mathematical Proof</h6>
+          <p class="text-secondary small mb-0">View the complete derivation rendered in MathJax LaTeX. Each step is annotated and logged to your calculation history for later review.</p>
         </div>
-        <h5 class="fw-bold mb-2">Inspect LaTeX Proofs</h5>
-        <p class="text-secondary small mb-0">View full mathematical derivations rendered in LaTeX with copyable formulas and instant saving.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── Platform Stats Banner ───────────────────────────────────────────── -->
-<section class="glass-panel p-4 p-md-5 mb-5 text-center" style="background: var(--primary-gradient-subtle, var(--bg-glass));">
-  <div class="row g-4">
-    <div class="col-6 col-md-3">
-      <h2 class="gradient-text fw-bold mb-1">100%</h2>
-      <p class="text-secondary mb-0 small text-uppercase fw-semibold">LaTeX Proof Coverage</p>
-    </div>
-    <div class="col-6 col-md-3">
-      <h2 class="gradient-text fw-bold mb-1">NxN</h2>
-      <p class="text-secondary mb-0 small text-uppercase fw-semibold">Dynamic Dimensions</p>
-    </div>
-    <div class="col-6 col-md-3">
-      <h2 class="gradient-text fw-bold mb-1">6</h2>
-      <p class="text-secondary mb-0 small text-uppercase fw-semibold">Specialized Modules</p>
-    </div>
-    <div class="col-6 col-md-3">
-      <h2 class="gradient-text fw-bold mb-1">&lt;10ms</h2>
-      <p class="text-secondary mb-0 small text-uppercase fw-semibold">Execution Latency</p>
-    </div>
-  </div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     FINAL CTA
+════════════════════════════════════════════════════════════════ -->
+<section class="cta-section mb-5 reveal">
+  <div class="glow-orb" style="width:300px;height:300px;background:var(--primary-accent);top:-80px;right:-60px;opacity:0.2;"></div>
+  <h2 class="fw-bold mb-3" style="font-size: clamp(1.6rem, 3.5vw, 2.4rem);">
+    Ready to Solve Linear Algebra Problems?
+  </h2>
+  <p class="text-secondary mx-auto mb-4" style="max-width: 520px; font-size: 1.05rem;">
+    Access all 6 specialized solvers with complete LaTeX proofs and auto-saved calculation history — no account required.
+  </p>
+  <a href="{{ url_for('main.dashboard') }}" class="btn-hero-primary" style="font-size: 1.05rem; padding: 1rem 2.5rem;">
+    <i class="fas fa-chart-pie"></i> Go to Workspace Dashboard
+  </a>
 </section>
 
-<!-- ── Final Call to Action ───────────────────────────────────────────── -->
-<section class="glass-panel p-4 p-md-5 text-center mb-4 position-relative overflow-hidden" style="border-color:var(--border-highlight);">
-  <div class="py-3">
-    <h2 class="fw-bold mb-3">Ready to Solve Linear Algebra Problems?</h2>
-    <p class="text-secondary mx-auto mb-4" style="max-width:560px;">
-      Access all 6 specialized solvers, compute step-by-step proofs, and view calculation history — zero sign-up required.
-    </p>
-    <a href="{{ url_for('main.dashboard') }}" class="btn-primary-custom btn-lg fs-6">
-      <i class="fas fa-rocket me-2"></i> Launch Workspace Dashboard
-    </a>
-  </div>
-</section>
 {% endblock %}
+
 
 {% block extra_js %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/modules.css') }}">
 <script>
-/* ── Live Multi-Operation Hero Demo ────────────────────────────────────── */
+/* ─── Hero Particles ──────────────────────────────────────── */
+(function() {
+  const container = document.getElementById('heroParticles');
+  if (!container) return;
+  for (let i = 0; i < 28; i++) {
+    const el = document.createElement('div');
+    el.className = 'hero-particle';
+    el.style.cssText = `
+      left: ${Math.random() * 100}%;
+      top: ${Math.random() * 100}%;
+      --dur: ${6 + Math.random() * 8}s;
+      --delay: ${Math.random() * 8}s;
+      --tx: ${(Math.random() - 0.5) * 140}px;
+      --ty: ${-60 - Math.random() * 120}px;
+      width: ${2 + Math.random() * 4}px;
+      height: ${2 + Math.random() * 4}px;
+      opacity: 0;
+    `;
+    container.appendChild(el);
+  }
+}());
+
+/* ─── Scroll Reveal ───────────────────────────────────────── */
+(function() {
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+}());
+
+/* ─── Live Multi-Op Demo ──────────────────────────────────── */
 (function () {
-  const IDS    = ['hd_0_0', 'hd_0_1', 'hd_1_0', 'hd_1_1'];
-  const latex  = document.getElementById('heroDemoLatex');
-  const timer  = document.getElementById('heroDemoTimer');
-  const opLabel= document.getElementById('opLabel');
-  const link   = document.getElementById('heroModuleLink');
+  const IDS     = ['hd_0_0', 'hd_0_1', 'hd_1_0', 'hd_1_1'];
+  const latex   = document.getElementById('heroDemoLatex');
+  const timer   = document.getElementById('heroDemoTimer');
+  const opLabel = document.getElementById('opLabel');
+  const link    = document.getElementById('heroModuleLink');
+  const resultBox = latex ? latex.closest('.result-box') : null;
   let currentOp = 'eigen';
   let debounce;
 
@@ -366,72 +913,75 @@
     eigen: {
       label: 'Eigenvalues λ',
       endpoint: '/api/eigen/calculate',
-      linkText: 'Open Eigenvalue Module',
+      linkText: 'Full Eigenvalue Proof',
       linkUrl: "{{ url_for('eigen.eigen_page') }}",
-      process: (data) => {
-        if (data.success && data.eigenvalues && data.eigenvalues.length) {
-          const lx = data.eigenvalues.map((v, i) => `\\lambda_{${i+1}} = ${v}`).join(',\\;');
-          return `\\(${lx}\\)`;
+      payload: m => ({ matrix: m }),
+      process: (d) => {
+        if (d.success && d.eigenvalues && d.eigenvalues.length) {
+          return '\\(' + d.eigenvalues.map((v, i) => `\\lambda_{${i+1}} = ${v}`).join(',\\;') + '\\)';
         }
-        return data.error || 'Complex eigenvalues';
+        return d.error || 'Complex or repeated eigenvalues';
       }
     },
     determinant: {
       label: 'Determinant |A|',
       endpoint: '/api/determinant/calculate',
-      linkText: 'Open Determinant Module',
+      linkText: 'Full Determinant Proof',
       linkUrl: "{{ url_for('determinant.determinant_page') }}",
-      process: (data) => {
-        if (data.success) {
-          return `\\(\\det(A) = ${data.result}\\)`;
-        }
-        return data.error || 'Computation failed';
+      payload: m => ({ matrix: m }),
+      process: (d) => {
+        if (d.success) return `\\(\\det(A) = ${d.result}\\)`;
+        return d.error || 'Computation failed';
       }
     },
     inverse: {
       label: 'Inverse A⁻¹',
       endpoint: '/api/inverse/calculate',
-      linkText: 'Open Inverse Module',
+      linkText: 'Full Inverse Proof',
       linkUrl: "{{ url_for('inverse.inverse_page') }}",
-      process: (data) => {
-        if (data.success && data.result) {
-          const rows = data.result.map(row => row.join(' & ')).join(' \\\\ ');
+      payload: m => ({ matrix: m }),
+      process: (d) => {
+        if (d.success && d.result) {
+          const rows = d.result.map(r => r.join(' & ')).join(' \\\\ ');
           return `\\(A^{-1} = \\begin{pmatrix} ${rows} \\end{pmatrix}\\)`;
         }
-        return data.error || 'Matrix singular (det = 0)';
+        return d.error || 'Singular matrix — det = 0';
       }
     }
   };
 
-  function solve() {
-    const config = OP_CONFIG[currentOp];
-    const m = [
+  function getMatrix() {
+    return [
       [+document.getElementById('hd_0_0').value, +document.getElementById('hd_0_1').value],
       [+document.getElementById('hd_1_0').value, +document.getElementById('hd_1_1').value]
     ];
-    const t0 = performance.now();
+  }
 
-    fetch(config.endpoint, {
+  function solve() {
+    const cfg = OP_CONFIG[currentOp];
+    const m = getMatrix();
+    const t0 = performance.now();
+    if (resultBox) resultBox.classList.remove('has-result');
+
+    fetch(cfg.endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ matrix: m })
+      body: JSON.stringify(cfg.payload(m))
     })
     .then(r => r.ok ? r.json() : Promise.reject())
     .then(d => {
       const ms = (performance.now() - t0).toFixed(1);
-      timer.textContent = `Computed in ${ms}ms`;
-      const html = config.process(d);
+      timer.textContent = `${ms}ms`;
+      const html = cfg.process(d);
       latex.innerHTML = html;
-      if (window.MathJax && MathJax.typeset) {
-        MathJax.typeset([latex.parentElement]);
-      }
+      if (window.MathJax && MathJax.typeset) MathJax.typeset([latex.parentElement]);
+      if (resultBox) resultBox.classList.add('has-result');
     })
     .catch(() => {
-      latex.textContent = 'Network error — check connection';
+      if (latex) latex.textContent = 'Network error';
     });
   }
 
-  // Bind inputs
   IDS.forEach(id => {
     document.getElementById(id).addEventListener('input', () => {
       clearTimeout(debounce);
@@ -439,21 +989,19 @@
     });
   });
 
-  // Bind tabs
-  document.querySelectorAll('.demo-op-btn').forEach(btn => {
+  document.querySelectorAll('.demo-tab').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      document.querySelectorAll('.demo-op-btn').forEach(b => b.classList.remove('active'));
-      e.target.classList.add('active');
-      currentOp = e.target.getAttribute('data-op');
+      document.querySelectorAll('.demo-tab').forEach(b => b.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      currentOp = e.currentTarget.getAttribute('data-op');
       const cfg = OP_CONFIG[currentOp];
       opLabel.textContent = cfg.label;
-      link.innerHTML = `${cfg.linkText} <i class="fas fa-chevron-right ms-1"></i>`;
+      link.innerHTML = `${cfg.linkText} <i class="fas fa-external-link-alt ms-1" style="font-size:0.65rem;"></i>`;
       link.href = cfg.linkUrl;
       solve();
     });
   });
 
-  // Run once on load
   solve();
 }());
 </script>

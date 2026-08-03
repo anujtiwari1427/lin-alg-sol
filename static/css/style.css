@@ -29,21 +29,22 @@
   --light-yellow:   #EDE1AC;
 
   --bg-primary:       #161616;
-  --bg-secondary:     #222222;
-  --bg-card:          rgba(34, 34, 34, 0.78);
-  --bg-glass:         rgba(22, 22, 22, 0.88);
-  --border-color:     rgba(121, 193, 49, 0.22);
+  --bg-secondary:     #1e1e1e;
+  --bg-card:          rgba(30, 30, 30, 0.80);
+  --bg-glass:         rgba(18, 18, 18, 0.90);
+  --border-color:     rgba(121, 193, 49, 0.20);
   --border-highlight: #79C131;
 
   --text-primary:   #EDE1AC;
   --text-secondary: #79C131;
-  --text-muted:     #a8bd86;
+  --text-muted:     #8aaa60;
 
-  --primary-accent:   #79C131;
-  --primary-gradient: linear-gradient(135deg, #79C131 0%, #a8bd86 50%, #EDE1AC 100%);
-  --hero-gradient:    radial-gradient(ellipse at 50% 0%, rgba(121, 193, 49, 0.35) 0%, rgba(237, 225, 172, 0.18) 50%, #161616 85%);
-  --card-shadow:      0 10px 30px -10px rgba(0,0,0,0.85);
-  --glass-shadow:     0  8px 32px   0  rgba(0,0,0,0.60);
+  --primary-accent:     #79C131;
+  --primary-accent-rgb: 121, 193, 49;
+  --primary-gradient:   linear-gradient(135deg, #79C131 0%, #a8e048 50%, #EDE1AC 100%);
+  --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(121,193,49,0.40) 0%, rgba(237,225,172,0.12) 55%, #161616 85%);
+  --card-shadow:        0 12px 40px -8px rgba(0,0,0,0.90);
+  --glass-shadow:       0 8px 32px 0 rgba(0,0,0,0.65), 0 0 0 1px rgba(121,193,49,0.06);
 
   --sidebar-width:   260px;
   --navbar-height:   70px;
@@ -59,100 +60,115 @@
    CSS Custom Properties — Ice Cold & Purple Theme
    --------------------------------------------------------- */
 [data-theme="purple"] {
-  --bg-primary:       #1b1226;
-  --bg-secondary:     #291b3b;
-  --bg-card:          rgba(41, 27, 59, 0.75);
-  --bg-glass:         rgba(27, 18, 38, 0.85);
-  --border-color:     rgba(208, 189, 244, 0.22);
+  --bg-primary:       #16102a;
+  --bg-secondary:     #221636;
+  --bg-card:          rgba(35, 22, 56, 0.82);
+  --bg-glass:         rgba(22, 16, 42, 0.92);
+  --border-color:     rgba(160, 210, 235, 0.18);
   --border-highlight: #a0d2eb;
 
   --text-primary:   #e5eaf5;
   --text-secondary: #a0d2eb;
-  --text-muted:     #a28089;
+  --text-muted:     #7a8090;
 
-  --primary-accent:   #a0d2eb;
-  --primary-gradient: linear-gradient(135deg, #8458B3 0%, #a0d2eb 55%, #d0bdf4 100%);
-  --hero-gradient:    radial-gradient(ellipse at 50% 0%, rgba(160, 210, 235, 0.35) 0%, rgba(132, 88, 179, 0.45) 50%, #1b1226 85%);
+  --primary-accent:     #a0d2eb;
+  --primary-accent-rgb: 160, 210, 235;
+  --primary-gradient:   linear-gradient(135deg, #8458B3 0%, #a0d2eb 55%, #d0bdf4 100%);
+  --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(160,210,235,0.40) 0%, rgba(132,88,179,0.38) 55%, #16102a 85%);
+  --card-shadow:        0 12px 40px -8px rgba(0,0,0,0.90);
+  --glass-shadow:       0 8px 32px 0 rgba(0,0,0,0.65), 0 0 0 1px rgba(160,210,235,0.06);
 }
 
 /* ---------------------------------------------------------
    CSS Custom Properties — Sand & Night Blue Theme
    --------------------------------------------------------- */
 [data-theme="sand"] {
-  --bg-primary:       #12343b;
-  --bg-secondary:     #1a434c;
-  --bg-card:          rgba(45, 84, 94, 0.70);
-  --bg-glass:         rgba(18, 52, 59, 0.85);
+  --bg-primary:       #10303a;
+  --bg-secondary:     #183e48;
+  --bg-card:          rgba(24, 62, 72, 0.80);
+  --bg-glass:         rgba(16, 48, 58, 0.92);
   --border-color:     rgba(225, 179, 130, 0.20);
   --border-highlight: #e1b382;
 
-  --text-primary:   #fef9f3;
+  --text-primary:   #fef5e8;
   --text-secondary: #e1b382;
-  --text-muted:     #c89666;
+  --text-muted:     #a88060;
 
-  --primary-accent:   #e1b382;
-  --primary-gradient: linear-gradient(135deg, #e1b382 0%, #c89666 50%, #2d545e 100%);
-  --hero-gradient:    radial-gradient(ellipse at 50% 0%, rgba(225, 179, 130, 0.35) 0%, rgba(45, 84, 94, 0.5) 45%, #12343b 85%);
+  --primary-accent:     #e1b382;
+  --primary-accent-rgb: 225, 179, 130;
+  --primary-gradient:   linear-gradient(135deg, #e8ba8e 0%, #c89666 50%, #2d545e 100%);
+  --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(225,179,130,0.42) 0%, rgba(45,84,94,0.45) 50%, #10303a 85%);
+  --card-shadow:        0 12px 40px -8px rgba(0,0,0,0.90);
+  --glass-shadow:       0 8px 32px 0 rgba(0,0,0,0.65), 0 0 0 1px rgba(225,179,130,0.06);
 }
 
 /* ---------------------------------------------------------
    CSS Custom Properties — Rich Turquoise & Sweet Cream Theme
    --------------------------------------------------------- */
 [data-theme="turquoise"] {
-  --bg-primary:       #06423d;
-  --bg-secondary:     #0a544e;
-  --bg-card:          rgba(10, 84, 78, 0.78);
-  --bg-glass:         rgba(6, 66, 61, 0.88);
-  --border-color:     rgba(255, 234, 207, 0.25);
+  --bg-primary:       #043a36;
+  --bg-secondary:     #084e48;
+  --bg-card:          rgba(8, 78, 72, 0.82);
+  --bg-glass:         rgba(4, 58, 54, 0.92);
+  --border-color:     rgba(255, 234, 207, 0.20);
   --border-highlight: #FFEACF;
 
   --text-primary:   #FFEACF;
   --text-secondary: #5eead4;
-  --text-muted:     #9cd6cf;
+  --text-muted:     #7dbcb8;
 
-  --primary-accent:   #FFEACF;
-  --primary-gradient: linear-gradient(135deg, #0A756C 0%, #2dd4bf 50%, #FFEACF 100%);
-  --hero-gradient:    radial-gradient(ellipse at 50% 0%, rgba(10, 117, 108, 0.50) 0%, rgba(255, 234, 207, 0.22) 50%, #06423d 85%);
+  --primary-accent:     #FFEACF;
+  --primary-accent-rgb: 255, 234, 207;
+  --primary-gradient:   linear-gradient(135deg, #2dd4bf 0%, #5eead4 40%, #FFEACF 100%);
+  --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(10,117,108,0.55) 0%, rgba(255,234,207,0.20) 55%, #043a36 85%);
+  --card-shadow:        0 12px 40px -8px rgba(0,0,0,0.90);
+  --glass-shadow:       0 8px 32px 0 rgba(0,0,0,0.65), 0 0 0 1px rgba(255,234,207,0.06);
 }
 
 /* ---------------------------------------------------------
    CSS Custom Properties — Black Chocolate & Canary Yellow Theme
    --------------------------------------------------------- */
 [data-theme="chocolate"] {
-  --bg-primary:       #1C1810;
-  --bg-secondary:     #282217;
-  --bg-card:          rgba(40, 34, 23, 0.78);
-  --bg-glass:         rgba(28, 24, 16, 0.88);
-  --border-color:     rgba(255, 243, 99, 0.22);
+  --bg-primary:       #181410;
+  --bg-secondary:     #231e15;
+  --bg-card:          rgba(35, 30, 21, 0.82);
+  --bg-glass:         rgba(24, 20, 16, 0.92);
+  --border-color:     rgba(255, 243, 99, 0.18);
   --border-highlight: #FFF363;
 
   --text-primary:   #FFF363;
-  --text-secondary: #fffaaa;
-  --text-muted:     #d4ce7c;
+  --text-secondary: #fff5a0;
+  --text-muted:     #b0a850;
 
-  --primary-accent:   #FFF363;
-  --primary-gradient: linear-gradient(135deg, #FFF363 0%, #e6da48 50%, #1C1810 100%);
-  --hero-gradient:    radial-gradient(ellipse at 50% 0%, rgba(255, 243, 99, 0.35) 0%, rgba(230, 218, 72, 0.18) 50%, #1C1810 85%);
+  --primary-accent:     #FFF363;
+  --primary-accent-rgb: 255, 243, 99;
+  --primary-gradient:   linear-gradient(135deg, #ffe44a 0%, #FFF363 55%, #fffff0 100%);
+  --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(255,243,99,0.42) 0%, rgba(180,168,50,0.20) 55%, #181410 85%);
+  --card-shadow:        0 12px 40px -8px rgba(0,0,0,0.90);
+  --glass-shadow:       0 8px 32px 0 rgba(0,0,0,0.65), 0 0 0 1px rgba(255,243,99,0.06);
 }
 
 /* ---------------------------------------------------------
    CSS Custom Properties — Light Mode Override
    --------------------------------------------------------- */
 [data-theme="light"] {
-  --bg-primary:       #f5f0fb;
+  --bg-primary:       #f0f2f5;
   --bg-secondary:     #ffffff;
-  --bg-card:          rgba(255, 255, 255, 0.92);
-  --bg-glass:         rgba(255, 255, 255, 0.90);
-  --border-color:     rgba(121, 193, 49, 0.25);
-  --border-highlight: #79C131;
+  --bg-card:          rgba(255, 255, 255, 0.95);
+  --bg-glass:         rgba(255, 255, 255, 0.92);
+  --border-color:     rgba(121, 193, 49, 0.22);
+  --border-highlight: #59a322;
 
-  --text-primary:   #161616;
-  --text-secondary: #79C131;
-  --text-muted:     #6b8a91;
+  --text-primary:   #1a1c1e;
+  --text-secondary: #437a18;
+  --text-muted:     #6b8060;
 
-  --primary-accent:   #79C131;
-  --primary-gradient: linear-gradient(135deg, #79C131 0%, #a8bd86 70%, #EDE1AC 100%);
-  --hero-gradient:    radial-gradient(ellipse at 50% 0%, rgba(121, 193, 49, 0.20) 0%, rgba(237, 225, 172, 0.12) 45%, #f5f0fb 85%);
+  --primary-accent:     #59a322;
+  --primary-accent-rgb: 89, 163, 34;
+  --primary-gradient:   linear-gradient(135deg, #59a322 0%, #79C131 50%, #a8e040 100%);
+  --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(121,193,49,0.22) 0%, rgba(237,225,172,0.10) 50%, #f0f2f5 85%);  
+  --card-shadow:        0 4px 20px -4px rgba(0,0,0,0.12);
+  --glass-shadow:       0 4px 20px 0 rgba(0,0,0,0.08), 0 0 0 1px rgba(121,193,49,0.08);
   --card-shadow:      0 10px 30px -10px rgba(22, 22, 22, 0.12);
   --glass-shadow:     0  8px 32px   0  rgba(22, 22, 22, 0.08);
 }
@@ -216,7 +232,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .glass-panel:hover {
   border-color: var(--border-highlight);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.40), 0 0 0 1px rgba(var(--primary-accent-rgb, 121,193,49), 0.12);
 }
 
 .glass-nav {

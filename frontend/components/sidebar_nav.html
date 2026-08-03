@@ -28,15 +28,6 @@
     <i class="fas fa-wave-square"></i><span>Eigenvalues & Vectors</span>
   </a>
 
-  <div class="nav-section-title">Advanced Decompositions</div>
-  <a href="{{ url_for('lu.lu_page') }}" class="sidebar-link {% if request.path == '/lu' %}active{% endif %}">
-    <i class="fas fa-layer-group"></i><span>LU Decomposition</span>
-    <span class="badge rounded-pill ms-auto" style="background:rgba(121,193,49,0.2);color:var(--primary-accent);font-size:0.6rem;">NEW</span>
-  </a>
-  <a href="{{ url_for('svd.svd_page') }}" class="sidebar-link {% if request.path == '/svd' %}active{% endif %}">
-    <i class="fas fa-chart-scatter"></i><span>SVD</span>
-    <span class="badge rounded-pill ms-auto" style="background:rgba(121,193,49,0.2);color:var(--primary-accent);font-size:0.6rem;">NEW</span>
-  </a>
 
   <div class="nav-section-title">Resources & Analytics</div>
   <a href="{{ url_for('main.learning_module') }}" class="sidebar-link {% if request.path == '/learning' %}active{% endif %}">

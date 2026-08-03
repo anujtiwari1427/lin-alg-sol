@@ -8,8 +8,6 @@ from controllers.inverse_controller import inverse_bp
 from controllers.vector_controller import vector_bp
 from controllers.linear_equations_controller import linear_equations_bp
 from controllers.eigen_controller import eigen_bp
-from controllers.lu_controller import lu_bp
-from controllers.svd_controller import svd_bp
 from datetime import date
 
 
@@ -27,8 +25,7 @@ def create_app(config_class=Config):
 
     # Register all blueprints
     for bp in (main_bp, matrix_bp, determinant_bp, inverse_bp,
-               vector_bp, linear_equations_bp, eigen_bp,
-               lu_bp, svd_bp):
+               vector_bp, linear_equations_bp, eigen_bp):
         app.register_blueprint(bp)
 
     # ── Request-scoped DB connection via Flask g ──────────────────────
@@ -76,8 +73,6 @@ def create_app(config_class=Config):
         ('/vector',            '0.9', 'monthly'),
         ('/linear-equations',  '0.9', 'monthly'),
         ('/eigen',             '0.9', 'monthly'),
-        ('/lu',                '0.9', 'monthly'),
-        ('/svd',               '0.9', 'monthly'),
         ('/learning',          '0.7', 'monthly'),
     ]
 

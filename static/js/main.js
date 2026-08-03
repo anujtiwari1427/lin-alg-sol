@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   highlightActiveNavLink();
 });
 
-const THEMES = ['green', 'purple', 'sand', 'turquoise', 'light'];
+const THEMES = ['green', 'purple', 'sand', 'turquoise', 'chocolate', 'light'];
 
 function initTheme() {
   const saved = localStorage.getItem('las-theme') || 'green';
@@ -43,6 +43,9 @@ function applyTheme(theme, save = true) {
     } else if (theme === 'turquoise') {
       icon.className = 'fas fa-gem';
       icon.style.color = '#FFEACF';
+    } else if (theme === 'chocolate') {
+      icon.className = 'fas fa-cookie-bite';
+      icon.style.color = '#FFF363';
     } else {
       icon.className = 'fas fa-moon text-primary';
     }

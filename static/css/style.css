@@ -116,6 +116,26 @@
 }
 
 /* ---------------------------------------------------------
+   CSS Custom Properties — Black Chocolate & Canary Yellow Theme
+   --------------------------------------------------------- */
+[data-theme="chocolate"] {
+  --bg-primary:       #1C1810;
+  --bg-secondary:     #282217;
+  --bg-card:          rgba(40, 34, 23, 0.78);
+  --bg-glass:         rgba(28, 24, 16, 0.88);
+  --border-color:     rgba(255, 243, 99, 0.22);
+  --border-highlight: #FFF363;
+
+  --text-primary:   #FFF363;
+  --text-secondary: #fffaaa;
+  --text-muted:     #d4ce7c;
+
+  --primary-accent:   #FFF363;
+  --primary-gradient: linear-gradient(135deg, #FFF363 0%, #e6da48 50%, #1C1810 100%);
+  --hero-gradient:    radial-gradient(ellipse at 50% 0%, rgba(255, 243, 99, 0.35) 0%, rgba(230, 218, 72, 0.18) 50%, #1C1810 85%);
+}
+
+/* ---------------------------------------------------------
    CSS Custom Properties — Light Mode Override
    --------------------------------------------------------- */
 [data-theme="light"] {

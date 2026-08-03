@@ -31,74 +31,140 @@
 {% endblock %}
 
 {% block content %}
-<!-- ── Animated Hero Section ─────────────────────────────────────────── -->
-<section class="hero-section glass-panel mb-5">
+<!-- ── Hero Section ─────────────────────────────────────────────────── -->
+<section class="hero-section glass-panel mb-5 text-center">
   <div class="container py-4">
-    <div class="badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-30 rounded-pill px-3 py-2 mb-3">
-      <i class="fas fa-sparkles me-1"></i> 6 Math Modules · Step-by-Step Proofs · Free
+    <div class="d-inline-flex align-items-center gap-2 badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-30 rounded-pill px-3 py-2 mb-3">
+      <i class="fas fa-sparkles text-warning"></i>
+      <span>6 Specialized Math Solvers · Step-by-Step LaTeX Proofs · Free</span>
     </div>
+
     <h1 class="hero-title">
       Master Linear Algebra with <br>
-      <span class="gradient-text">Step-by-Step Solver</span>
+      <span class="gradient-text">Step-by-Step LaTeX Solvers</span>
     </h1>
+
     <p class="hero-subtitle">
-      Perform matrix operations, calculate determinants, solve linear systems, and analyze vectors with instant, comprehensive mathematical proofs and LaTeX visualizations.
+      Perform matrix operations, compute determinants, solve linear systems, analyze vectors, and derive eigenvalues with sub-millisecond response times and comprehensive LaTeX visualizations.
     </p>
 
     <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
       <a href="{{ url_for('main.dashboard') }}" class="btn-primary-custom btn-lg fs-6" id="cta-launch">
-        <i class="fas fa-rocket me-1"></i> Launch Dashboard
+        <i class="fas fa-chart-pie me-1"></i> Launch Workspace Dashboard
       </a>
-      <a href="#modules" class="btn-secondary-custom btn-lg fs-6" id="cta-modules">
-        <i class="fas fa-layer-group me-1"></i> Explore Modules
+      <a href="#demo" class="btn-secondary-custom btn-lg fs-6" id="cta-modules">
+        <i class="fas fa-play me-1"></i> Try Live Interactive Demo
       </a>
     </div>
 
-    <!-- ── Live Interactive Demo ──────────────────────────────────── -->
-    <div class="row justify-content-center mt-5">
-      <div class="col-lg-9">
-        <div class="glass-panel p-4 animate-float text-start">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-30 px-3 py-1">
-              <i class="fas fa-bolt me-1"></i> Try It Live — Edit any cell
-            </span>
-            <small class="text-muted font-monospace" id="heroDemoTimer">Computed in 0.0ms</small>
+    <!-- ── Live Interactive Multi-Operation Demo ────────────────────────── -->
+    <div id="demo" class="row justify-content-center mt-5">
+      <div class="col-lg-10">
+        <div class="glass-panel p-4 animate-float text-start" style="border-color: var(--border-highlight);">
+          
+          <!-- Top bar with operation selector tabs -->
+          <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-30 px-3 py-1">
+                <i class="fas fa-bolt me-1"></i> Live Interactive Sandbox
+              </span>
+              <small class="text-muted d-none d-sm-inline">Edit matrix values in real-time</small>
+            </div>
+            
+            <!-- Demo tabs -->
+            <div class="btn-group btn-group-sm" role="group" aria-label="Demo operation switch">
+              <button type="button" class="btn btn-outline-primary active demo-op-btn" data-op="eigen">Eigenvalues</button>
+              <button type="button" class="btn btn-outline-primary demo-op-btn" data-op="determinant">Determinant</button>
+              <button type="button" class="btn btn-outline-primary demo-op-btn" data-op="inverse">Inverse</button>
+            </div>
           </div>
+
           <div class="row align-items-center g-3">
+            <!-- 2x2 Input Matrix -->
             <div class="col-md-5">
-              <label class="small text-secondary fw-semibold mb-2">2×2 Matrix A</label>
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-                <input type="number" class="matrix-cell" id="hd_0_0" value="4" step="any" aria-label="Row 1 Col 1">
-                <input type="number" class="matrix-cell" id="hd_0_1" value="2" step="any" aria-label="Row 1 Col 2">
-                <input type="number" class="matrix-cell" id="hd_1_0" value="1" step="any" aria-label="Row 2 Col 1">
-                <input type="number" class="matrix-cell" id="hd_1_1" value="3" step="any" aria-label="Row 2 Col 2">
+              <label class="small text-secondary fw-semibold mb-2 d-flex justify-content-between">
+                <span>Input 2×2 Matrix A</span>
+                <span class="text-muted font-monospace" id="heroDemoTimer">Computed in 0.0ms</span>
+              </label>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <input type="number" class="matrix-cell text-center font-monospace fs-5 fw-bold" id="hd_0_0" value="4" step="any" aria-label="Row 1 Col 1">
+                <input type="number" class="matrix-cell text-center font-monospace fs-5 fw-bold" id="hd_0_1" value="2" step="any" aria-label="Row 1 Col 2">
+                <input type="number" class="matrix-cell text-center font-monospace fs-5 fw-bold" id="hd_1_0" value="1" step="any" aria-label="Row 2 Col 1">
+                <input type="number" class="matrix-cell text-center font-monospace fs-5 fw-bold" id="hd_1_1" value="3" step="any" aria-label="Row 2 Col 2">
               </div>
             </div>
-            <div class="col-md-2 text-center">
-              <i class="fas fa-long-arrow-alt-right fs-4" style="color:var(--primary-accent)"></i>
-              <div class="small text-muted mt-1">Eigenvalues</div>
+
+            <!-- Arrow Indicator -->
+            <div class="col-md-2 text-center my-2 my-md-0">
+              <div class="d-flex flex-column align-items-center">
+                <i class="fas fa-arrow-right fs-3 text-primary d-none d-md-block" style="color:var(--primary-accent)"></i>
+                <i class="fas fa-arrow-down fs-3 text-primary d-md-none" style="color:var(--primary-accent)"></i>
+                <span class="badge bg-secondary rounded-pill mt-1" id="opLabel">Eigenvalues λ</span>
+              </div>
             </div>
+
+            <!-- Output LaTeX Result Box -->
             <div class="col-md-5">
-              <label class="small text-secondary fw-semibold mb-2">Eigenvalues λ</label>
-              <div id="heroDemoResult" class="p-3 bg-primary bg-opacity-20 border border-primary border-opacity-30 rounded text-center" style="min-height:58px;">
-                <span class="fw-bold fs-5 text-primary-accent" id="heroDemoLatex">\(\lambda_1 = 5,\;\lambda_2 = 2\)</span>
+              <label class="small text-secondary fw-semibold mb-2">Live Proof & Calculation Result</label>
+              <div id="heroDemoResult" class="p-3 bg-primary bg-opacity-10 border border-primary border-opacity-30 rounded text-center d-flex align-items-center justify-content-center" style="min-height:90px;">
+                <span class="fw-bold fs-5" id="heroDemoLatex" style="color:var(--primary-accent);">\(\lambda_1 = 5,\;\lambda_2 = 2\)</span>
               </div>
               <div class="mt-2 text-end">
-                <a href="{{ url_for('eigen.eigen_page') }}" class="small" style="color:var(--primary-accent)">Full eigenvalue analysis →</a>
+                <a href="{{ url_for('eigen.eigen_page') }}" id="heroModuleLink" class="small fw-semibold text-decoration-none" style="color:var(--primary-accent)">
+                  Open Full Module Proofs <i class="fas fa-chevron-right ms-1"></i>
+                </a>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- ── Key Benefits / Features Showcase ─────────────────────────────── -->
+<section class="mb-5 py-3">
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-3">
+      <div class="glass-panel p-4 h-100 text-center">
+        <div class="feature-icon mx-auto mb-3"><i class="fas fa-square-root-variable"></i></div>
+        <h6 class="fw-bold mb-2">Step-by-Step Proofs</h6>
+        <p class="small text-secondary mb-0">Every operation comes with LaTeX mathematical derivations and cofactor/row-reduction steps.</p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="glass-panel p-4 h-100 text-center">
+        <div class="feature-icon mx-auto mb-3"><i class="fas fa-expand-arrows-alt"></i></div>
+        <h6 class="fw-bold mb-2">NxN Dynamic Scale</h6>
+        <p class="small text-secondary mb-0">Flexibly construct 2×2 up to NxN matrices with dynamic dimension controls and row inputs.</p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="glass-panel p-4 h-100 text-center">
+        <div class="feature-icon mx-auto mb-3"><i class="fas fa-bolt"></i></div>
+        <h6 class="fw-bold mb-2">Sub-Millisecond Engine</h6>
+        <p class="small text-secondary mb-0">Optimized NumPy/SciPy linear algebra algorithms running on rapid Flask backend endpoints.</p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="glass-panel p-4 h-100 text-center">
+        <div class="feature-icon mx-auto mb-3"><i class="fas fa-history"></i></div>
+        <h6 class="fw-bold mb-2">Persistent History</h6>
+        <p class="small text-secondary mb-0">All computations automatically log to your local workspace database for instant review.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ── Modules Grid Section ───────────────────────────────────────────── -->
-<section id="modules" class="mb-5">
-  <div class="text-center mb-4">
-    <h2 class="fw-bold">Powered by 8 Advanced Solvers</h2>
-    <p class="text-secondary">Designed for students, researchers, and professional engineers</p>
+<section id="modules" class="mb-5 py-3">
+  <div class="text-center mb-5">
+    <span class="badge bg-primary bg-opacity-20 text-primary px-3 py-1 rounded-pill uppercase mb-2">Modules Overview</span>
+    <h2 class="fw-bold display-6">Comprehensive Math Solvers</h2>
+    <p class="text-secondary mx-auto" style="max-width: 600px;">
+      Explore our suite of specialized linear algebra solvers designed for students, researchers, and professional engineers.
+    </p>
   </div>
 
   <div class="row g-4">
@@ -106,9 +172,12 @@
     <div class="col-md-6 col-lg-4">
       <div class="glass-panel feature-card">
         <div>
-          <div class="feature-icon"><i class="fas fa-th"></i></div>
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="feature-icon"><i class="fas fa-th"></i></div>
+            <span class="badge bg-secondary rounded-pill">NxN Matrix</span>
+          </div>
           <h5 class="fw-bold mb-2">Matrix Operations</h5>
-          <p class="text-secondary fs-6">Dynamic NxN matrix generator. Compute sums, products, transpose, rank, and trace with step-by-step proofs.</p>
+          <p class="text-secondary fs-6">Perform matrix addition, subtraction, scalar multiplication, matrix product, transpose, rank, and trace calculations with step-by-step proofs.</p>
         </div>
         <a href="{{ url_for('matrix.matrix_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center" id="card-matrix">
           Open Matrix Tool <i class="fas fa-arrow-right ms-1"></i>
@@ -120,9 +189,12 @@
     <div class="col-md-6 col-lg-4">
       <div class="glass-panel feature-card">
         <div>
-          <div class="feature-icon"><i class="fas fa-square-root-variable"></i></div>
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="feature-icon"><i class="fas fa-square-root-variable"></i></div>
+            <span class="badge bg-secondary rounded-pill">Det |A|</span>
+          </div>
           <h5 class="fw-bold mb-2">Determinants</h5>
-          <p class="text-secondary fs-6">Step-by-step determinant solver using cofactor expansion, Laplace expansion, and row operations with MathJax formulas.</p>
+          <p class="text-secondary fs-6">Step-by-step determinant calculations using cofactor expansion along any row/column, triangular reduction, and MathJax formula derivations.</p>
         </div>
         <a href="{{ url_for('determinant.determinant_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center" id="card-det">
           Calculate Determinant <i class="fas fa-arrow-right ms-1"></i>
@@ -134,9 +206,12 @@
     <div class="col-md-6 col-lg-4">
       <div class="glass-panel feature-card">
         <div>
-          <div class="feature-icon"><i class="fas fa-rotate-left"></i></div>
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="feature-icon"><i class="fas fa-rotate-left"></i></div>
+            <span class="badge bg-secondary rounded-pill">A⁻¹ Inverse</span>
+          </div>
           <h5 class="fw-bold mb-2">Matrix Inverse</h5>
-          <p class="text-secondary fs-6">Full derivation of cofactor matrices, adjoint matrices, and inverse validation with non-zero determinant check.</p>
+          <p class="text-secondary fs-6">Full mathematical derivation of cofactor matrices, adjoint (adjugate) matrices, inverse verification, and non-singular determinant checks.</p>
         </div>
         <a href="{{ url_for('inverse.inverse_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center" id="card-inv">
           Invert Matrix <i class="fas fa-arrow-right ms-1"></i>
@@ -148,9 +223,12 @@
     <div class="col-md-6 col-lg-4">
       <div class="glass-panel feature-card">
         <div>
-          <div class="feature-icon"><i class="fas fa-location-arrow"></i></div>
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="feature-icon"><i class="fas fa-location-arrow"></i></div>
+            <span class="badge bg-secondary rounded-pill">2D & 3D Vector</span>
+          </div>
           <h5 class="fw-bold mb-2">Vector Calculator</h5>
-          <p class="text-secondary fs-6">Dot product, cross product, magnitude, projections, vector angles, and 2D/3D visual vector charts.</p>
+          <p class="text-secondary fs-6">Dot product, cross product, vector magnitude, projection of vector A onto B, inter-vector angles, and interactive 2D/3D canvas charts.</p>
         </div>
         <a href="{{ url_for('vector.vector_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center" id="card-vec">
           Analyze Vectors <i class="fas fa-arrow-right ms-1"></i>
@@ -162,9 +240,12 @@
     <div class="col-md-6 col-lg-4">
       <div class="glass-panel feature-card">
         <div>
-          <div class="feature-icon"><i class="fas fa-equals"></i></div>
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="feature-icon"><i class="fas fa-equals"></i></div>
+            <span class="badge bg-secondary rounded-pill">Ax = b</span>
+          </div>
           <h5 class="fw-bold mb-2">Linear System Solver</h5>
-          <p class="text-secondary fs-6">Gaussian elimination, Cramer's Rule, and Matrix Inverse method — all with timeline step-by-step proofs.</p>
+          <p class="text-secondary fs-6">Solve systems of linear equations using Gaussian Elimination with row operations, Cramer's Rule, and Matrix Inversion methods.</p>
         </div>
         <a href="{{ url_for('linear_equations.linear_equations_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center" id="card-sys">
           Solve Systems <i class="fas fa-arrow-right ms-1"></i>
@@ -176,9 +257,12 @@
     <div class="col-md-6 col-lg-4">
       <div class="glass-panel feature-card">
         <div>
-          <div class="feature-icon"><i class="fas fa-wave-square"></i></div>
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="feature-icon"><i class="fas fa-wave-square"></i></div>
+            <span class="badge bg-secondary rounded-pill">Eigen λ & v</span>
+          </div>
           <h5 class="fw-bold mb-2">Eigenvalues & Vectors</h5>
-          <p class="text-secondary fs-6">Characteristic polynomial solver, eigenspaces, and full step-by-step mathematical proofs with LaTeX.</p>
+          <p class="text-secondary fs-6">Compute characteristic polynomials det(A − λI) = 0, eigenspace bases, algebraic vs geometric multiplicity, and step-by-step proofs.</p>
         </div>
         <a href="{{ url_for('eigen.eigen_page') }}" class="btn-secondary-custom mt-3 w-100 justify-content-center" id="card-eigen">
           Compute Eigen <i class="fas fa-arrow-right ms-1"></i>
@@ -188,25 +272,79 @@
   </div>
 </section>
 
-<!-- ── Stats Banner ───────────────────────────────────────────────────── -->
-<section class="glass-panel p-4 p-md-5 mb-5 text-center">
+<!-- ── How It Works Section ─────────────────────────────────────────── -->
+<section class="glass-panel p-4 p-md-5 mb-5">
+  <div class="text-center mb-5">
+    <span class="badge bg-success bg-opacity-20 text-success px-3 py-1 rounded-pill uppercase mb-2">Workflow</span>
+    <h2 class="fw-bold">How It Works in 3 Steps</h2>
+    <p class="text-secondary">Streamlined calculation workflow designed for clarity and efficiency</p>
+  </div>
+
+  <div class="row g-4 text-center">
+    <div class="col-md-4">
+      <div class="p-3">
+        <div class="rounded-circle bg-primary bg-opacity-20 text-primary border border-primary border-opacity-30 d-inline-flex align-items-center justify-content-center fs-3 fw-bold mb-3" style="width:64px;height:64px;">
+          1
+        </div>
+        <h5 class="fw-bold mb-2">Set Dimensions & Values</h5>
+        <p class="text-secondary small mb-0">Input matrix elements or vector components with customizable NxN row/column controls.</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="p-3">
+        <div class="rounded-circle bg-primary bg-opacity-20 text-primary border border-primary border-opacity-30 d-inline-flex align-items-center justify-content-center fs-3 fw-bold mb-3" style="width:64px;height:64px;">
+          2
+        </div>
+        <h5 class="fw-bold mb-2">Select Operation</h5>
+        <p class="text-secondary small mb-0">Choose your calculation method — Gaussian elimination, Cramer's rule, cofactor expansion, or dot products.</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="p-3">
+        <div class="rounded-circle bg-primary bg-opacity-20 text-primary border border-primary border-opacity-30 d-inline-flex align-items-center justify-content-center fs-3 fw-bold mb-3" style="width:64px;height:64px;">
+          3
+        </div>
+        <h5 class="fw-bold mb-2">Inspect LaTeX Proofs</h5>
+        <p class="text-secondary small mb-0">View full mathematical derivations rendered in LaTeX with copyable formulas and instant saving.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Platform Stats Banner ───────────────────────────────────────────── -->
+<section class="glass-panel p-4 p-md-5 mb-5 text-center" style="background: var(--primary-gradient-subtle, var(--bg-glass));">
   <div class="row g-4">
     <div class="col-6 col-md-3">
-      <h2 class="gradient-text fw-bold">100%</h2>
-      <p class="text-secondary mb-0">Step-by-Step LaTeX Proofs</p>
+      <h2 class="gradient-text fw-bold mb-1">100%</h2>
+      <p class="text-secondary mb-0 small text-uppercase fw-semibold">LaTeX Proof Coverage</p>
     </div>
     <div class="col-6 col-md-3">
-      <h2 class="gradient-text fw-bold">NxN</h2>
-      <p class="text-secondary mb-0">Dynamic Dimensions</p>
+      <h2 class="gradient-text fw-bold mb-1">NxN</h2>
+      <p class="text-secondary mb-0 small text-uppercase fw-semibold">Dynamic Dimensions</p>
     </div>
     <div class="col-6 col-md-3">
-      <h2 class="gradient-text fw-bold">6</h2>
-      <p class="text-secondary mb-0">Math Modules</p>
+      <h2 class="gradient-text fw-bold mb-1">6</h2>
+      <p class="text-secondary mb-0 small text-uppercase fw-semibold">Specialized Modules</p>
     </div>
     <div class="col-6 col-md-3">
-      <h2 class="gradient-text fw-bold">Free</h2>
-      <p class="text-secondary mb-0">No Sign-up Required</p>
+      <h2 class="gradient-text fw-bold mb-1">&lt;10ms</h2>
+      <p class="text-secondary mb-0 small text-uppercase fw-semibold">Execution Latency</p>
     </div>
+  </div>
+</section>
+
+<!-- ── Final Call to Action ───────────────────────────────────────────── -->
+<section class="glass-panel p-4 p-md-5 text-center mb-4 position-relative overflow-hidden" style="border-color:var(--border-highlight);">
+  <div class="py-3">
+    <h2 class="fw-bold mb-3">Ready to Solve Linear Algebra Problems?</h2>
+    <p class="text-secondary mx-auto mb-4" style="max-width:560px;">
+      Access all 6 specialized solvers, compute step-by-step proofs, and view calculation history — zero sign-up required.
+    </p>
+    <a href="{{ url_for('main.dashboard') }}" class="btn-primary-custom btn-lg fs-6">
+      <i class="fas fa-rocket me-2"></i> Launch Workspace Dashboard
+    </a>
   </div>
 </section>
 {% endblock %}
@@ -214,20 +352,66 @@
 {% block extra_js %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/modules.css') }}">
 <script>
-/* ── Live eigenvalue hero demo ────────────────────────────────────────── */
+/* ── Live Multi-Operation Hero Demo ────────────────────────────────────── */
 (function () {
   const IDS    = ['hd_0_0', 'hd_0_1', 'hd_1_0', 'hd_1_1'];
   const latex  = document.getElementById('heroDemoLatex');
   const timer  = document.getElementById('heroDemoTimer');
+  const opLabel= document.getElementById('opLabel');
+  const link   = document.getElementById('heroModuleLink');
+  let currentOp = 'eigen';
   let debounce;
 
+  const OP_CONFIG = {
+    eigen: {
+      label: 'Eigenvalues λ',
+      endpoint: '/api/eigen/calculate',
+      linkText: 'Open Eigenvalue Module',
+      linkUrl: "{{ url_for('eigen.eigen_page') }}",
+      process: (data) => {
+        if (data.success && data.eigenvalues && data.eigenvalues.length) {
+          const lx = data.eigenvalues.map((v, i) => `\\lambda_{${i+1}} = ${v}`).join(',\\;');
+          return `\\(${lx}\\)`;
+        }
+        return data.error || 'Complex eigenvalues';
+      }
+    },
+    determinant: {
+      label: 'Determinant |A|',
+      endpoint: '/api/determinant/calculate',
+      linkText: 'Open Determinant Module',
+      linkUrl: "{{ url_for('determinant.determinant_page') }}",
+      process: (data) => {
+        if (data.success) {
+          return `\\(\\det(A) = ${data.result}\\)`;
+        }
+        return data.error || 'Computation failed';
+      }
+    },
+    inverse: {
+      label: 'Inverse A⁻¹',
+      endpoint: '/api/inverse/calculate',
+      linkText: 'Open Inverse Module',
+      linkUrl: "{{ url_for('inverse.inverse_page') }}",
+      process: (data) => {
+        if (data.success && data.result) {
+          const rows = data.result.map(row => row.join(' & ')).join(' \\\\ ');
+          return `\\(A^{-1} = \\begin{pmatrix} ${rows} \\end{pmatrix}\\)`;
+        }
+        return data.error || 'Matrix singular (det = 0)';
+      }
+    }
+  };
+
   function solve() {
+    const config = OP_CONFIG[currentOp];
     const m = [
       [+document.getElementById('hd_0_0').value, +document.getElementById('hd_0_1').value],
       [+document.getElementById('hd_1_0').value, +document.getElementById('hd_1_1').value]
     ];
     const t0 = performance.now();
-    fetch('/api/eigen/calculate', {
+
+    fetch(config.endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ matrix: m })
@@ -236,29 +420,40 @@
     .then(d => {
       const ms = (performance.now() - t0).toFixed(1);
       timer.textContent = `Computed in ${ms}ms`;
-      if (d.success && d.eigenvalues && d.eigenvalues.length) {
-        const lx = d.eigenvalues.map((v, i) => `\\lambda_{${i+1}} = ${v}`).join(',\\;');
-        latex.innerHTML = `\\(${lx}\\)`;
-        if (window.MathJax && MathJax.typeset) {
-          MathJax.typeset([latex.parentElement]);
-        }
-      } else {
-        latex.textContent = d.error || 'Complex or no real eigenvalues';
+      const html = config.process(d);
+      latex.innerHTML = html;
+      if (window.MathJax && MathJax.typeset) {
+        MathJax.typeset([latex.parentElement]);
       }
     })
     .catch(() => {
-      latex.textContent = 'Network error — check server';
+      latex.textContent = 'Network error — check connection';
     });
   }
 
+  // Bind inputs
   IDS.forEach(id => {
     document.getElementById(id).addEventListener('input', () => {
       clearTimeout(debounce);
-      debounce = setTimeout(solve, 400);
+      debounce = setTimeout(solve, 350);
     });
   });
 
-  // Run once on load with default values
+  // Bind tabs
+  document.querySelectorAll('.demo-op-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.demo-op-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      currentOp = e.target.getAttribute('data-op');
+      const cfg = OP_CONFIG[currentOp];
+      opLabel.textContent = cfg.label;
+      link.innerHTML = `${cfg.linkText} <i class="fas fa-chevron-right ms-1"></i>`;
+      link.href = cfg.linkUrl;
+      solve();
+    });
+  });
+
+  // Run once on load
   solve();
 }());
 </script>

@@ -11,6 +11,8 @@ const SolutionExporter = {
   activeModuleName: 'Linear Algebra Solution',
   activeQuestion: null,   // stores the input question data
 
+  pendingAction: null,
+
   setSolution(data, moduleName, questionData) {
     this.activeData = data;
     this.activeModuleName = moduleName || 'Linear Algebra Solution';
@@ -19,6 +21,16 @@ const SolutionExporter = {
       this.renderDirectSolution(data, moduleName);
     } catch (e) {
       console.error('[SolutionExporter] renderDirectSolution error:', e);
+    }
+
+    if (this.pendingAction) {
+      const act = this.pendingAction;
+      this.pendingAction = null;
+      setTimeout(() => {
+        if (act === 'print') this.printSolution();
+        else if (act === 'pdf') this.downloadPDF();
+        else if (act === 'word') this.downloadWord();
+      }, 350);
     }
   },
 
@@ -897,6 +909,13 @@ const SolutionExporter = {
   // Real PDF export using html2pdf.js (already loaded in base.html)
   downloadPDF() {
     if (!this.activeData) {
+      const btnCalc = document.getElementById('btnCalculate');
+      if (btnCalc) {
+        if (typeof showToast === 'function') showToast('Calculating solution before generating PDF…', 'info');
+        this.pendingAction = 'pdf';
+        btnCalc.click();
+        return;
+      }
       if (typeof showToast === 'function') showToast('Please calculate a solution first.', 'warning');
       return;
     }
@@ -1021,7 +1040,17 @@ const SolutionExporter = {
   },
 
   downloadWord() {
-    if (!this.activeData) return;
+    if (!this.activeData) {
+      const btnCalc = document.getElementById('btnCalculate');
+      if (btnCalc) {
+        if (typeof showToast === 'function') showToast('Calculating solution before downloading Word doc…', 'info');
+        this.pendingAction = 'word';
+        btnCalc.click();
+        return;
+      }
+      if (typeof showToast === 'function') showToast('Please calculate a solution first.', 'warning');
+      return;
+    }
     const content = this.buildWordHtml();
     const blob = new Blob([content], { type: 'application/msword;charset=utf-8' });
     const url  = URL.createObjectURL(blob);
@@ -1204,6 +1233,13 @@ const SolutionExporter = {
 
   printSolution() {
     if (!this.activeData) {
+      const btnCalc = document.getElementById('btnCalculate');
+      if (btnCalc) {
+        if (typeof showToast === 'function') showToast('Calculating solution before printing…', 'info');
+        this.pendingAction = 'print';
+        btnCalc.click();
+        return;
+      }
       if (typeof showToast === 'function') showToast('Please calculate a solution first before printing.', 'warning');
       return;
     }
@@ -1281,6 +1317,14 @@ const SolutionExporter = {
     overlay.style.display = 'block';
 
     if (typeof showToast === 'function') showToast('Opening print dialog…', 'info');
+
+    // Clean up overlay when print dialog closes
+    const handleAfterPrint = () => {
+      const ov = document.getElementById('solutionPrintOverlay');
+      if (ov) ov.remove();
+      window.removeEventListener('afterprint', handleAfterPrint);
+    };
+    window.addEventListener('afterprint', handleAfterPrint);
 
     // Trigger browser print
     setTimeout(() => {

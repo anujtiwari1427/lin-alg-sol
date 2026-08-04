@@ -5,17 +5,13 @@
       - Green: #79C131
       - Black: #161616
       - Light Yellow: #EDE1AC
-   2. Purple Ice Cold Theme
-      - Ice Cold: #a0d2eb
-      - Freeze Purple: #e5eaf5
-      - Medium Purple: #d0bdf4
-      - Purple Pain: #8458B3
-      - Heavy Purple: #a28089
-   3. Sand & Night Blue Theme
+   2. Sand & Night Blue Theme
       - Sand Tan: #e1b382
       - Night Blue: #2d545e
       - Night Blue Shadow: #12343b
-   4. Light Mode
+   3. Rich Turquoise & Cream Theme
+   4. Chocolate & Yellow Theme
+   5. Light Mode
    ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap');
@@ -56,28 +52,7 @@
   --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ---------------------------------------------------------
-   CSS Custom Properties — Ice Cold & Purple Theme
-   --------------------------------------------------------- */
-[data-theme="purple"] {
-  --bg-primary:       #16102a;
-  --bg-secondary:     #221636;
-  --bg-card:          rgba(35, 22, 56, 0.82);
-  --bg-glass:         rgba(22, 16, 42, 0.92);
-  --border-color:     rgba(160, 210, 235, 0.18);
-  --border-highlight: #a0d2eb;
 
-  --text-primary:   #e5eaf5;
-  --text-secondary: #a0d2eb;
-  --text-muted:     #7a8090;
-
-  --primary-accent:     #a0d2eb;
-  --primary-accent-rgb: 160, 210, 235;
-  --primary-gradient:   linear-gradient(135deg, #8458B3 0%, #a0d2eb 55%, #d0bdf4 100%);
-  --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(160,210,235,0.40) 0%, rgba(132,88,179,0.38) 55%, #16102a 85%);
-  --card-shadow:        0 12px 40px -8px rgba(0,0,0,0.90);
-  --glass-shadow:       0 8px 32px 0 rgba(0,0,0,0.65), 0 0 0 1px rgba(160,210,235,0.06);
-}
 
 /* ---------------------------------------------------------
    CSS Custom Properties — Sand & Night Blue Theme

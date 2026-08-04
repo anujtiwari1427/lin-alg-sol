@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const CHART_THEME = {
   green:     { line: '#79C131', point: '#a8bd86', fill0: 'rgba(121,193,49,0.35)', fill1: 'rgba(121,193,49,0.02)', tick: '#79C131', grid: 'rgba(121,193,49,0.10)', tooltip_bg: '#161616', tooltip_border: '#79C131' },
-  purple:    { line: '#a0d2eb', point: '#8458B3', fill0: 'rgba(160,210,235,0.35)', fill1: 'rgba(160,210,235,0.02)', tick: '#a0d2eb', grid: 'rgba(160,210,235,0.10)', tooltip_bg: '#1b1226', tooltip_border: '#a0d2eb' },
   sand:      { line: '#e1b382', point: '#c89666', fill0: 'rgba(225,179,130,0.35)', fill1: 'rgba(225,179,130,0.02)', tick: '#e1b382', grid: 'rgba(225,179,130,0.10)', tooltip_bg: '#12343b', tooltip_border: '#e1b382' },
   turquoise: { line: '#FFEACF', point: '#2dd4bf', fill0: 'rgba(255,234,207,0.35)', fill1: 'rgba(255,234,207,0.02)', tick: '#FFEACF', grid: 'rgba(255,234,207,0.10)', tooltip_bg: '#06423d', tooltip_border: '#FFEACF' },
   chocolate: { line: '#FFF363', point: '#e6da48', fill0: 'rgba(255,243,99,0.35)', fill1: 'rgba(255,243,99,0.02)', tick: '#FFF363', grid: 'rgba(255,243,99,0.10)', tooltip_bg: '#1C1810', tooltip_border: '#FFF363' },

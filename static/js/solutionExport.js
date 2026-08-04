@@ -939,7 +939,85 @@ const SolutionExporter = {
     });
   },
 
-  downloadPDF() { this.downloadServerExport('pdf'); },
+  downloadPDF() {
+    if (!this.activeData) {
+      if (typeof showToast === 'function') showToast('Please calculate a solution first.', 'warning');
+      return;
+    }
+
+    if (typeof showToast === 'function') showToast('Opening PDF — use browser Save as PDF…', 'info');
+
+    const bodyContent = this.buildPrintBodyHtml();
+    const filename    = `${this.safeName()}_solution`;
+
+    // Build a full standalone HTML document using the same CSS as printSolution overlay
+    const fullHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>${filename}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; color: #1e293b; background: #fff; }
+    .prt-page { padding: 32px 36px; }
+    .prt-hdr { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #16a34a; padding-bottom: 14px; margin-bottom: 22px; }
+    .prt-hdr-title { font-size: 20px; font-weight: 800; color: #16a34a; }
+    .prt-hdr-sub { font-size: 13px; font-weight: 600; color: #334155; }
+    .prt-hdr-date { font-size: 10px; color: #94a3b8; text-align: right; }
+    .prt-sec-lbl { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; padding: 4px 10px; border-radius: 4px; display: inline-block; margin-top: 18px; margin-bottom: 8px; }
+    .prt-blue  { color: #0891b2; background: #f0f9ff; }
+    .prt-amber { color: #b45309; background: #fffbeb; }
+    .prt-green { color: #15803d; background: #f0fdf4; }
+    .prt-formula { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 12px 16px; font-family: 'Courier New', monospace; font-size: 12px; color: #0c4a6e; word-break: break-all; margin-bottom: 10px; }
+    .prt-step { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #16a34a; border-radius: 6px; padding: 12px 14px; margin-bottom: 10px; page-break-inside: avoid; }
+    .prt-step-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .prt-step-num { width: 24px; height: 24px; border-radius: 50%; background: #16a34a; color: #fff; font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .prt-step-title { font-weight: 700; font-size: 13px; color: #0f172a; }
+    .prt-step-text { font-size: 12px; color: #475569; margin: 4px 0 4px 34px; line-height: 1.5; }
+    .prt-step-list { margin: 4px 0 4px 34px; padding-left: 16px; font-size: 12px; color: #334155; }
+    .prt-step-list li { margin-bottom: 2px; }
+    .prt-step-formula { font-family: 'Courier New', monospace; font-size: 11px; color: #1e40af; background: #eff6ff; border-radius: 4px; padding: 4px 8px; margin: 6px 0 2px 34px; word-break: break-all; }
+    .prt-result-box { background: #f0fdf4; border: 2px solid #86efac; border-radius: 10px; padding: 18px 20px; text-align: center; margin: 10px 0 20px; page-break-inside: avoid; }
+    .prt-result-value { font-size: 18px; font-weight: 800; color: #14532d; }
+    .prt-result-label { font-size: 10px; color: #15803d; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+    .prt-mat-table { border-collapse: collapse; margin: 8px auto; font-family: 'Courier New', monospace; font-size: 12px; }
+    .prt-mat-table td { padding: 5px 12px; border: 1px solid #cbd5e1; text-align: right; }
+    .prt-sol-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+    .prt-sol-item { background: #fff; border: 2px solid #16a34a; border-radius: 8px; padding: 8px 16px; text-align: center; min-width: 80px; }
+    .prt-sol-var { font-size: 11px; color: #6b7280; font-weight: 600; }
+    .prt-sol-val { font-size: 16px; font-weight: 800; color: #14532d; }
+    .prt-eigen-table { border-collapse: collapse; width: 100%; font-size: 12px; }
+    .prt-eigen-table th { background: #f1f5f9; color: #475569; font-size: 10px; text-transform: uppercase; padding: 6px 10px; border: 1px solid #e2e8f0; text-align: left; }
+    .prt-eigen-table td { padding: 8px 10px; border: 1px solid #e2e8f0; font-family: 'Courier New', monospace; }
+    .prt-hr { border: none; border-top: 1px solid #e2e8f0; margin: 18px 0; }
+    .prt-footer { margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px; text-align: center; color: #94a3b8; font-size: 10px; }
+    /* Question / input boxes */
+    .prt-q-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; font-size: 12px; }
+    .prt-q-row { display: flex; gap: 10px; margin-bottom: 4px; }
+    .prt-q-label { color: #64748b; font-weight: 600; min-width: 110px; }
+    .prt-q-value { color: #0f172a; font-family: 'Courier New', monospace; }
+    @media print {
+      @page { margin: 14mm 14mm 14mm 14mm; size: A4; }
+      .prt-page { padding: 0; }
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+${bodyContent}
+<script>window.onload = function(){ window.print(); window.onafterprint = function(){ window.close(); }; };<\/script>
+</body>
+</html>`;
+
+    const win = window.open('', '_blank', 'width=900,height=700');
+    if (!win) {
+      if (typeof showToast === 'function') showToast('Pop-up blocked — please allow pop-ups and try again.', 'warning');
+      return;
+    }
+    win.document.open();
+    win.document.write(fullHtml);
+    win.document.close();
+  },
   downloadWord() { this.downloadServerExport('docx'); },
   downloadExcel() { this.downloadServerExport('xlsx'); },
   downloadCSV() { this.downloadServerExport('csv'); },
@@ -990,46 +1068,11 @@ const SolutionExporter = {
     if (typeof showToast === 'function') showToast(successMsg, 'success');
   },
 
-  downloadPDF() {
-    if (!this.activeData) return;
-    const htmlStr  = this.buildPDFHtml();
-    const filename = `${this.safeName()}_solution.pdf`;
-
-    if (!window.html2pdf) {
-      this.triggerDownload(htmlStr, filename.replace('.pdf', '.html'), 'text/html');
-      return;
-    }
-
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:794px;height:1px;';
-    document.body.appendChild(iframe);
-    iframe.contentDocument.open();
-    iframe.contentDocument.write(htmlStr);
-    iframe.contentDocument.close();
-
-    if (typeof showToast === 'function') showToast('Generating PDF document…', 'info');
-
-    setTimeout(() => {
-      html2pdf().set({
-        margin: [8, 8, 8, 8],
-        filename,
-        image:      { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, logging: false, useCORS: true, allowTaint: true },
-        jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      }).from(iframe.contentDocument.body).save().then(() => {
-        document.body.removeChild(iframe);
-        if (typeof showToast === 'function') showToast(`Downloaded: ${filename}`, 'success');
-      }).catch(err => {
-        console.error('PDF error:', err);
-        document.body.removeChild(iframe);
-        this.downloadTXT();
-      });
-    }, 300);
-  },
 
   // ─── Builds print body content (no outer html/head/body tags) ────
   buildPrintBodyHtml() {
     if (!this.activeData) return '';
+
     const d    = this.activeData;
     const mod  = this.activeModuleName;
     const op   = d.operation || '';

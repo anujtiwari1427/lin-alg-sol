@@ -228,57 +228,22 @@ const SolutionExporter = {
             </div>
           </div>
           <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small">
-            <i class="fas fa-check-circle me-1"></i>9 Professional Export Formats
+            <i class="fas fa-check-circle me-1"></i>Available Export Formats
           </span>
         </div>
 
         <div class="row g-2 mb-3">
-          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadPDF()" title="Download PDF Report">
-              <i class="fas fa-file-pdf text-danger fs-5 mb-1 d-block"></i><span>PDF Document</span>
-            </button>
-          </div>
-          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
+          <div class="col-6 col-sm-4 col-md-3">
             <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadWord()" title="Download Word Document (.docx)">
               <i class="fas fa-file-word fs-5 mb-1 d-block" style="color:#2b7cd3;"></i><span>Word (.docx)</span>
             </button>
           </div>
-          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadExcel()" title="Download Excel Workbook (.xlsx)">
-              <i class="fas fa-file-excel fs-5 mb-1 d-block" style="color:#107c41;"></i><span>Excel (.xlsx)</span>
-            </button>
-          </div>
-          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadCSV()" title="Download CSV Spreadsheet">
-              <i class="fas fa-file-csv text-primary fs-5 mb-1 d-block"></i><span>CSV Table</span>
-            </button>
-          </div>
-          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadJSON()" title="Download JSON Data">
-              <i class="fas fa-file-code text-success fs-5 mb-1 d-block"></i><span>JSON Data</span>
-            </button>
-          </div>
-          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadMD()" title="Download Markdown Document">
-              <i class="fab fa-markdown text-warning fs-5 mb-1 d-block"></i><span>Markdown</span>
-            </button>
-          </div>
-          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
+          <div class="col-6 col-sm-4 col-md-3">
             <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadLaTeX()" title="Download LaTeX Document (.tex)">
               <i class="fas fa-square-root-variable text-purple fs-5 mb-1 d-block" style="color:#a855f7;"></i><span>LaTeX (.tex)</span>
             </button>
           </div>
-          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadHTML()" title="Download Offline HTML Report">
-              <i class="fab fa-html5 text-orange fs-5 mb-1 d-block" style="color:#f97316;"></i><span>HTML Web</span>
-            </button>
-          </div>
-          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadTXT()" title="Download Plain Text File">
-              <i class="fas fa-file-lines text-info fs-5 mb-1 d-block"></i><span>Plain Text</span>
-            </button>
-          </div>
-          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
+          <div class="col-6 col-sm-4 col-md-3">
             <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.printSolution()" title="Print Solution">
               <i class="fas fa-print text-info fs-5 mb-1 d-block"></i><span>Print</span>
             </button>
@@ -286,22 +251,19 @@ const SolutionExporter = {
         </div>
 
         <div class="pt-3 border-top border-secondary-subtle d-flex flex-wrap align-items-center justify-content-between gap-2">
-          <span class="small text-secondary fw-semibold"><i class="fas fa-copy me-1"></i>Quick Actions &amp; Clipboard:</span>
+          <span class="small text-secondary fw-semibold"><i class="fas fa-bolt me-1"></i>Quick Actions:</span>
           <div class="d-flex flex-wrap gap-2">
-            <button type="button" class="btn btn-sm btn-success text-white fw-bold px-3" onclick="SolutionExporter.downloadPDF()" title="Download PDF Report">
-              <i class="fas fa-file-pdf me-1"></i>Download PDF
+            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.downloadWord()" title="Download Word Document">
+              <i class="fas fa-file-word me-1 text-primary"></i>Word (.docx)
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.downloadLaTeX()" title="Download LaTeX Document">
+              <i class="fas fa-square-root-variable me-1 text-purple" style="color:#a855f7;"></i>LaTeX (.tex)
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyLaTeX()" title="Copy LaTeX Formula">
+              <i class="fas fa-copy me-1 text-info"></i>Copy LaTeX
             </button>
             <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.printSolution()" title="Print Solution">
-              <i class="fas fa-print me-1 text-info"></i>Print Solution
-            </button>
-            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyToClipboard()" title="Copy Text Solution to Clipboard">
-              <i class="fas fa-copy me-1 text-info"></i>Copy Text
-            </button>
-            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyLaTeX()" title="Copy LaTeX Formula to Clipboard">
-              <i class="fas fa-square-root-variable me-1 text-purple" style="color:#a855f7;"></i>Copy LaTeX
-            </button>
-            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyMD()" title="Copy Markdown to Clipboard">
-              <i class="fab fa-markdown me-1 text-warning"></i>Copy Markdown
+              <i class="fas fa-print me-1 text-info"></i>Print
             </button>
           </div>
         </div>

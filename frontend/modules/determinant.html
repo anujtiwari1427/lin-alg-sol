@@ -85,6 +85,7 @@
 
         <h6 class="fw-bold mb-2 text-secondary"><i class="fas fa-list-ol me-2"></i>Step-by-Step Proof</h6>
         <div id="stepsAccordion"></div>
+        <div id="downloadPanelContainer"></div>
       </div>
     </div>
   </div>
@@ -170,6 +171,10 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
 
         if (window.MathJax && window.MathJax.typeset) window.MathJax.typeset();
+
+        if (window.SolutionExporter) {
+          SolutionExporter.setSolution(data, 'Determinant Calculation');
+        }
       } else {
         showToast(data.error, 'danger');
       }

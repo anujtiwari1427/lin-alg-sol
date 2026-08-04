@@ -996,16 +996,52 @@ const SolutionExporter = {
     .prt-q-row { display: flex; gap: 10px; margin-bottom: 4px; }
     .prt-q-label { color: #64748b; font-weight: 600; min-width: 110px; }
     .prt-q-value { color: #0f172a; font-family: 'Courier New', monospace; }
+    /* Rendered math divs */
+    .prt-step-math { margin: 8px 0 4px 34px; padding: 6px 10px; background: #eff6ff; border-radius: 5px; font-size: 13px; color: #1e40af; overflow-x: auto; }
+    .prt-result-math { margin-top: 10px; padding: 8px 12px; background: #f0fdf4; border-radius: 6px; font-size: 14px; color: #14532d; text-align: center; overflow-x: auto; }
     @media print {
       @page { margin: 14mm 14mm 14mm 14mm; size: A4; }
       .prt-page { padding: 0; }
       body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\\\(','\\\\)']], displayMath: [['\\\\[','\\\\]']] },
+      options: { skipHtmlTags: ['script','noscript','style','textarea'] }
+    };
+  <\/script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async><\/script>
 </head>
 <body>
 ${bodyContent}
-<script>window.onload = function(){ window.print(); window.onafterprint = function(){ window.close(); }; };<\/script>
+<script>
+  function doPrint() {
+    window.print();
+    window.onafterprint = function() { window.close(); };
+  }
+  window.onload = function() {
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise().then(function() {
+        setTimeout(doPrint, 400);
+      }).catch(function() { setTimeout(doPrint, 400); });
+    } else {
+      // MathJax still loading — wait up to 4 s then print anyway
+      var waited = 0;
+      var poll = setInterval(function() {
+        waited += 200;
+        if ((window.MathJax && window.MathJax.typesetPromise) || waited >= 4000) {
+          clearInterval(poll);
+          if (window.MathJax && window.MathJax.typesetPromise) {
+            window.MathJax.typesetPromise().then(function() { setTimeout(doPrint, 300); });
+          } else {
+            doPrint();
+          }
+        }
+      }, 200);
+    }
+  };
+<\/script>
 </body>
 </html>`;
 
@@ -1090,7 +1126,7 @@ ${bodyContent}
           </div>
           ${step.text ? `<div class="prt-step-text">${this.stripHtml(step.text)}</div>` : ''}
           ${step.list && step.list.length ? `<ul class="prt-step-list">${step.list.map(l => `<li>${this.stripHtml(l)}</li>`).join('')}</ul>` : ''}
-          ${step.latex ? `<div class="prt-step-formula">${step.latex}</div>` : ''}
+          ${step.latex ? `<div class="prt-step-math">\\[ ${step.latex} \\]</div>` : ''}
         </div>
       `).join('');
     } else {
@@ -1126,7 +1162,7 @@ ${bodyContent}
       if (val !== null) resultHtml = `<div class="prt-result-value">${val}</div>`;
     }
     if (d.result_latex) {
-      resultHtml += `<div style="font-family:monospace;font-size:11px;color:#666;margin-top:8px;">LaTeX: ${d.result_latex}</div>`;
+      resultHtml += `<div class="prt-result-math">\\[ ${d.result_latex} \\]</div>`;
     }
 
     return `

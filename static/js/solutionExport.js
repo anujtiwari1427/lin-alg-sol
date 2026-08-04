@@ -1,8 +1,9 @@
 /* =========================================================
-   SOLUTION EXPORTER  — Well-Formatted Export Engine
+   SOLUTION EXPORTER — Comprehensive Multi-Format Export Engine
    Handles all 6 solvers: Matrix, Determinant, Inverse,
    Vector, Linear Equations, Eigenvalue/Eigenvector.
-   Exports: PDF, TXT, Markdown, JSON, Clipboard.
+   Export Formats: PDF, TXT, Markdown, JSON, CSV, LaTeX, HTML.
+   Clipboard Options: Plain Text, LaTeX Code, Markdown.
    ========================================================= */
 
 const SolutionExporter = {
@@ -15,7 +16,7 @@ const SolutionExporter = {
     this.renderDirectSolution(data, moduleName);
   },
 
-  // ─── Formula lookup ──────────────────────────────────────
+  // ─── Formula lookup (LaTeX) ─────────────────────────────
   getFormula(moduleName, data) {
     const op  = (data.operation || '').toLowerCase();
     const mod = (moduleName   || '').toLowerCase();
@@ -45,7 +46,7 @@ const SolutionExporter = {
     return '';
   },
 
-  // ─── Formula text (plain, for TXT/clipboard) ─────────────
+  // ─── Formula text (plain) ───────────────────────────────
   getFormulaPlain(moduleName, data) {
     const op  = (data.operation || '').toLowerCase();
     const mod = (moduleName   || '').toLowerCase();
@@ -99,9 +100,9 @@ const SolutionExporter = {
 
   // ─── Render formula box + export panel ───────────────────
   renderDirectSolution(data, moduleName) {
-    const accordion   = document.getElementById('stepsAccordion');
+    const accordion     = document.getElementById('stepsAccordion');
     const downloadPanel = document.getElementById('downloadPanelContainer');
-    const formula = this.getFormula(moduleName, data);
+    const formula       = this.getFormula(moduleName, data);
 
     // Insert formula card before steps
     let formulaBox = document.getElementById('solutionFormulaBox');
@@ -122,46 +123,77 @@ const SolutionExporter = {
     if (!downloadPanel) return;
     downloadPanel.innerHTML = `
       <div class="combined-single-card p-3 p-md-4 mt-3">
-        <div class="d-flex align-items-center gap-2 mb-3">
-          <div class="download-icon-box"><i class="fas fa-file-export"></i></div>
-          <div>
-            <h6 class="fw-bold mb-0 text-primary-accent">Export Full Detailed Solution</h6>
-            <p class="small text-secondary mb-0">Well-formatted export of formula, all steps &amp; result</p>
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+          <div class="d-flex align-items-center gap-2">
+            <div class="download-icon-box"><i class="fas fa-file-export"></i></div>
+            <div>
+              <h6 class="fw-bold mb-0 text-primary-accent">Export Solution</h6>
+              <p class="small text-secondary mb-0">Download or copy full calculation steps and results in multiple formats</p>
+            </div>
+          </div>
+          <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small">
+            <i class="fas fa-check-circle me-1"></i>7 Export Formats Available
+          </span>
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadPDF()" title="Download PDF Report">
+              <i class="fas fa-file-pdf text-danger fs-5 mb-1 d-block"></i><span>PDF Document</span>
+            </button>
+          </div>
+          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadTXT()" title="Download Plain Text File">
+              <i class="fas fa-file-lines text-info fs-5 mb-1 d-block"></i><span>Plain Text</span>
+            </button>
+          </div>
+          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadMD()" title="Download Markdown Document">
+              <i class="fab fa-markdown text-warning fs-5 mb-1 d-block"></i><span>Markdown</span>
+            </button>
+          </div>
+          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadJSON()" title="Download JSON Data">
+              <i class="fas fa-file-code text-success fs-5 mb-1 d-block"></i><span>JSON Data</span>
+            </button>
+          </div>
+          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadCSV()" title="Download CSV Spreadsheet">
+              <i class="fas fa-file-csv text-primary fs-5 mb-1 d-block"></i><span>CSV Table</span>
+            </button>
+          </div>
+          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadLaTeX()" title="Download LaTeX Document (.tex)">
+              <i class="fas fa-square-root-variable text-purple fs-5 mb-1 d-block" style="color:#a855f7;"></i><span>LaTeX (.tex)</span>
+            </button>
+          </div>
+          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadHTML()" title="Download Offline HTML Report">
+              <i class="fab fa-html5 text-orange fs-5 mb-1 d-block" style="color:#f97316;"></i><span>HTML Web</span>
+            </button>
           </div>
         </div>
-        <div class="row g-2">
-          <div class="col-6 col-sm-4 col-md-3">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadPDF()">
-              <i class="fas fa-file-pdf text-danger"></i><span>PDF</span>
+
+        <div class="pt-3 border-top border-secondary-subtle d-flex flex-wrap align-items-center justify-content-between gap-2">
+          <span class="small text-secondary fw-semibold"><i class="fas fa-paste me-1"></i>Quick Clipboard Actions:</span>
+          <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyToClipboard()">
+              <i class="fas fa-copy me-1"></i>Copy Text
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyLaTeX()">
+              <i class="fas fa-square-root-variable me-1"></i>Copy LaTeX
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyMD()">
+              <i class="fab fa-markdown me-1"></i>Copy Markdown
             </button>
           </div>
-          <div class="col-6 col-sm-4 col-md-3">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadTXT()">
-              <i class="fas fa-file-lines text-info"></i><span>Text</span>
-            </button>
-          </div>
-          <div class="col-6 col-sm-4 col-md-3">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadMD()">
-              <i class="fab fa-markdown text-warning"></i><span>Markdown</span>
-            </button>
-          </div>
-          <div class="col-6 col-sm-4 col-md-3">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadJSON()">
-              <i class="fas fa-file-code text-success"></i><span>JSON</span>
-            </button>
-          </div>
-        </div>
-        <div class="mt-3 d-flex justify-content-end">
-          <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyToClipboard()">
-            <i class="fas fa-copy me-1"></i>Copy Full Solution
-          </button>
         </div>
       </div>`;
     if (window.MathJax && window.MathJax.typeset) window.MathJax.typeset();
   },
 
   // ═══════════════════════════════════════════════════════════
-  //  TEXT EXPORT — well-aligned plain text
+  //  TEXT EXPORT — plain text format
   // ═══════════════════════════════════════════════════════════
   buildFormattedText() {
     if (!this.activeData) return '';
@@ -170,7 +202,7 @@ const SolutionExporter = {
     const op  = d.operation || '';
     const title = op ? `${mod} — ${op}` : mod;
     const date  = new Date().toLocaleString();
-    const W     = 62;  // page width
+    const W     = 62;
     const hr    = '='.repeat(W);
     const hr2   = '-'.repeat(W);
     const ctr   = s => s.padStart(Math.floor((W + s.length) / 2)).padEnd(W);
@@ -184,13 +216,13 @@ const SolutionExporter = {
     t    += `  Generated: ${date}\n`;
     t    += `${hr}\n\n`;
 
-    // ── Section 1: Formula ──────────────────────────────────
+    // Section 1: Formula
     t += `  [1]  GOVERNING FORMULA & METHOD\n`;
     t += `  ${hr2}\n`;
     const formula = this.getFormulaPlain(mod, d);
     t += `  ${formula || title}\n\n`;
 
-    // ── Section 2: Steps ────────────────────────────────────
+    // Section 2: Steps
     t += `  [2]  STEP-BY-STEP COMPUTATION\n`;
     t += `  ${hr2}\n`;
     if (d.steps && d.steps.length > 0) {
@@ -220,11 +252,10 @@ const SolutionExporter = {
       t += '  (no computation steps available)\n\n';
     }
 
-    // ── Section 3: Result ───────────────────────────────────
+    // Section 3: Result
     t += `  [3]  FINAL RESULT\n`;
     t += `  ${hr2}\n`;
 
-    // Matrix result
     if (d.result_display && Array.isArray(d.result_display) && Array.isArray(d.result_display[0])) {
       t += `\n  Result Matrix:\n${this.formatMatrix(d.result_display)}\n\n`;
     } else if (d.result_display) {
@@ -233,7 +264,6 @@ const SolutionExporter = {
       t += `\n  Result: ${d.result}\n\n`;
     }
 
-    // Solution variables (linear equations)
     const solObj = d.solution || d.solutions;
     if (solObj && typeof solObj === 'object') {
       t += `  Solution Variables:\n`;
@@ -243,7 +273,6 @@ const SolutionExporter = {
       t += '\n';
     }
 
-    // Eigenpairs
     if (d.eigenvalues && Array.isArray(d.eigenvalues)) {
       t += `  Eigenvalues & Eigenvectors:\n`;
       t += `  ${'  Pair'.padEnd(8)}  ${'Eigenvalue'.padEnd(20)}  Eigenvector\n`;
@@ -266,7 +295,7 @@ const SolutionExporter = {
   },
 
   // ═══════════════════════════════════════════════════════════
-  //  MARKDOWN EXPORT — GitHub-flavored markdown
+  //  MARKDOWN EXPORT — markdown format
   // ═══════════════════════════════════════════════════════════
   buildFormattedMD() {
     if (!this.activeData) return '';
@@ -282,7 +311,6 @@ const SolutionExporter = {
     md    += `> **Generated:** ${date}\n\n`;
     md    += `---\n\n`;
 
-    // Section 1: Formula
     md += `## 1. Governing Formula & Method\n\n`;
     if (formula) {
       md += `$$\n${formula}\n$$\n\n`;
@@ -290,7 +318,6 @@ const SolutionExporter = {
       md += `> ${title}\n\n`;
     }
 
-    // Section 2: Steps
     md += `---\n\n## 2. Complete Step-by-Step Computation\n\n`;
     if (d.steps && d.steps.length > 0) {
       d.steps.forEach((step, idx) => {
@@ -306,9 +333,7 @@ const SolutionExporter = {
       md += `*No computation steps available.*\n\n`;
     }
 
-    // Section 3: Result
     md += `---\n\n## 3. Final Calculated Result\n\n`;
-
     if (d.result_latex) {
       md += `$$\n${d.result_latex}\n$$\n\n`;
     }
@@ -321,7 +346,6 @@ const SolutionExporter = {
       md += `**Result:** \`${d.result}\`\n\n`;
     }
 
-    // Solution variables
     const solObj = d.solution || d.solutions;
     if (solObj && typeof solObj === 'object') {
       md += `### Solution Variables\n\n`;
@@ -332,7 +356,6 @@ const SolutionExporter = {
       md += '\n';
     }
 
-    // Eigenpairs
     if (d.eigenvalues && Array.isArray(d.eigenvalues)) {
       md += `### Eigenvalues & Eigenvectors\n\n`;
       md += `| Pair | Eigenvalue (λ) | Eigenvector (v) |\n|---|---|---|\n`;
@@ -350,14 +373,13 @@ const SolutionExporter = {
   },
 
   // ═══════════════════════════════════════════════════════════
-  //  JSON EXPORT — structured, human-readable
+  //  JSON EXPORT — structured JSON format
   // ═══════════════════════════════════════════════════════════
   buildFormattedJSON() {
     if (!this.activeData) return '{}';
     const d   = this.activeData;
     const mod = this.activeModuleName;
 
-    // Structured result object per solver type
     const resultBlock = (() => {
       if (d.eigenvalues && Array.isArray(d.eigenvalues)) {
         return {
@@ -413,7 +435,122 @@ const SolutionExporter = {
   },
 
   // ═══════════════════════════════════════════════════════════
-  //  PDF EXPORT — polished HTML → html2pdf
+  //  CSV EXPORT — tabular spreadsheet format
+  // ═══════════════════════════════════════════════════════════
+  buildFormattedCSV() {
+    if (!this.activeData) return '';
+    const d   = this.activeData;
+    const mod = this.activeModuleName;
+    const lines = [];
+
+    lines.push(`"Linear Algebra Solver - ${mod}"`);
+    lines.push(`"Generated","${new Date().toLocaleString()}"`);
+    lines.push(`"Operation","${d.operation || ''}"`);
+    lines.push('');
+
+    // Result Matrix
+    if (d.result_display && Array.isArray(d.result_display) && Array.isArray(d.result_display[0])) {
+      lines.push('"Result Matrix:"');
+      d.result_display.forEach(row => {
+        lines.push((Array.isArray(row) ? row : [row]).map(val => `"${val}"`).join(','));
+      });
+      lines.push('');
+    } else if (d.result_display !== undefined && d.result_display !== null) {
+      lines.push(`"Result","${d.result_display}"`);
+      lines.push('');
+    }
+
+    // Solution variables
+    const solObj = d.solution || d.solutions;
+    if (solObj && typeof solObj === 'object') {
+      lines.push('"Variable","Value"');
+      Object.entries(solObj).forEach(([k, v]) => {
+        lines.push(`"${k}","${v}"`);
+      });
+      lines.push('');
+    }
+
+    // Eigenpairs
+    if (d.eigenvalues && Array.isArray(d.eigenvalues)) {
+      lines.push('"Pair","Eigenvalue","Eigenvector"');
+      d.eigenvalues.forEach((val, i) => {
+        const vec = d.eigenvectors && d.eigenvectors[i]
+          ? `"[${d.eigenvectors[i].join(', ')}]"`
+          : '""';
+        lines.push(`"λ${i + 1}","${val}",${vec}`);
+      });
+      lines.push('');
+    }
+
+    // Computation Steps
+    if (d.steps && d.steps.length > 0) {
+      lines.push('"Step","Title","Explanation"');
+      d.steps.forEach((step, idx) => {
+        const text = this.stripHtml(step.text || '').replace(/"/g, '""');
+        lines.push(`"${idx + 1}","${step.title.replace(/"/g, '""')}","${text}"`);
+      });
+    }
+
+    return lines.join('\n');
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  //  LaTeX DOCUMENT EXPORT — compilable .tex file
+  // ═══════════════════════════════════════════════════════════
+  buildFormattedLaTeXDoc() {
+    if (!this.activeData) return '';
+    const d   = this.activeData;
+    const mod = this.activeModuleName;
+    const op  = d.operation || '';
+    const date = new Date().toLocaleString();
+    const formula = this.getFormula(mod, d);
+
+    let tex = `% =========================================================\n`;
+    tex    += `% Linear Algebra Solution Document\n`;
+    tex    += `% Generated: ${date}\n`;
+    tex    += `% =========================================================\n`;
+    tex    += `\\documentclass[11pt,a4paper]{article}\n`;
+    tex    += `\\usepackage[utf8]{inputenc}\n`;
+    tex    += `\\usepackage{amsmath,amssymb,amsfonts}\n`;
+    tex    += `\\usepackage{geometry}\n`;
+    tex    += `\\geometry{margin=1in}\n`;
+    tex    += `\\usepackage{xcolor}\n`;
+    tex    += `\\usepackage{hyperref}\n\n`;
+    tex    += `\\title{\\textbf{Linear Algebra Solution Report}\\\\[0.5em]\\large ${mod}${op ? ' -- ' + op : ''}}\n`;
+    tex    += `\\author{Linear Algebra Solver Engine}\n`;
+    tex    += `\\date{${date}}\n\n`;
+    tex    += `\\begin{document}\n\\maketitle\n\n`;
+
+    if (formula) {
+      tex += `\\section*{1. Governing Formula \\& Method}\n`;
+      tex += `\\[ ${formula} \\]\n\n`;
+    }
+
+    tex += `\\section*{2. Step-by-Step Computation}\n`;
+    if (d.steps && d.steps.length > 0) {
+      d.steps.forEach((step, idx) => {
+        tex += `\\subsection*{Step ${idx + 1}: ${step.title}}\n`;
+        if (step.text) tex += `${this.stripHtml(step.text)}\\\\[0.5em]\n`;
+        if (step.latex) tex += `\\[ ${step.latex} \\]\n`;
+        tex += `\n`;
+      });
+    } else {
+      tex += `No steps available.\n\n`;
+    }
+
+    tex += `\\section*{3. Final Calculated Result}\n`;
+    if (d.result_latex) {
+      tex += `\\[ ${d.result_latex} \\]\n`;
+    } else if (d.result_display) {
+      tex += `Result: \\textbf{${d.result_display}}\n`;
+    }
+
+    tex += `\n\\end{document}\n`;
+    return tex;
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  //  PDF EXPORT — HTML for html2pdf
   // ═══════════════════════════════════════════════════════════
   buildPDFHtml() {
     if (!this.activeData) return '';
@@ -428,19 +565,15 @@ const SolutionExporter = {
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; color: #1e293b; background: #fff; }
       .page { padding: 32px 36px; }
-      /* Header */
       .hdr { border-bottom: 3px solid #16a34a; padding-bottom: 14px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: flex-end; }
       .hdr-left h1 { font-size: 20px; font-weight: 800; color: #16a34a; margin-bottom: 2px; }
       .hdr-left h2 { font-size: 13px; font-weight: 600; color: #334155; }
       .hdr-right { text-align: right; font-size: 10px; color: #94a3b8; }
-      /* Section headers */
       .sec-lbl { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; padding: 4px 10px; border-radius: 4px; display: inline-block; }
       .sec-lbl.blue  { color: #0891b2; background: #f0f9ff; }
       .sec-lbl.amber { color: #b45309; background: #fffbeb; }
       .sec-lbl.green { color: #15803d; background: #f0fdf4; }
-      /* Formula box */
       .formula-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 12px 16px; font-family: 'Courier New', monospace; font-size: 12px; color: #0c4a6e; word-break: break-all; margin-bottom: 20px; }
-      /* Steps */
       .step { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #16a34a; border-radius: 6px; padding: 12px 14px; margin-bottom: 10px; page-break-inside: avoid; }
       .step-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
       .step-num { width: 24px; height: 24px; border-radius: 50%; background: #16a34a; color: #fff; font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -449,29 +582,23 @@ const SolutionExporter = {
       .step-list { margin: 4px 0 4px 34px; padding-left: 16px; font-size: 12px; color: #334155; }
       .step-list li { margin-bottom: 2px; }
       .step-formula { font-family: 'Courier New', monospace; font-size: 11px; color: #1e40af; background: #eff6ff; border-radius: 4px; padding: 4px 8px; margin: 6px 0 2px 34px; word-break: break-all; }
-      /* Result */
       .result-box { background: #f0fdf4; border: 2px solid #86efac; border-radius: 10px; padding: 18px 20px; text-align: center; margin-bottom: 20px; }
       .result-value { font-size: 18px; font-weight: 800; color: #14532d; }
       .result-label { font-size: 10px; color: #15803d; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
-      /* Matrix table */
       .mat-table { border-collapse: collapse; margin: 8px auto; font-family: 'Courier New', monospace; font-size: 12px; }
       .mat-table td { padding: 5px 12px; border: 1px solid #cbd5e1; text-align: right; }
-      /* Solution vars */
       .sol-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
       .sol-item { background: #fff; border: 2px solid #16a34a; border-radius: 8px; padding: 8px 16px; text-align: center; min-width: 80px; }
       .sol-var  { font-size: 11px; color: #6b7280; font-weight: 600; }
       .sol-val  { font-size: 16px; font-weight: 800; color: #14532d; }
-      /* Eigen table */
       .eigen-table { border-collapse: collapse; width: 100%; font-size: 12px; }
       .eigen-table th { background: #f1f5f9; color: #475569; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; padding: 6px 10px; border: 1px solid #e2e8f0; text-align: left; }
       .eigen-table td { padding: 8px 10px; border: 1px solid #e2e8f0; font-family: 'Courier New', monospace; }
       .eigen-table tr:nth-child(even) td { background: #f8fafc; }
-      /* Footer */
       .footer { margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px; text-align: center; color: #94a3b8; font-size: 10px; }
       hr { border: none; border-top: 1px solid #e2e8f0; margin: 18px 0; }
     `;
 
-    // Build steps HTML
     let stepsHtml = '';
     if (d.steps && d.steps.length > 0) {
       stepsHtml = d.steps.map((step, idx) => `
@@ -489,7 +616,6 @@ const SolutionExporter = {
       stepsHtml = '<p style="color:#94a3b8; font-style:italic;">No computation steps recorded.</p>';
     }
 
-    // Build result HTML
     let resultHtml = '';
     const solObj = d.solution || d.solutions;
 
@@ -560,7 +686,7 @@ const SolutionExporter = {
     </body></html>`;
   },
 
-  // ─── Download helpers ─────────────────────────────────────
+  // ─── Trigger file download helper ─────────────────────────
   triggerDownload(content, filename, type = 'text/plain') {
     const blob = new Blob([content], { type: `${type};charset=utf-8` });
     const url  = URL.createObjectURL(blob);
@@ -578,6 +704,7 @@ const SolutionExporter = {
     return this.activeModuleName.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
   },
 
+  // ─── Export Action Trigger Methods ────────────────────────
   downloadTXT() {
     if (!this.activeData) return;
     this.triggerDownload(this.buildFormattedText(), `${this.safeName()}_solution.txt`, 'text/plain');
@@ -593,26 +720,60 @@ const SolutionExporter = {
     this.triggerDownload(this.buildFormattedJSON(), `${this.safeName()}_solution.json`, 'application/json');
   },
 
+  downloadCSV() {
+    if (!this.activeData) return;
+    this.triggerDownload(this.buildFormattedCSV(), `${this.safeName()}_solution.csv`, 'text/csv');
+  },
+
+  downloadLaTeX() {
+    if (!this.activeData) return;
+    this.triggerDownload(this.buildFormattedLaTeXDoc(), `${this.safeName()}_solution.tex`, 'application/x-tex');
+  },
+
+  downloadHTML() {
+    if (!this.activeData) return;
+    this.triggerDownload(this.buildPDFHtml(), `${this.safeName()}_solution.html`, 'text/html');
+  },
+
+  // ─── Clipboard Action Methods ─────────────────────────────
   copyToClipboard() {
     if (!this.activeData) return;
     const txt = this.buildFormattedText();
+    this.copyString(txt, 'Copied plain text solution to clipboard!');
+  },
+
+  copyLaTeX() {
+    if (!this.activeData) return;
+    const latex = this.activeData.result_latex
+      ? `\\[ ${this.activeData.result_latex} \\]`
+      : this.buildFormattedLaTeXDoc();
+    this.copyString(latex, 'Copied LaTeX code to clipboard!');
+  },
+
+  copyMD() {
+    if (!this.activeData) return;
+    const md = this.buildFormattedMD();
+    this.copyString(md, 'Copied Markdown solution to clipboard!');
+  },
+
+  copyString(text, successMsg) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(txt)
-        .then(() => { if (typeof showToast === 'function') showToast('Copied full solution to clipboard!', 'success'); })
-        .catch(() => this.fallbackCopy(txt));
+      navigator.clipboard.writeText(text)
+        .then(() => { if (typeof showToast === 'function') showToast(successMsg, 'success'); })
+        .catch(() => this.fallbackCopy(text, successMsg));
     } else {
-      this.fallbackCopy(txt);
+      this.fallbackCopy(text, successMsg);
     }
   },
 
-  fallbackCopy(text) {
+  fallbackCopy(text, successMsg = 'Copied to clipboard!') {
     const ta = document.createElement('textarea');
     ta.value = text;
     document.body.appendChild(ta);
     ta.select();
     document.execCommand('copy');
     document.body.removeChild(ta);
-    if (typeof showToast === 'function') showToast('Copied full solution to clipboard!', 'success');
+    if (typeof showToast === 'function') showToast(successMsg, 'success');
   },
 
   downloadPDF() {
@@ -621,12 +782,10 @@ const SolutionExporter = {
     const filename = `${this.safeName()}_solution.pdf`;
 
     if (!window.html2pdf) {
-      // Fallback: download as HTML file
       this.triggerDownload(htmlStr, filename.replace('.pdf', '.html'), 'text/html');
       return;
     }
 
-    // Create hidden iframe to render the standalone HTML doc
     const iframe = document.createElement('iframe');
     iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:794px;height:1px;';
     document.body.appendChild(iframe);
@@ -634,7 +793,7 @@ const SolutionExporter = {
     iframe.contentDocument.write(htmlStr);
     iframe.contentDocument.close();
 
-    if (typeof showToast === 'function') showToast('Generating PDF…', 'info');
+    if (typeof showToast === 'function') showToast('Generating PDF document…', 'info');
 
     setTimeout(() => {
       html2pdf().set({

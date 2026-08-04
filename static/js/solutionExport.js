@@ -223,11 +223,11 @@ const SolutionExporter = {
           <div class="d-flex align-items-center gap-2">
             <div class="download-icon-box"><i class="fas fa-file-export"></i></div>
             <div>
-              <h6 class="fw-bold mb-0 text-primary-accent">Export Solution</h6>
-              <p class="small text-secondary mb-0">Download or copy full calculation steps and results in professional formats</p>
+              <h6 class="fw-bold mb-0" style="color:var(--primary-accent)">Export Solution</h6>
+              <p class="small mb-0" style="color:var(--text-muted)">Download your full solution in professional formats</p>
             </div>
           </div>
-          <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small">
+          <span class="badge px-2 py-1 small" style="background:rgba(var(--primary-accent-rgb),0.12);color:var(--primary-accent);border:1px solid rgba(var(--primary-accent-rgb),0.30)">
             <i class="fas fa-check-circle me-1"></i>Available Export Formats
           </span>
         </div>
@@ -235,43 +235,47 @@ const SolutionExporter = {
         <div class="row g-2 mb-3">
           <div class="col-6 col-sm-4 col-md-3">
             <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadPDF()" title="Download PDF Report">
-              <i class="fas fa-file-pdf text-danger fs-5 mb-1 d-block"></i><span>PDF Document</span>
+              <i class="fas fa-file-pdf fs-5 mb-1 d-block" style="color:var(--primary-accent)"></i>
+              <span>PDF Document</span>
             </button>
           </div>
           <div class="col-6 col-sm-4 col-md-3">
             <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadWord()" title="Download Word Document (.docx)">
-              <i class="fas fa-file-word fs-5 mb-1 d-block" style="color:#2b7cd3;"></i><span>Word (.docx)</span>
+              <i class="fas fa-file-word fs-5 mb-1 d-block" style="color:var(--primary-accent)"></i>
+              <span>Word (.docx)</span>
             </button>
           </div>
           <div class="col-6 col-sm-4 col-md-3">
             <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadLaTeX()" title="Download LaTeX Document (.tex)">
-              <i class="fas fa-square-root-variable text-purple fs-5 mb-1 d-block" style="color:#a855f7;"></i><span>LaTeX (.tex)</span>
+              <i class="fas fa-square-root-variable fs-5 mb-1 d-block" style="color:var(--primary-accent)"></i>
+              <span>LaTeX (.tex)</span>
             </button>
           </div>
           <div class="col-6 col-sm-4 col-md-3">
             <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.printSolution()" title="Print Solution">
-              <i class="fas fa-print text-info fs-5 mb-1 d-block"></i><span>Print</span>
+              <i class="fas fa-print fs-5 mb-1 d-block" style="color:var(--primary-accent)"></i>
+              <span>Print</span>
             </button>
           </div>
         </div>
 
-        <div class="pt-3 border-top border-secondary-subtle d-flex flex-wrap align-items-center justify-content-between gap-2">
-          <span class="small text-secondary fw-semibold"><i class="fas fa-bolt me-1"></i>Quick Actions:</span>
+        <div class="pt-3 d-flex flex-wrap align-items-center justify-content-between gap-2" style="border-top:1px solid var(--border-color)">
+          <span class="small fw-semibold" style="color:var(--text-muted)"><i class="fas fa-bolt me-1" style="color:var(--primary-accent)"></i>Quick Actions:</span>
           <div class="d-flex flex-wrap gap-2">
-            <button type="button" class="btn btn-sm btn-success text-white fw-bold px-3" onclick="SolutionExporter.downloadPDF()" title="Download PDF Report">
+            <button type="button" class="btn btn-primary-custom btn-sm fw-bold px-3" onclick="SolutionExporter.downloadPDF()" title="Download PDF Report">
               <i class="fas fa-file-pdf me-1"></i>Download PDF
             </button>
-            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.downloadWord()" title="Download Word Document">
-              <i class="fas fa-file-word me-1 text-primary"></i>Word (.docx)
+            <button type="button" class="btn btn-secondary-custom btn-sm" onclick="SolutionExporter.downloadWord()" title="Download Word Document">
+              <i class="fas fa-file-word me-1" style="color:var(--primary-accent)"></i>Word (.docx)
             </button>
-            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.downloadLaTeX()" title="Download LaTeX Document">
-              <i class="fas fa-square-root-variable me-1 text-purple" style="color:#a855f7;"></i>LaTeX (.tex)
+            <button type="button" class="btn btn-secondary-custom btn-sm" onclick="SolutionExporter.downloadLaTeX()" title="Download LaTeX Document">
+              <i class="fas fa-square-root-variable me-1" style="color:var(--primary-accent)"></i>LaTeX (.tex)
             </button>
-            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyLaTeX()" title="Copy LaTeX Formula">
-              <i class="fas fa-copy me-1 text-info"></i>Copy LaTeX
+            <button type="button" class="btn btn-secondary-custom btn-sm" onclick="SolutionExporter.copyLaTeX()" title="Copy LaTeX Formula">
+              <i class="fas fa-copy me-1" style="color:var(--primary-accent)"></i>Copy LaTeX
             </button>
-            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.printSolution()" title="Print Solution">
-              <i class="fas fa-print me-1 text-info"></i>Print
+            <button type="button" class="btn btn-secondary-custom btn-sm" onclick="SolutionExporter.printSolution()" title="Print Solution">
+              <i class="fas fa-print me-1" style="color:var(--primary-accent)"></i>Print
             </button>
           </div>
         </div>

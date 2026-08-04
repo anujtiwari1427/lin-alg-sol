@@ -515,7 +515,7 @@ h1, h2, h3, h4, h5, h6 {
 .btn-secondary-custom:hover {
   border-color: var(--primary-accent);
   color: var(--primary-accent);
-  background: rgba(121, 193, 49, 0.10);
+  background: rgba(var(--primary-accent-rgb), 0.10);
 }
 
 /* ---------------------------------------------------------
@@ -541,7 +541,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-export:hover {
   border-color: var(--primary-accent);
-  background: rgba(121, 193, 49, 0.08);
+  background: rgba(var(--primary-accent-rgb), 0.08);
   transform: translateY(-2px);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
   color: var(--primary-accent);
@@ -555,7 +555,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: rgba(121, 193, 49, 0.15);
+  background: rgba(var(--primary-accent-rgb), 0.15);
   color: var(--primary-accent);
   display: flex;
   align-items: center;

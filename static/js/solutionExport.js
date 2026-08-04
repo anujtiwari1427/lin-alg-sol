@@ -286,22 +286,22 @@ const SolutionExporter = {
         </div>
 
         <div class="pt-3 border-top border-secondary-subtle d-flex flex-wrap align-items-center justify-content-between gap-2">
-          <span class="small text-secondary fw-semibold"><i class="fas fa-file-export me-1"></i>Quick Export Actions:</span>
+          <span class="small text-secondary fw-semibold"><i class="fas fa-copy me-1"></i>Quick Actions &amp; Clipboard:</span>
           <div class="d-flex flex-wrap gap-2">
             <button type="button" class="btn btn-sm btn-success text-white fw-bold px-3" onclick="SolutionExporter.downloadPDF()" title="Download PDF Report">
-              <i class="fas fa-file-pdf me-1"></i>Download PDF Report
+              <i class="fas fa-file-pdf me-1"></i>Download PDF
             </button>
             <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.printSolution()" title="Print Solution">
               <i class="fas fa-print me-1 text-info"></i>Print Solution
             </button>
-            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.downloadTXT()" title="Export Plain Text File">
-              <i class="fas fa-file-lines me-1 text-info"></i>Export Text
+            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyToClipboard()" title="Copy Text Solution to Clipboard">
+              <i class="fas fa-copy me-1 text-info"></i>Copy Text
             </button>
-            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.downloadLaTeX()" title="Export LaTeX Document">
-              <i class="fas fa-square-root-variable me-1 text-purple" style="color:#a855f7;"></i>Export LaTeX
+            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyLaTeX()" title="Copy LaTeX Formula to Clipboard">
+              <i class="fas fa-square-root-variable me-1 text-purple" style="color:#a855f7;"></i>Copy LaTeX
             </button>
-            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.downloadMD()" title="Export Markdown Document">
-              <i class="fab fa-markdown me-1 text-warning"></i>Export Markdown
+            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyMD()" title="Copy Markdown to Clipboard">
+              <i class="fab fa-markdown me-1 text-warning"></i>Copy Markdown
             </button>
           </div>
         </div>

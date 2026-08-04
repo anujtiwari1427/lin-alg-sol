@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(data => {
       document.getElementById('btnCalculate').classList.remove('btn-loading');
       if (data.success) {
-        displayResults(data);
+        displayResults(data, payload);
       } else {
         showToast(data.error || 'Calculation failed.', 'danger');
       }
@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  function displayResults(data) {
+  function displayResults(data, payload) {
     document.getElementById('placeholderResult').style.display = 'none';
     const output = document.getElementById('outputContent');
     output.style.display = 'block';

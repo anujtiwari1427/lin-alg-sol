@@ -224,11 +224,11 @@ const SolutionExporter = {
             <div class="download-icon-box"><i class="fas fa-file-export"></i></div>
             <div>
               <h6 class="fw-bold mb-0 text-primary-accent">Export Solution</h6>
-              <p class="small text-secondary mb-0">Download or copy full calculation steps and results in multiple formats</p>
+              <p class="small text-secondary mb-0">Download or copy full calculation steps and results in professional formats</p>
             </div>
           </div>
           <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small">
-            <i class="fas fa-check-circle me-1"></i>8 Export Formats Available
+            <i class="fas fa-check-circle me-1"></i>9 Professional Export Formats
           </span>
         </div>
 
@@ -239,13 +239,18 @@ const SolutionExporter = {
             </button>
           </div>
           <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadTXT()" title="Download Plain Text File">
-              <i class="fas fa-file-lines text-info fs-5 mb-1 d-block"></i><span>Plain Text</span>
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadWord()" title="Download Word Document (.docx)">
+              <i class="fas fa-file-word fs-5 mb-1 d-block" style="color:#2b7cd3;"></i><span>Word (.docx)</span>
             </button>
           </div>
           <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadMD()" title="Download Markdown Document">
-              <i class="fab fa-markdown text-warning fs-5 mb-1 d-block"></i><span>Markdown</span>
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadExcel()" title="Download Excel Workbook (.xlsx)">
+              <i class="fas fa-file-excel fs-5 mb-1 d-block" style="color:#107c41;"></i><span>Excel (.xlsx)</span>
+            </button>
+          </div>
+          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadCSV()" title="Download CSV Spreadsheet">
+              <i class="fas fa-file-csv text-primary fs-5 mb-1 d-block"></i><span>CSV Table</span>
             </button>
           </div>
           <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
@@ -254,8 +259,8 @@ const SolutionExporter = {
             </button>
           </div>
           <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadCSV()" title="Download CSV Spreadsheet">
-              <i class="fas fa-file-csv text-primary fs-5 mb-1 d-block"></i><span>CSV Table</span>
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadMD()" title="Download Markdown Document">
+              <i class="fab fa-markdown text-warning fs-5 mb-1 d-block"></i><span>Markdown</span>
             </button>
           </div>
           <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
@@ -269,8 +274,8 @@ const SolutionExporter = {
             </button>
           </div>
           <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadWord()" title="Download Word Document">
-              <i class="fas fa-file-word fs-5 mb-1 d-block" style="color:#2b7cd3;"></i><span>Word (.doc)</span>
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadTXT()" title="Download Plain Text File">
+              <i class="fas fa-file-lines text-info fs-5 mb-1 d-block"></i><span>Plain Text</span>
             </button>
           </div>
           <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
@@ -281,19 +286,22 @@ const SolutionExporter = {
         </div>
 
         <div class="pt-3 border-top border-secondary-subtle d-flex flex-wrap align-items-center justify-content-between gap-2">
-          <span class="small text-secondary fw-semibold"><i class="fas fa-paste me-1"></i>Quick Clipboard Actions:</span>
+          <span class="small text-secondary fw-semibold"><i class="fas fa-file-export me-1"></i>Quick Export Actions:</span>
           <div class="d-flex flex-wrap gap-2">
-            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.printSolution()">
+            <button type="button" class="btn btn-sm btn-success text-white fw-bold px-3" onclick="SolutionExporter.downloadPDF()" title="Download PDF Report">
+              <i class="fas fa-file-pdf me-1"></i>Download PDF Report
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.printSolution()" title="Print Solution">
               <i class="fas fa-print me-1 text-info"></i>Print Solution
             </button>
-            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyToClipboard()">
-              <i class="fas fa-copy me-1"></i>Copy Text
+            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.downloadTXT()" title="Export Plain Text File">
+              <i class="fas fa-file-lines me-1 text-info"></i>Export Text
             </button>
-            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyLaTeX()">
-              <i class="fas fa-square-root-variable me-1"></i>Copy LaTeX
+            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.downloadLaTeX()" title="Export LaTeX Document">
+              <i class="fas fa-square-root-variable me-1 text-purple" style="color:#a855f7;"></i>Export LaTeX
             </button>
-            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyMD()">
-              <i class="fab fa-markdown me-1"></i>Copy Markdown
+            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.downloadMD()" title="Export Markdown Document">
+              <i class="fab fa-markdown me-1 text-warning"></i>Export Markdown
             </button>
           </div>
         </div>
@@ -906,13 +914,12 @@ const SolutionExporter = {
 
   // ─── Export Action Trigger Methods ────────────────────────
 
-  // PDF export via Server-side ReportLab API (/api/export/pdf)
-  downloadPDF() {
+  downloadServerExport(fmt) {
     if (!this.activeData) {
       const btnCalc = document.getElementById('btnCalculate');
       if (btnCalc) {
-        if (typeof showToast === 'function') showToast('Calculating solution before generating PDF…', 'info');
-        this.pendingAction = 'pdf';
+        if (typeof showToast === 'function') showToast(`Calculating solution before generating ${fmt.toUpperCase()} export…`, 'info');
+        this.pendingAction = fmt;
         btnCalc.click();
         return;
       }
@@ -920,9 +927,9 @@ const SolutionExporter = {
       return;
     }
 
-    if (typeof showToast === 'function') showToast('Generating PDF\u2026', 'info');
+    if (typeof showToast === 'function') showToast(`Generating ${fmt.toUpperCase()} report…`, 'info');
 
-    fetch('/api/export/pdf', {
+    fetch(`/api/export/${fmt}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -932,81 +939,41 @@ const SolutionExporter = {
       })
     })
     .then(res => {
-      if (!res.ok) throw new Error('PDF service HTTP ' + res.status);
-      return res.blob();
+      if (!res.ok) throw new Error(`${fmt} export service HTTP ${res.status}`);
+      const disposition = res.headers.get('Content-Disposition');
+      let filename = `${this.safeName()}_solution.${fmt}`;
+      if (disposition && disposition.indexOf('filename=') !== -1) {
+        const matches = /filename="?([^";]+)"?/.exec(disposition);
+        if (matches && matches[1]) filename = matches[1];
+      }
+      return res.blob().then(blob => ({ blob, filename }));
     })
-    .then(blob => {
+    .then(({ blob, filename }) => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${this.safeName()}_solution.pdf`;
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      if (typeof showToast === 'function') showToast(`Downloaded: ${this.safeName()}_solution.pdf`, 'success');
+      if (typeof showToast === 'function') showToast(`Downloaded: ${filename}`, 'success');
     })
     .catch(err => {
-      console.warn('[SolutionExporter] Server PDF fallback to print dialog:', err);
-      if (typeof showToast === 'function') showToast('Opening print dialog for PDF export…', 'info');
-      this.printSolution();
+      console.warn(`[SolutionExporter] Server ${fmt} export error:`, err);
+      if (typeof showToast === 'function') showToast(`Failed to generate ${fmt.toUpperCase()} report.`, 'danger');
     });
   },
 
-  downloadTXT() {
-    if (!this.activeData) return;
-    this.triggerDownload(this.buildFormattedText(), `${this.safeName()}_solution.txt`, 'text/plain');
-  },
-
-  downloadMD() {
-    if (!this.activeData) return;
-    this.triggerDownload(this.buildFormattedMD(), `${this.safeName()}_solution.md`, 'text/markdown');
-  },
-
-  downloadJSON() {
-    if (!this.activeData) return;
-    this.triggerDownload(this.buildFormattedJSON(), `${this.safeName()}_solution.json`, 'application/json');
-  },
-
-  downloadCSV() {
-    if (!this.activeData) return;
-    this.triggerDownload(this.buildFormattedCSV(), `${this.safeName()}_solution.csv`, 'text/csv');
-  },
-
-  downloadLaTeX() {
-    if (!this.activeData) return;
-    this.triggerDownload(this.buildFormattedLaTeXDoc(), `${this.safeName()}_solution.tex`, 'application/x-tex');
-  },
-
-  downloadHTML() {
-    if (!this.activeData) return;
-    this.triggerDownload(this.buildPDFHtml(), `${this.safeName()}_solution.html`, 'text/html');
-  },
-
-  downloadWord() {
-    if (!this.activeData) {
-      const btnCalc = document.getElementById('btnCalculate');
-      if (btnCalc) {
-        if (typeof showToast === 'function') showToast('Calculating solution before downloading Word doc…', 'info');
-        this.pendingAction = 'word';
-        btnCalc.click();
-        return;
-      }
-      if (typeof showToast === 'function') showToast('Please calculate a solution first.', 'warning');
-      return;
-    }
-    const content = this.buildWordHtml();
-    const blob = new Blob([content], { type: 'application/msword;charset=utf-8' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = `${this.safeName()}_solution.doc`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    if (typeof showToast === 'function') showToast(`Downloaded: ${this.safeName()}_solution.doc`, 'success');
-  },
+  downloadPDF() { this.downloadServerExport('pdf'); },
+  downloadWord() { this.downloadServerExport('docx'); },
+  downloadExcel() { this.downloadServerExport('xlsx'); },
+  downloadCSV() { this.downloadServerExport('csv'); },
+  downloadJSON() { this.downloadServerExport('json'); },
+  downloadMD() { this.downloadServerExport('md'); },
+  downloadLaTeX() { this.downloadServerExport('tex'); },
+  downloadHTML() { this.downloadServerExport('html'); },
+  downloadTXT() { this.downloadServerExport('txt'); },
 
   // ─── Clipboard Action Methods ─────────────────────────────
   copyToClipboard() {

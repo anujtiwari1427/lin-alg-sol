@@ -59,10 +59,11 @@ def learning_module():
     return render_template('dashboard.html', **ctx)
 
 
+@main_bp.route('/api/export/<format_type>', methods=['POST'])
 @main_bp.route('/api/export/pdf', methods=['POST'])
-def export_pdf():
+def export_solution(format_type='pdf'):
     try:
-        from services.pdf_service import PDFService
+        from services.export_service import ExportService
         import io
         from flask import send_file
 
@@ -71,15 +72,22 @@ def export_pdf():
         module_name   = req.get('module_name', 'Linear Algebra Solution')
         question_data = req.get('question_data', {})
 
-        pdf_bytes = PDFService.generate_pdf(solution_data, module_name, question_data)
-        safe_name = module_name.lower().replace(' ', '_')
+        content, mimetype, filename = ExportService.export(
+            format_type, solution_data, module_name, question_data
+        )
+
+        if isinstance(content, str):
+            content_bytes = content.encode('utf-8')
+        else:
+            content_bytes = content
 
         return send_file(
-            io.BytesIO(pdf_bytes),
-            mimetype='application/pdf',
+            io.BytesIO(content_bytes),
+            mimetype=mimetype,
             as_attachment=True,
-            download_name=f'{safe_name}_solution.pdf'
+            download_name=filename
         )
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
 

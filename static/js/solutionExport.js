@@ -15,7 +15,11 @@ const SolutionExporter = {
     this.activeData = data;
     this.activeModuleName = moduleName || 'Linear Algebra Solution';
     this.activeQuestion = questionData || null;
-    this.renderDirectSolution(data, moduleName);
+    try {
+      this.renderDirectSolution(data, moduleName);
+    } catch (e) {
+      console.error('[SolutionExporter] renderDirectSolution error:', e);
+    }
   },
 
   // ─── Build HTML block for question/input section ──────
@@ -58,11 +62,15 @@ const SolutionExporter = {
     if (q.matrix_a) body += matrixTable(q.matrix_a, 'Matrix A');
     if (q.matrix_b) body += matrixTable(q.matrix_b, 'Matrix B');
     if (q.matrix)   body += matrixTable(q.matrix,   'Input Matrix A');
-    if (q.scalar !== undefined && q.scalar !== null) {
+    // scalar: only show when it is a finite number (guard against NaN)
+    if (q.scalar !== undefined && q.scalar !== null && Number.isFinite(q.scalar)) {
       body += `<div style="margin-bottom:8px;"><b>Scalar k:</b> ${q.scalar}</div>`;
     }
-    if (q.vector_u) body += vecRow(q.vector_u, 'Vector u');
-    if (q.vector_v) body += vecRow(q.vector_v, 'Vector v');
+    // vectors — support both key naming conventions
+    const vu = q.vector_u || q.vector_a;
+    const vv = q.vector_v || q.vector_b;
+    if (vu) body += vecRow(vu, 'Vector u');
+    if (vv) body += vecRow(vv, 'Vector v');
     if (q.coefficients) {
       // Linear system [A|b]
       const n = q.coefficients.length;
@@ -82,11 +90,11 @@ const SolutionExporter = {
 
     if (!body) return '';
 
-    const borderColor = forPrint ? '#bae6fd' : '#bae6fd';
+    const borderColor = '#bae6fd';
     return `
       <div style="background:#f0f9ff;border:2px solid ${borderColor};border-radius:8px;padding:14px 18px;margin-bottom:18px;">
         <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#0891b2;margin-bottom:10px;">
-          &#x1F4DD; Question / Input Data
+          [INPUT] Question / Input Data
         </div>
         ${body}
       </div>`;

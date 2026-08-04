@@ -5,8 +5,10 @@
       - Green: #79C131
       - Black: #161616
       - Light Yellow: #EDE1AC
-   2. Ocean Deep Theme (Navy #140C30 → Teal #16A085)
-   3. Light Mode
+   2. Ocean Deep Theme (Navy #0D1F23 → Slate #AFB3B7)
+   3. Butter & Forest Green Theme (#FFEFB3 butter + #013E37 green)
+   4. Burgundy & Black Theme (#6D001A burgundy + #000000 black)
+   5. Light Mode
    ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap');
@@ -72,6 +74,54 @@
   --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(105,129,141,0.40) 0%, rgba(45,74,83,0.30) 55%, #0D1F23 85%);
   --card-shadow:        0 12px 40px -8px rgba(0,0,0,0.92);
   --glass-shadow:       0 8px 32px 0 rgba(0,0,0,0.70), 0 0 0 1px rgba(105,129,141,0.08);
+}
+
+/* ---------------------------------------------------------
+   CSS Custom Properties — Butter & Forest Green Theme
+   (#013E37 forest green + #FFEFB3 butter yellow)
+   --------------------------------------------------------- */
+[data-theme="butter"] {
+  --bg-primary:       #012a25;
+  --bg-secondary:     #013E37;
+  --bg-card:          rgba(1, 62, 55, 0.84);
+  --bg-glass:         rgba(1, 40, 36, 0.94);
+  --border-color:     rgba(255, 239, 179, 0.22);
+  --border-highlight: #FFEFB3;
+
+  --text-primary:   #FFEFB3;
+  --text-secondary: #ffe87a;
+  --text-muted:     #b8a85e;
+
+  --primary-accent:     #FFEFB3;
+  --primary-accent-rgb: 255, 239, 179;
+  --primary-gradient:   linear-gradient(135deg, #013E37 0%, #025c4e 50%, #FFEFB3 100%);
+  --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(255,239,179,0.38) 0%, rgba(1,62,55,0.40) 55%, #012a25 85%);
+  --card-shadow:        0 12px 40px -8px rgba(0,0,0,0.92);
+  --glass-shadow:       0 8px 32px 0 rgba(0,0,0,0.70), 0 0 0 1px rgba(255,239,179,0.08);
+}
+
+/* ---------------------------------------------------------
+   CSS Custom Properties — Burgundy & Black Theme
+   (#000000 jet black + #6D001A deep burgundy + #FFFFFF white)
+   --------------------------------------------------------- */
+[data-theme="burgundy"] {
+  --bg-primary:       #0a0000;
+  --bg-secondary:     #1a0008;
+  --bg-card:          rgba(60, 0, 14, 0.80);
+  --bg-glass:         rgba(10, 0, 0, 0.94);
+  --border-color:     rgba(109, 0, 26, 0.40);
+  --border-highlight: #6D001A;
+
+  --text-primary:   #ffffff;
+  --text-secondary: #c47a8a;
+  --text-muted:     #7a3040;
+
+  --primary-accent:     #6D001A;
+  --primary-accent-rgb: 109, 0, 26;
+  --primary-gradient:   linear-gradient(135deg, #000000 0%, #6D001A 55%, #a0102e 100%);
+  --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(109,0,26,0.55) 0%, rgba(60,0,14,0.35) 55%, #0a0000 85%);
+  --card-shadow:        0 12px 40px -8px rgba(0,0,0,0.96);
+  --glass-shadow:       0 8px 32px 0 rgba(0,0,0,0.80), 0 0 0 1px rgba(109,0,26,0.12);
 }
 
 /* ---------------------------------------------------------

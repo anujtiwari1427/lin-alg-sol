@@ -157,34 +157,34 @@ class BaseExporter:
                     "many key linear algebra properties, such as invertibility and linear transformation volume scaling factor. "
                     "A matrix is invertible if and only if its determinant is non-zero.")
         if 'inverse' in mod or 'inverse' in op:
-            return ("The inverse of a square matrix A is a matrix A⁻¹ such that A · A⁻¹ = A⁻¹ · A = I, "
+            return ("The inverse of a square matrix A is a matrix A^-1 such that A * A^-1 = A^-1 * A = I, "
                     "where I is the identity matrix. It can be calculated using the classical adjugate formula "
-                    "A⁻¹ = (1/det(A)) adj(A) or Gauss-Jordan elimination [A | I] → [I | A⁻¹].")
+                    "A^-1 = (1/det(A)) adj(A) or Gauss-Jordan elimination [A | I] -> [I | A^-1].")
         if 'linear' in mod or 'system' in op or 'gaussian' in op:
             return ("A system of linear equations Ax = b represents simultaneous linear relationships. "
                     "Gaussian elimination reduces the augmented matrix [A | b] into Row Echelon Form (REF) or "
                     "Reduced Row Echelon Form (RREF) using elementary row operations to determine exact or parameter solutions.")
         if 'eigen' in mod or 'eigen' in op:
-            return ("Eigenvalues λ and eigenvectors v of a matrix A satisfy the characteristic equation (A - λI)v = 0, "
-                    "where det(A - λI) = 0. Eigenvectors indicate directions along which linear transformation acts as pure scaling by factor λ.")
+            return ("Eigenvalues lambda and eigenvectors v of a matrix A satisfy the characteristic equation (A - lambda*I)v = 0, "
+                    "where det(A - lambda*I) = 0. Eigenvectors indicate directions along which linear transformation acts as pure scaling by factor lambda.")
         if 'vector' in mod or 'vector' in op:
             if 'dot' in op:
-                return ("The dot product u · v = Σ uᵢvᵢ measures the geometric projection and scalar inner product of two vectors, "
+                return ("The dot product u * v = Sum u_i*v_i measures the geometric projection and scalar inner product of two vectors, "
                         "yielding zero when vectors are orthogonal.")
             if 'cross' in op:
-                return ("The cross product u × v calculates a vector perpendicular to both input 3D vectors u and v, "
+                return ("The cross product u x v calculates a vector perpendicular to both input 3D vectors u and v, "
                         "with magnitude equal to the area of the spanned parallelogram.")
             if 'magnitude' in op or 'unit' in op:
-                return ("Vector magnitude ||v|| = √(Σ vᵢ²) measures Euclidean length. A unit vector v̂ = v / ||v|| scales length to 1.")
+                return ("Vector magnitude ||v|| = sqrt(Sum v_i^2) measures Euclidean length. A unit vector v_unit = v / ||v|| scales length to 1.")
             return "Vector operations process directional components in Euclidean space using vector algebra laws."
         
         if 'multi' in op:
-            return ("Matrix multiplication computes entry Cᵢⱼ as the dot product of row i of A and column j of B. "
-                    "Requires inner dimensions to match: (m×n) · (n×p) = (m×p).")
+            return ("Matrix multiplication computes entry C_ij as the dot product of row i of A and column j of B. "
+                    "Requires inner dimensions to match: (m*n) * (n*p) = (m*p).")
         if 'add' in op or 'sub' in op:
             return ("Matrix addition/subtraction operates element-wise on matrices of identical dimensions.")
         if 'transpose' in op:
-            return ("The transpose Aᵀ flips a matrix over its diagonal, converting rows into columns: (Aᵀ)ᵢⱼ = Aⱼᵢ.")
+            return ("The transpose A^T flips a matrix over its diagonal, converting rows into columns: (A^T)_ij = A_ji.")
         if 'trace' in op:
             return ("The trace tr(A) is the sum of main diagonal entries in a square matrix.")
         if 'rank' in op:
@@ -219,7 +219,7 @@ class BaseExporter:
             if 'magnitude' in op:
                 return ("||v|| = sqrt( Sum( v_i^2 ) )", r"\|\vec{v}\| = \sqrt{\sum_{i=1}^{n} v_i^2}")
             if 'unit' in op:
-                return ("v_hat = v / ||v||", r"\hat{v} = \frac{\vec{v}}{\|\vec{v}\|}")
+                return ("v_unit = v / ||v||", r"\hat{v} = \frac{\vec{v}}{\|\vec{v}\|}")
             if 'add' in op:
                 return ("u + v = (u1+v1, u2+v2, ...)", r"\vec{u} + \vec{v} = (u_1+v_1, u_2+v_2, \ldots)")
             if 'sub' in op:
@@ -251,7 +251,7 @@ class BaseExporter:
             vecs = sol.get('eigenvectors', [])
             pairs = []
             for i, val in enumerate(vals):
-                vec_str = f"[{', '.join(map(str, vecs[i]))}]ᵀ" if vecs and i < len(vecs) else "N/A"
+                vec_str = f"[{', '.join(map(str, vecs[i]))}]^T" if vecs and i < len(vecs) else "N/A"
                 pairs.append({'index': i + 1, 'eigenvalue': str(val), 'eigenvector': vec_str})
             return {'type': 'eigenpairs', 'pairs': pairs, 'display': f"{len(vals)} Eigenpairs computed"}
 
@@ -280,7 +280,7 @@ class BaseExporter:
         q = question_data or {}
 
         try:
-            # 1. Inverse Verification A * A⁻¹ = I
+            # 1. Inverse Verification A * A^-1 = I
             if 'inverse' in mod or 'inverse' in op:
                 raw_a = q.get('matrix') or q.get('matrix_a')
                 res_inv = sol.get('result')
@@ -291,13 +291,13 @@ class BaseExporter:
                         product = np.matmul(A, A_inv)
                         identity = np.eye(A.shape[0])
                         residual = float(np.max(np.abs(product - identity)))
-                        status = "VERIFIED ✓ (A × A⁻¹ = I)" if residual < 1e-4 else "APPROXIMATE"
+                        status = "VERIFIED [OK] (A * A^-1 = I)" if residual < 1e-4 else "APPROXIMATE"
                         return {
-                            'method': 'A × A⁻¹ = I',
+                            'method': 'A * A^-1 = I',
                             'formula': r'A \cdot A^{-1} = I',
                             'residual': f'{residual:.6f}',
                             'status': status,
-                            'details': f'Matrix product A × A⁻¹ yields Identity matrix with max residual {residual:.6e}.'
+                            'details': f'Matrix product A * A^-1 yields Identity matrix with max residual {residual:.6e}.'
                         }
 
             # 2. Linear System Verification Ax = b
@@ -313,7 +313,7 @@ class BaseExporter:
                     if A.shape[1] == len(x):
                         ax = np.matmul(A, x)
                         residual = float(np.max(np.abs(ax - b)))
-                        status = "VERIFIED ✓ (Ax = b satisfied)" if residual < 1e-4 else "APPROXIMATE"
+                        status = "VERIFIED [OK] (Ax = b satisfied)" if residual < 1e-4 else "APPROXIMATE"
                         return {
                             'method': 'Residual Check ||b - Ax|| = 0',
                             'formula': r'\|\mathbf{b} - A\mathbf{x}\| = 0',
@@ -322,7 +322,7 @@ class BaseExporter:
                             'details': f'Substitution into original system yields max residual ||b - Ax|| = {residual:.6e}.'
                         }
 
-            # 3. Eigenpairs Verification Av = λv
+            # 3. Eigenpairs Verification Av = lambda*v
             if 'eigen' in mod or 'eigen' in op:
                 raw_a = q.get('matrix')
                 evals = sol.get('eigenvalues')
@@ -338,13 +338,13 @@ class BaseExporter:
                         res = float(np.max(np.abs(av - lam_v)))
                         if res > max_res:
                             max_res = res
-                    status = "VERIFIED ✓ (Av = λv satisfied)" if max_res < 1e-4 else "APPROXIMATE"
+                    status = "VERIFIED [OK] (Av = lambda*v satisfied)" if max_res < 1e-4 else "APPROXIMATE"
                     return {
-                        'method': 'Av = λv Characteristic Equation',
+                        'method': 'Av = lambda*v Characteristic Equation',
                         'formula': r'A\mathbf{v} = \lambda \mathbf{v}',
                         'residual': f'{max_res:.6f}',
                         'status': status,
-                        'details': f'Max eigenvector residual ||Av - λv|| across all eigenpairs = {max_res:.6e}.'
+                        'details': f'Max eigenvector residual ||Av - lambda*v|| across all eigenpairs = {max_res:.6e}.'
                     }
 
             # 4. Determinant Verification
@@ -355,7 +355,7 @@ class BaseExporter:
                         'method': 'Invertibility & Volume Scaling Property',
                         'formula': r'\det(A) \neq 0 \iff A \text{ is invertible}',
                         'residual': '0.000000',
-                        'status': 'VERIFIED ✓',
+                        'status': 'VERIFIED [OK]',
                         'details': f'Determinant = {det_val}. Matrix is {"invertible (non-singular)" if float(det_val) != 0 else "singular (non-invertible)"}.'
                     }
 
@@ -372,9 +372,9 @@ class BaseExporter:
                         dot1 = abs(float(np.dot(w, u)))
                         dot2 = abs(float(np.dot(w, v)))
                         res = max(dot1, dot2)
-                        status = "VERIFIED ✓ ((u × v) ⊥ u and (u × v) ⊥ v)" if res < 1e-4 else "APPROXIMATE"
+                        status = "VERIFIED [OK] ((u x v) perp u and (u x v) perp v)" if res < 1e-4 else "APPROXIMATE"
                         return {
-                            'method': 'Orthogonality Proof (w · u = 0 and w · v = 0)',
+                            'method': 'Orthogonality Proof (w * u = 0 and w * v = 0)',
                             'formula': r'(\vec{u}\times\vec{v})\cdot\vec{u} = 0 \quad\text{and}\quad (\vec{u}\times\vec{v})\cdot\vec{v} = 0',
                             'residual': f'{res:.6f}',
                             'status': status,
@@ -386,9 +386,9 @@ class BaseExporter:
                         w = np.array(res_vec, dtype=float)
                         mag = float(np.linalg.norm(w))
                         res = abs(mag - 1.0)
-                        status = "VERIFIED ✓ (||v̂|| = 1.0)" if res < 1e-4 else "APPROXIMATE"
+                        status = "VERIFIED [OK] (||v_unit|| = 1.0)" if res < 1e-4 else "APPROXIMATE"
                         return {
-                            'method': 'Unit Magnitude Check ||v̂|| = 1',
+                            'method': 'Unit Magnitude Check ||v_unit|| = 1',
                             'formula': r'\|\hat{v}\| = 1',
                             'residual': f'{res:.6f}',
                             'status': status,
@@ -401,7 +401,7 @@ class BaseExporter:
             'method': 'Algebraic Property Consistency Check',
             'formula': r'\text{Verification Check}',
             'residual': '0.000000',
-            'status': 'VERIFIED ✓',
+            'status': 'VERIFIED [OK]',
             'details': 'Solution steps and algebraic operations verified against standard linear algebra definitions.'
         }
 
@@ -411,9 +411,27 @@ class BaseExporter:
 # ==============================================================================
 class PDFExporter(BaseExporter):
 
+    @staticmethod
+    def sanitize_for_pdf(text):
+        if text is None:
+            return ""
+        s = str(text)
+        replacements = {
+            '—': '-', '⁻¹': '^-1', '⁻': '-', '¹': '^1', '²': '^2', '³': '^3',
+            'ᵢ': '_i', 'ⱼ': '_j', 'ₖ': '_k', 'ᵀ': '^T',
+            'λ': 'lambda', 'θ': 'theta', 'Σ': 'Sum', '∏': 'Product',
+            '✓': '[OK]', '✕': '[X]', '→': '->', '⇒': '=>', '·': '*',
+            '▸': '>', '•': '*', '≠': '!=', '≈': '~=', '≤': '<=', '≥': '>=',
+            '±': '+/-', '⊥': ' perp ', 'v̂': 'v_unit', '×': '*', '√': 'sqrt'
+        }
+        for k, v in replacements.items():
+            s = s.replace(k, v)
+        return ''.join(c if ord(c) < 128 else '' for c in s)
+
     @classmethod
     def export(cls, solution_data, module_name, question_data=None):
         r = cls.normalize_report_data(solution_data, module_name, question_data)
+        S = cls.sanitize_for_pdf
         buffer = io.BytesIO()
 
         doc = SimpleDocTemplate(
@@ -462,11 +480,11 @@ class PDFExporter(BaseExporter):
         # --- Header ---
         header_table_data = [
             [
-                Paragraph(f"<b>{r['app_name']}</b>", title_style),
-                Paragraph(f"<b>Date:</b> {r['date']}<br/><b>Time:</b> {r['time']}<br/><b>Version:</b> {r['app_version']}", meta_style)
+                Paragraph(f"<b>{S(r['app_name'])}</b>", title_style),
+                Paragraph(f"<b>Date:</b> {S(r['date'])}<br/><b>Time:</b> {S(r['time'])}<br/><b>Version:</b> {S(r['app_version'])}", meta_style)
             ],
             [
-                Paragraph(f"<b>Operation:</b> {r['operation']}", sub_style),
+                Paragraph(f"<b>Operation:</b> {S(r['operation'])}", sub_style),
                 Paragraph("", meta_style)
             ]
         ]
@@ -482,15 +500,15 @@ class PDFExporter(BaseExporter):
         story.append(Paragraph("1. INPUT DATA", sec_style))
         q = r['input']
         input_lines = []
-        if q.get('operation'): input_lines.append(f"<b>Operation:</b> {q['operation']}")
-        if q.get('matrix_a'): input_lines.append(f"<b>Matrix A:</b> {q['matrix_a']}")
-        if q.get('matrix_b'): input_lines.append(f"<b>Matrix B:</b> {q['matrix_b']}")
-        if q.get('matrix'): input_lines.append(f"<b>Input Matrix:</b> {q['matrix']}")
-        if q.get('scalar') is not None: input_lines.append(f"<b>Scalar k:</b> {q['scalar']}")
-        if q.get('vector_u') or q.get('vector_a'): input_lines.append(f"<b>Vector u:</b> {q.get('vector_u') or q.get('vector_a')}")
-        if q.get('vector_v') or q.get('vector_b'): input_lines.append(f"<b>Vector v:</b> {q.get('vector_v') or q.get('vector_b')}")
-        if q.get('coefficients'): input_lines.append(f"<b>Coefficients [A]:</b> {q['coefficients']}")
-        if q.get('constants'): input_lines.append(f"<b>Constants [b]:</b> {q['constants']}")
+        if q.get('operation'): input_lines.append(f"<b>Operation:</b> {S(q['operation'])}")
+        if q.get('matrix_a'): input_lines.append(f"<b>Matrix A:</b> {S(q['matrix_a'])}")
+        if q.get('matrix_b'): input_lines.append(f"<b>Matrix B:</b> {S(q['matrix_b'])}")
+        if q.get('matrix'): input_lines.append(f"<b>Input Matrix:</b> {S(q['matrix'])}")
+        if q.get('scalar') is not None: input_lines.append(f"<b>Scalar k:</b> {S(q['scalar'])}")
+        if q.get('vector_u') or q.get('vector_a'): input_lines.append(f"<b>Vector u:</b> {S(q.get('vector_u') or q.get('vector_a'))}")
+        if q.get('vector_v') or q.get('vector_b'): input_lines.append(f"<b>Vector v:</b> {S(q.get('vector_v') or q.get('vector_b'))}")
+        if q.get('coefficients'): input_lines.append(f"<b>Coefficients [A]:</b> {S(q['coefficients'])}")
+        if q.get('constants'): input_lines.append(f"<b>Constants [b]:</b> {S(q['constants'])}")
 
         q_html = "<br/>".join(input_lines) if input_lines else "Input parameters recorded."
         inp_table = Table([[Paragraph(q_html, body_style)]], colWidths=[540])
@@ -504,12 +522,12 @@ class PDFExporter(BaseExporter):
 
         # --- Section 2: Mathematical Theory ---
         story.append(Paragraph("2. MATHEMATICAL THEORY", sec_style))
-        story.append(Paragraph(r['theory'], body_style))
+        story.append(Paragraph(S(r['theory']), body_style))
         story.append(Spacer(1, 8))
 
         # --- Section 3: Formula Used ---
         story.append(Paragraph("3. FORMULA USED", sec_style))
-        f_html = f"<b>Plain Text:</b> {r['formula_plain']}<br/><b>LaTeX Formula:</b> <code>{r['formula_latex']}</code>"
+        f_html = f"<b>Plain Text:</b> {S(r['formula_plain'])}<br/><b>LaTeX Formula:</b> <code>{S(r['formula_latex'])}</code>"
         f_table = Table([[Paragraph(f_html, code_style)]], colWidths=[540])
         f_table.setStyle(TableStyle([
             ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#f8fafc')),
@@ -523,10 +541,10 @@ class PDFExporter(BaseExporter):
         story.append(Paragraph("4. STEP-BY-STEP SOLUTION", sec_style))
         if r['steps']:
             for st in r['steps']:
-                st_block = f"<b>Step {st['step_num']}: {st['title']}</b>"
-                if st['text']: st_block += f"<br/>{st['text']}"
-                if st['list']: st_block += "<br/>• " + "<br/>• ".join(st['list'])
-                if st['latex']: st_block += f"<br/><font color='#1e40af'><code>{st['latex']}</code></font>"
+                st_block = f"<b>Step {st['step_num']}: {S(st['title'])}</b>"
+                if st['text']: st_block += f"<br/>{S(st['text'])}"
+                if st['list']: st_block += "<br/>* " + "<br/>* ".join(S(item) for item in st['list'])
+                if st['latex']: st_block += f"<br/><font color='#1e40af'><code>{S(st['latex'])}</code></font>"
 
                 st_table = Table([[Paragraph(st_block, body_style)]], colWidths=[540])
                 st_table.setStyle(TableStyle([
@@ -544,8 +562,8 @@ class PDFExporter(BaseExporter):
         # --- Section 5: Final Answer ---
         story.append(Paragraph("5. FINAL ANSWER", sec_style))
         fa = r['final_answer']
-        fa_text = f"<b>Result:</b> {fa['display']}"
-        if fa.get('latex'): fa_text += f"<br/><font color='#1e40af'>LaTeX: <code>{fa['latex']}</code></font>"
+        fa_text = f"<b>Result:</b> {S(fa['display'])}"
+        if fa.get('latex'): fa_text += f"<br/><font color='#1e40af'>LaTeX: <code>{S(fa['latex'])}</code></font>"
 
         fa_table = Table([[Paragraph(fa_text, res_val_style)]], colWidths=[540])
         fa_table.setStyle(TableStyle([
@@ -560,10 +578,10 @@ class PDFExporter(BaseExporter):
         # --- Section 6: Verification ---
         story.append(Paragraph("6. VERIFICATION", sec_style))
         v = r['verification']
-        v_text = (f"<b>Method:</b> {v['method']}<br/>"
-                  f"<b>Status:</b> <font color='#15803d'><b>{v['status']}</b></font><br/>"
-                  f"<b>Residual:</b> {v['residual']}<br/>"
-                  f"<b>Details:</b> {v['details']}")
+        v_text = (f"<b>Method:</b> {S(v['method'])}<br/>"
+                  f"<b>Status:</b> <font color='#15803d'><b>{S(v['status'])}</b></font><br/>"
+                  f"<b>Residual:</b> {S(v['residual'])}<br/>"
+                  f"<b>Details:</b> {S(v['details'])}")
         v_table = Table([[Paragraph(v_text, body_style)]], colWidths=[540])
         v_table.setStyle(TableStyle([
             ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#f0fdf4')),

@@ -945,158 +945,119 @@ const SolutionExporter = {
       return;
     }
 
-    // ── Grab the live solution panel exactly as rendered on screen ──
-    const outputEl = document.getElementById('outputContent');
-    if (!outputEl) {
-      if (typeof showToast === 'function') showToast('Solution panel not found.', 'warning');
-      return;
-    }
+    if (typeof showToast === 'function') showToast('Opening PDF — choose "Save as PDF" in the print dialog…', 'info');
 
-    if (typeof showToast === 'function') showToast('Opening PDF — use "Save as PDF" in the print dialog…', 'info');
+    const bodyContent = this.buildPrintBodyHtml();
+    const filename    = `${this.safeName()}_solution`;
 
-    // Deep-clone the rendered solution (MathJax SVGs already inside)
-    const clone = outputEl.cloneNode(true);
-
-    // Hide the export/download panel inside the clone — no buttons in the PDF
-    const dlPanel = clone.querySelector('#downloadPanelContainer');
-    if (dlPanel) dlPanel.remove();
-
-    // Collect every <link rel="stylesheet"> and <style> from the current page
-    const styleLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
-      .map(l => `<link rel="stylesheet" href="${l.href}">`)
-      .join('\n');
-    const inlineStyles = Array.from(document.querySelectorAll('style'))
-      .map(s => `<style>${s.textContent}</style>`)
-      .join('\n');
-
-    const filename  = `${this.safeName()}_solution`;
-    const date      = new Date().toLocaleString();
-    const title     = this.activeData.operation
-      ? `${this.activeModuleName} — ${this.activeData.operation}`
-      : this.activeModuleName;
-
+    // Use the EXACT same CSS as printSolution overlay (confirmed working)
+    // plus MathJax so formulas render before print fires
     const fullHtml = `<!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>${filename}</title>
-  ${styleLinks}
-  ${inlineStyles}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap">
   <style>
-    /* Print-specific overrides */
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #fff !important;
-      color: #0f172a !important;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      padding: 24px 32px;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #fff;
     }
-    /* Neutralise dark-mode glassmorphic backgrounds */
-    .glass-panel, .combined-single-card, .direct-step-block,
-    [class*="bg-glass"], [class*="bg-card"] {
-      background: #f8fafc !important;
-      border: 1px solid #e2e8f0 !important;
-      box-shadow: none !important;
-      backdrop-filter: none !important;
-    }
-    /* Header strip */
-    .pdf-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      border-bottom: 3px solid #16a34a;
-      padding-bottom: 12px;
-      margin-bottom: 20px;
-    }
-    .pdf-header-title { font-size: 18px; font-weight: 800; color: #16a34a; }
-    .pdf-header-sub   { font-size: 12px; color: #475569; margin-top: 2px; }
-    .pdf-header-date  { font-size: 10px; color: #94a3b8; text-align: right; }
-    .pdf-footer {
-      margin-top: 28px;
-      border-top: 1px solid #e2e8f0;
-      padding-top: 8px;
-      text-align: center;
-      color: #94a3b8;
-      font-size: 10px;
-    }
-    /* Force readable text colours over dark theme variables */
-    * { color: inherit; }
-    h5, h6, .fw-bold { color: #0f172a !important; }
-    .text-success { color: #16a34a !important; }
-    .text-secondary, .text-muted { color: #64748b !important; }
-    .text-primary-accent, [style*="color:var(--primary-accent)"],
-    [style*="color: var(--primary-accent)"] { color: #16a34a !important; }
-    .step-num-badge {
-      background: #16a34a !important;
-      color: #fff !important;
-    }
-    .step-latex, .formula-box {
-      background: #eff6ff !important;
-      border: 1px solid #bae6fd !important;
-      color: #1e40af !important;
-      border-radius: 6px;
-      padding: 8px 12px;
-    }
-    /* Matrix cells */
-    .matrix-cell, table td, table th {
-      border: 1px solid #cbd5e1 !important;
-      background: #fff !important;
-      color: #0f172a !important;
-    }
-    /* Step blocks */
-    .direct-step-block {
-      border-left: 4px solid #16a34a !important;
-      background: #f8fafc !important;
-      margin-bottom: 10px;
-      page-break-inside: avoid;
-    }
-    /* Result area */
-    #mathJaxResult {
-      background: #f0fdf4 !important;
-      border: 2px solid #86efac !important;
-      border-radius: 10px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-    /* Hide UI-only elements */
-    button, .btn, input, select, textarea,
-    #downloadPanelContainer, .theme-toggle-btn,
-    .prt-close-btn { display: none !important; }
+    .prt-page { padding: 32px 36px; }
+    .prt-hdr { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #16a34a; padding-bottom: 14px; margin-bottom: 22px; }
+    .prt-hdr-title { font-size: 20px; font-weight: 800; color: #16a34a; }
+    .prt-hdr-sub { font-size: 13px; font-weight: 600; color: #334155; }
+    .prt-hdr-date { font-size: 10px; color: #94a3b8; text-align: right; }
+    .prt-sec-lbl { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; padding: 4px 10px; border-radius: 4px; display: inline-block; margin-top: 18px; margin-bottom: 8px; }
+    .prt-blue  { color: #0891b2; background: #f0f9ff; }
+    .prt-amber { color: #b45309; background: #fffbeb; }
+    .prt-green { color: #15803d; background: #f0fdf4; }
+    .prt-formula { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 12px 16px; font-family: 'Courier New', monospace; font-size: 12px; color: #0c4a6e; word-break: break-all; margin-bottom: 10px; }
+    .prt-step { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #16a34a; border-radius: 6px; padding: 12px 14px; margin-bottom: 10px; page-break-inside: avoid; }
+    .prt-step-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .prt-step-num { width: 24px; height: 24px; border-radius: 50%; background: #16a34a; color: #fff; font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .prt-step-title { font-weight: 700; font-size: 13px; color: #0f172a; }
+    .prt-step-text { font-size: 12px; color: #475569; margin: 4px 0 4px 34px; line-height: 1.6; }
+    .prt-step-text strong, .prt-step-text b { color: #0f172a; font-weight: 700; }
+    .prt-step-text code { font-family: 'Courier New', monospace; background: #f1f5f9; padding: 1px 4px; border-radius: 3px; }
+    .prt-step-list { margin: 4px 0 4px 34px; padding-left: 16px; font-size: 12px; color: #334155; }
+    .prt-step-list li { margin-bottom: 3px; line-height: 1.5; font-family: 'Courier New', monospace; }
+    .prt-step-math { margin: 8px 0 4px 34px; padding: 6px 10px; background: #eff6ff; border-radius: 5px; color: #1e40af; overflow-x: auto; }
+    .prt-result-box { background: #f0fdf4; border: 2px solid #86efac; border-radius: 10px; padding: 18px 20px; text-align: center; margin: 10px 0 20px; page-break-inside: avoid; }
+    .prt-result-value { font-size: 18px; font-weight: 800; color: #14532d; }
+    .prt-result-label { font-size: 10px; color: #15803d; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+    .prt-result-math { margin-top: 10px; padding: 8px 12px; background: #f0fdf4; border-radius: 6px; color: #14532d; text-align: center; overflow-x: auto; }
+    .prt-mat-table { border-collapse: collapse; margin: 8px auto; font-family: 'Courier New', monospace; font-size: 12px; }
+    .prt-mat-table td { padding: 5px 12px; border: 1px solid #cbd5e1; text-align: right; }
+    .prt-sol-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+    .prt-sol-item { background: #fff; border: 2px solid #16a34a; border-radius: 8px; padding: 8px 16px; text-align: center; min-width: 80px; }
+    .prt-sol-var { font-size: 11px; color: #6b7280; font-weight: 600; }
+    .prt-sol-val { font-size: 16px; font-weight: 800; color: #14532d; }
+    .prt-eigen-table { border-collapse: collapse; width: 100%; font-size: 12px; }
+    .prt-eigen-table th { background: #f1f5f9; color: #475569; font-size: 10px; text-transform: uppercase; padding: 6px 10px; border: 1px solid #e2e8f0; text-align: left; }
+    .prt-eigen-table td { padding: 8px 10px; border: 1px solid #e2e8f0; font-family: 'Courier New', monospace; }
+    .prt-hr { border: none; border-top: 1px solid #e2e8f0; margin: 18px 0; }
+    .prt-footer { margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px; text-align: center; color: #94a3b8; font-size: 10px; }
+    /* Question / input tables */
+    table td { padding: 4px 10px; border: 1px solid #cbd5e1; font-family: 'Courier New', monospace; text-align: right; }
+    table th { padding: 5px 10px; background: #f1f5f9; border: 1px solid #e2e8f0; }
     @media print {
-      @page { margin: 12mm 14mm 12mm 14mm; size: A4; }
-      body { padding: 0; }
-      body, * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      @page { margin: 14mm 14mm 14mm 14mm; size: A4; }
+      .prt-page { padding: 16px 24px; }
+      body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     }
   </style>
+  <script>
+    window.MathJax = {
+      tex: { displayMath: [['\\\\[','\\\\]']], inlineMath: [['\\\\(','\\\\)']] },
+      options: { skipHtmlTags: ['script','noscript','style','textarea'] },
+      startup: { typeset: false }
+    };
+  <\/script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async><\/script>
 </head>
 <body>
-  <div class="pdf-header">
-    <div>
-      <div class="pdf-header-title">&#x221A; Linear Algebra Solver</div>
-      <div class="pdf-header-sub">${title}</div>
-    </div>
-    <div class="pdf-header-date">Detailed Solution Report<br>${date}</div>
-  </div>
-
-  ${clone.outerHTML}
-
-  <div class="pdf-footer">Linear Algebra Solver &mdash; ${title} &mdash; ${date}</div>
-
+${bodyContent}
 <script>
-  // MathJax already rendered in the cloned HTML as SVG — no re-typeset needed.
-  // Just wait a moment for images/fonts then print.
   function doPrint() {
     window.print();
     window.onafterprint = function() { window.close(); };
   }
-  window.onload = function() { setTimeout(doPrint, 600); };
+  window.onload = function() {
+    if (window.MathJax && window.MathJax.startup) {
+      window.MathJax.startup.promise.then(function() {
+        return window.MathJax.typesetPromise();
+      }).then(function() {
+        setTimeout(doPrint, 400);
+      }).catch(function() { setTimeout(doPrint, 500); });
+    } else {
+      // Poll until MathJax is ready (max 5s)
+      var waited = 0;
+      var poll = setInterval(function() {
+        waited += 250;
+        var ready = window.MathJax && window.MathJax.typesetPromise;
+        if (ready || waited >= 5000) {
+          clearInterval(poll);
+          if (ready) {
+            window.MathJax.typesetPromise().then(function() { setTimeout(doPrint, 400); });
+          } else {
+            doPrint();
+          }
+        }
+      }, 250);
+    }
+  };
 <\/script>
 </body>
 </html>`;
 
     const win = window.open('', '_blank', 'width=960,height=800');
     if (!win) {
-      if (typeof showToast === 'function') showToast('Pop-up blocked — please allow pop-ups and try again.', 'warning');
+      if (typeof showToast === 'function') showToast('Pop-up blocked — allow pop-ups and try again.', 'warning');
       return;
     }
     win.document.open();
@@ -1173,8 +1134,8 @@ const SolutionExporter = {
             <div class="prt-step-num">${idx + 1}</div>
             <div class="prt-step-title">${step.title}</div>
           </div>
-          ${step.text ? `<div class="prt-step-text">${this.stripHtml(step.text)}</div>` : ''}
-          ${step.list && step.list.length ? `<ul class="prt-step-list">${step.list.map(l => `<li>${this.stripHtml(l)}</li>`).join('')}</ul>` : ''}
+          ${step.text ? `<div class="prt-step-text">${step.text}</div>` : ''}
+          ${step.list && step.list.length ? `<ul class="prt-step-list">${step.list.map(l => `<li>${l}</li>`).join('')}</ul>` : ''}
           ${step.latex ? `<div class="prt-step-math">\\[ ${step.latex} \\]</div>` : ''}
         </div>
       `).join('');

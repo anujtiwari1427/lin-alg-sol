@@ -234,6 +234,11 @@ const SolutionExporter = {
 
         <div class="row g-2 mb-3">
           <div class="col-6 col-sm-4 col-md-3">
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadPDF()" title="Download PDF Report">
+              <i class="fas fa-file-pdf text-danger fs-5 mb-1 d-block"></i><span>PDF Document</span>
+            </button>
+          </div>
+          <div class="col-6 col-sm-4 col-md-3">
             <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadWord()" title="Download Word Document (.docx)">
               <i class="fas fa-file-word fs-5 mb-1 d-block" style="color:#2b7cd3;"></i><span>Word (.docx)</span>
             </button>
@@ -253,6 +258,9 @@ const SolutionExporter = {
         <div class="pt-3 border-top border-secondary-subtle d-flex flex-wrap align-items-center justify-content-between gap-2">
           <span class="small text-secondary fw-semibold"><i class="fas fa-bolt me-1"></i>Quick Actions:</span>
           <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-sm btn-success text-white fw-bold px-3" onclick="SolutionExporter.downloadPDF()" title="Download PDF Report">
+              <i class="fas fa-file-pdf me-1"></i>Download PDF
+            </button>
             <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.downloadWord()" title="Download Word Document">
               <i class="fas fa-file-word me-1 text-primary"></i>Word (.docx)
             </button>

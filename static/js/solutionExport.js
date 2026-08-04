@@ -53,157 +53,68 @@ const SolutionExporter = {
     return '';
   },
 
-  // ─── Main render: direct view (no dropdown) + export at bottom ─────
+  // ─── Main render: insert formula header + export panel (steps already rendered by module) ─────
   renderDirectSolution(data, moduleName) {
     const accordion = document.getElementById('stepsAccordion');
     const downloadPanel = document.getElementById('downloadPanelContainer');
 
-    // Hide the old accordion and its heading
-    if (accordion) {
-      accordion.style.display = 'none';
-      // Also hide the h6 heading right before it
-      const prevSibling = accordion.previousElementSibling;
-      if (prevSibling && prevSibling.tagName === 'H6') {
-        prevSibling.style.display = 'none';
-      }
-    }
-    // Hide the separate download panel container (we embed export inside the card)
-    if (downloadPanel) {
-      downloadPanel.style.display = 'none';
-    }
-
-    // Create or reuse the combined container
-    let container = document.getElementById('directSolutionContainer');
-    if (!container && accordion) {
-      container = document.createElement('div');
-      container.id = 'directSolutionContainer';
-      accordion.parentNode.insertBefore(container, accordion);
-    }
-    if (!container) return;
-
     const formula = this.getFormula(moduleName, data);
-    const title = data.operation ? `${moduleName} — ${data.operation}` : moduleName;
 
-    // ── Build steps HTML (all directly visible, no dropdown) ──────────
-    let stepsHtml = '';
-    if (data.steps && data.steps.length > 0) {
-      stepsHtml = data.steps.map((step, idx) => `
-        <div class="direct-step-block rounded-3 p-3 mb-3">
-          <div class="d-flex align-items-start gap-2 mb-2">
-            <span class="step-num-badge">${idx + 1}</span>
-            <span class="fw-bold text-primary-accent">${step.title}</span>
-          </div>
-          ${step.text ? `<p class="mb-2 text-secondary small ps-4">${step.text}</p>` : ''}
-          ${step.list ? `<ul class="small font-monospace mb-2 ps-4">${step.list.map(l => `<li>${l}</li>`).join('')}</ul>` : ''}
-          ${step.latex ? `<div class="step-latex text-center my-2">\\[ ${step.latex} \\]</div>` : ''}
-        </div>
-      `).join('');
+    // ── 1. Insert formula box BEFORE the stepsAccordion ────────────────
+    let formulaBox = document.getElementById('solutionFormulaBox');
+    if (!formulaBox && accordion) {
+      formulaBox = document.createElement('div');
+      formulaBox.id = 'solutionFormulaBox';
+      accordion.parentNode.insertBefore(formulaBox, accordion);
     }
-
-    // ── Build solution values (for linear equations) ─────────────────
-    let solutionValuesHtml = '';
-    const solObj = data.solution || data.solutions;
-    if (solObj) {
-      solutionValuesHtml = `
-        <div class="d-flex flex-wrap gap-2 mb-3">
-          ${Object.entries(solObj).map(([k, v]) => `
-            <div class="solution-var">
-              <div class="var-name">${k}</div>
-              <div class="var-val">${v}</div>
-            </div>
-          `).join('')}
+    if (formulaBox && formula) {
+      formulaBox.innerHTML = `
+        <div class="combined-single-card p-3 mb-3">
+          <div class="section-label text-info mb-2"><i class="fas fa-square-root-variable me-2"></i>Governing Formula & Method</div>
+          <div class="formula-box p-3 rounded-3 text-center border border-info-subtle">
+            \\[ ${formula} \\]
+          </div>
         </div>
       `;
     }
 
-    // ── Build eigenpairs (for eigen) ─────────────────────────────────
-    let eigenHtml = '';
-    if (data.eigenvalues && Array.isArray(data.eigenvalues)) {
-      eigenHtml = data.eigenvalues.map((val, idx) => {
-        const vec = data.eigenvectors && data.eigenvectors[idx] ? data.eigenvectors[idx].join(', ') : '';
-        return `
-          <div class="eigen-pair-card mb-2">
-            <div class="eigen-val-header">λ${idx + 1} = ${val}</div>
-            <div class="eigen-vec-body">v${idx + 1} = [${vec}]ᵀ</div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // ── Build result LaTeX ───────────────────────────────────────────
-    let resultHtml = '';
-    if (data.result_latex) {
-      resultHtml = `\\[ ${data.result_latex} \\]`;
-    } else if (data.result_display) {
-      resultHtml = `<div class="fs-4 fw-bold font-monospace text-primary-accent">${JSON.stringify(data.result_display)}</div>`;
-    }
-
-    // ── Render the full direct card ──────────────────────────────────
-    container.innerHTML = `
+    // ── 2. Render export panel into #downloadPanelContainer ────────────
+    if (!downloadPanel) return;
+    downloadPanel.innerHTML = `
       <div class="combined-single-card p-3 p-md-4 mt-3">
-
-        <!-- ▸ SECTION 1 — Formula & Method -->
-        <div class="mb-4">
-          <div class="section-label text-info"><i class="fas fa-square-root-variable me-2"></i>Governing Formula & Method</div>
-          <div class="formula-box p-3 rounded-3 text-center border border-info-subtle mt-2">
-            ${formula ? `\\[ ${formula} \\]` : `<span class="text-muted fst-italic">${title}</span>`}
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div class="download-icon-box"><i class="fas fa-file-export"></i></div>
+          <div>
+            <h6 class="fw-bold mb-0 text-primary-accent">Export Full Detailed Solution</h6>
+            <p class="small text-secondary mb-0">Download formula, all computation steps &amp; result</p>
           </div>
         </div>
-
-        <!-- ▸ SECTION 2 — All Steps (directly visible) -->
-        <div class="mb-4">
-          <div class="section-label text-warning"><i class="fas fa-calculator me-2"></i>Complete Step-by-Step Computation</div>
-          <div class="mt-2">
-            ${stepsHtml || '<p class="text-muted small fst-italic">No computation steps available.</p>'}
-          </div>
-        </div>
-
-        <!-- ▸ SECTION 3 — Final Result -->
-        <div class="mb-4">
-          <div class="section-label text-success"><i class="fas fa-check-double me-2"></i>Final Calculated Result</div>
-          <div class="result-highlight-box p-3 rounded-3 text-center mt-2">
-            ${eigenHtml}
-            ${solutionValuesHtml}
-            ${resultHtml}
-          </div>
-        </div>
-
-        <!-- ▸ SECTION 4 — Export Options -->
-        <div class="export-section pt-3 mt-3 border-top border-secondary-subtle">
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <div class="download-icon-box"><i class="fas fa-file-export"></i></div>
-            <div>
-              <h6 class="fw-bold mb-0 text-primary-accent">Export Full Detailed Solution</h6>
-              <p class="small text-secondary mb-0">Download the complete formula, computation & result report</p>
-            </div>
-          </div>
-          <div class="row g-2">
-            <div class="col-6 col-sm-4 col-md-3">
-              <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadPDF()">
-                <i class="fas fa-file-pdf text-danger"></i><span>PDF</span>
-              </button>
-            </div>
-            <div class="col-6 col-sm-4 col-md-3">
-              <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadTXT()">
-                <i class="fas fa-file-lines text-info"></i><span>Text</span>
-              </button>
-            </div>
-            <div class="col-6 col-sm-4 col-md-3">
-              <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadMD()">
-                <i class="fab fa-markdown text-warning"></i><span>Markdown</span>
-              </button>
-            </div>
-            <div class="col-6 col-sm-4 col-md-3">
-              <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadJSON()">
-                <i class="fas fa-file-code text-success"></i><span>JSON</span>
-              </button>
-            </div>
-          </div>
-          <div class="mt-3 d-flex justify-content-end">
-            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyToClipboard()">
-              <i class="fas fa-copy me-1"></i>Copy Full Solution
+        <div class="row g-2">
+          <div class="col-6 col-sm-4 col-md-3">
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadPDF()">
+              <i class="fas fa-file-pdf text-danger"></i><span>PDF</span>
             </button>
           </div>
+          <div class="col-6 col-sm-4 col-md-3">
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadTXT()">
+              <i class="fas fa-file-lines text-info"></i><span>Text</span>
+            </button>
+          </div>
+          <div class="col-6 col-sm-4 col-md-3">
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadMD()">
+              <i class="fab fa-markdown text-warning"></i><span>Markdown</span>
+            </button>
+          </div>
+          <div class="col-6 col-sm-4 col-md-3">
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadJSON()">
+              <i class="fas fa-file-code text-success"></i><span>JSON</span>
+            </button>
+          </div>
+        </div>
+        <div class="mt-3 d-flex justify-content-end">
+          <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyToClipboard()">
+            <i class="fas fa-copy me-1"></i>Copy Full Solution
+          </button>
         </div>
       </div>
     `;
@@ -410,32 +321,75 @@ const SolutionExporter = {
 
   downloadPDF() {
     if (!this.activeData) return;
-    const title = this.activeData.operation
-      ? `${this.activeModuleName} — ${this.activeData.operation}`
-      : this.activeModuleName;
+    const d = this.activeData;
+    const title = d.operation ? `${this.activeModuleName} — ${d.operation}` : this.activeModuleName;
+    const formula = this.getFormula(this.activeModuleName, d);
 
-    // Clone the visible combined card for PDF rendering
-    const sourceCard = document.getElementById('directSolutionContainer');
-    if (!sourceCard) { this.downloadTXT(); return; }
+    // Build step HTML for PDF
+    let stepsHtml = '';
+    if (d.steps && d.steps.length > 0) {
+      stepsHtml = d.steps.map((step, idx) => `
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px; margin-bottom:10px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="width:22px; height:22px; border-radius:50%; background:#16a34a; color:#fff; font-weight:bold; font-size:11px; display:inline-flex; align-items:center; justify-content:center;">${idx + 1}</span>
+            <strong>${step.title}</strong>
+          </div>
+          ${step.text ? `<p style="margin:4px 0 4px 30px; font-size:13px; color:#475569;">${step.text}</p>` : ''}
+          ${step.list ? `<ul style="margin:4px 0 4px 30px; font-size:12px;">${step.list.map(l => `<li>${l.replace(/<[^>]*>?/gm, '')}</li>`).join('')}</ul>` : ''}
+          ${step.latex ? `<div style="margin:6px 0 0 30px; font-family:monospace; font-size:12px; color:#1e40af;">${step.latex}</div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    // Build result
+    let resultHtml = '';
+    if (d.result_display) {
+      resultHtml = Array.isArray(d.result_display)
+        ? d.result_display.map(row => `[ ${row.join(', ')} ]`).join('<br>')
+        : `${d.result_display}`;
+    } else if (d.result !== undefined) {
+      resultHtml = `${d.result}`;
+    }
+    const solObj = d.solution || d.solutions;
+    if (solObj) {
+      resultHtml += Object.entries(solObj).map(([k, v]) => `<strong>${k}</strong> = ${v}`).join(',  ');
+    }
+    if (d.eigenvalues) {
+      resultHtml += d.eigenvalues.map((val, i) => {
+        const vec = d.eigenvectors && d.eigenvectors[i] ? d.eigenvectors[i].join(', ') : '';
+        return `λ${i+1} = ${val},  v${i+1} = [${vec}]ᵀ`;
+      }).join('<br>');
+    }
 
     const pdfDiv = document.createElement('div');
     pdfDiv.id = 'pdfExportContainer';
-    pdfDiv.style.cssText = 'padding: 30px; background: #fff; color: #111; font-family: system-ui, -apple-system, sans-serif;';
-
-    // Clone inner HTML but strip the export section
-    const clone = sourceCard.cloneNode(true);
-    const exportSection = clone.querySelector('.export-section');
-    if (exportSection) exportSection.remove();
-
+    pdfDiv.style.cssText = 'padding:30px; background:#fff; color:#111; font-family:system-ui,-apple-system,sans-serif;';
     pdfDiv.innerHTML = `
-      <div style="border-bottom: 3px solid #16a34a; padding-bottom: 12px; margin-bottom: 24px;">
+      <div style="border-bottom:3px solid #16a34a; padding-bottom:12px; margin-bottom:20px;">
         <h2 style="margin:0 0 4px 0; color:#16a34a; font-size:22px; font-weight:bold;">Linear Algebra Solver</h2>
         <h4 style="margin:0; color:#334155; font-size:15px;">${title}</h4>
-        <p style="margin:6px 0 0 0; color:#94a3b8; font-size:11px;">Generated on ${new Date().toLocaleString()}</p>
+        <p style="margin:6px 0 0; color:#94a3b8; font-size:11px;">Generated on ${new Date().toLocaleString()}</p>
       </div>
-      ${clone.innerHTML}
+
+      ${formula ? `
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:#0891b2; margin-bottom:6px;">1. Governing Formula & Method</div>
+        <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px; padding:10px; font-family:monospace; font-size:13px; text-align:center;">${formula}</div>
+      </div>` : ''}
+
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:#d97706; margin-bottom:6px;">2. Step-by-Step Computation</div>
+        ${stepsHtml || '<p style="color:#94a3b8; font-size:13px; font-style:italic;">No steps available.</p>'}
+      </div>
+
+      ${resultHtml ? `
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:#16a34a; margin-bottom:6px;">3. Final Result</div>
+        <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:8px; padding:14px; text-align:center; font-size:16px; font-weight:bold;">${resultHtml}</div>
+      </div>` : ''}
+
       <div style="margin-top:30px; border-top:1px solid #e2e8f0; padding-top:10px; text-align:center; color:#94a3b8; font-size:10px;">
-        Linear Algebra Solver — Complete Formula, Computation & Result Report
+        Linear Algebra Solver — Complete Formula, Computation &amp; Result Report
       </div>
     `;
 

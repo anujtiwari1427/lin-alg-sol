@@ -157,16 +157,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const accordion = document.getElementById('stepsAccordion');
         accordion.innerHTML = data.steps.map((step, idx) => `
-          <div class="step-item">
-            <div class="step-header ${idx === 0 ? 'open' : ''}" onclick="toggleStep(this)">
-              <span>${step.title}</span>
-              <i class="fas fa-chevron-down"></i>
+          <div class="direct-step-block mb-3 rounded-3 p-3">
+            <div class="d-flex align-items-start gap-2 mb-2">
+              <span class="step-num-badge">${idx + 1}</span>
+              <span class="fw-bold text-primary-accent">${step.title}</span>
             </div>
-            <div class="step-body ${idx === 0 ? 'open' : ''}">
-              ${step.text ? `<p class="mb-2 text-secondary">${step.text}</p>` : ''}
-              ${step.list ? `<ul class="small font-monospace mb-2">${step.list.map(l => `<li>${l}</li>`).join('')}</ul>` : ''}
-              ${step.latex ? `<div class="step-latex">\\[ ${step.latex} \\]</div>` : ''}
-            </div>
+            ${step.text ? `<p class="mb-2 text-secondary small ps-4">${step.text}</p>` : ''}
+            ${step.list ? `<ul class="small font-monospace mb-2 ps-4">${step.list.map(l => `<li>${l}</li>`).join('')}</ul>` : ''}
+            ${step.latex ? `<div class="step-latex">\\[ ${step.latex} \\]</div>` : ''}
           </div>
         `).join('');
 
@@ -194,10 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
   renderGrid();
 });
 
-function toggleStep(el) {
-  el.classList.toggle('open');
-  el.nextElementSibling.classList.toggle('open');
-  if (window.MathJax && window.MathJax.typeset) window.MathJax.typeset();
-}
+function toggleStep(el) {}
 </script>
 {% endblock %}

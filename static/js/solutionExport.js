@@ -2,18 +2,94 @@
    SOLUTION EXPORTER — Comprehensive Multi-Format Export Engine
    Handles all 6 solvers: Matrix, Determinant, Inverse,
    Vector, Linear Equations, Eigenvalue/Eigenvector.
-   Export Formats: PDF, TXT, Markdown, JSON, CSV, LaTeX, HTML.
-   Clipboard Options: Plain Text, LaTeX Code, Markdown.
+   Export Formats: PDF, TXT, Markdown, JSON, CSV, LaTeX, HTML, Word.
+   Print: Includes Question + Solution with full formatting.
    ========================================================= */
 
 const SolutionExporter = {
   activeData: null,
   activeModuleName: 'Linear Algebra Solution',
+  activeQuestion: null,   // stores the input question data
 
-  setSolution(data, moduleName) {
+  setSolution(data, moduleName, questionData) {
     this.activeData = data;
     this.activeModuleName = moduleName || 'Linear Algebra Solution';
+    this.activeQuestion = questionData || null;
     this.renderDirectSolution(data, moduleName);
+  },
+
+  // ─── Build HTML block for question/input section ──────
+  buildQuestionHtml(forPrint = false) {
+    const q = this.activeQuestion;
+    if (!q) return '';
+
+    const td = (v) => `<td style="padding:4px 10px;border:1px solid #cbd5e1;font-family:'Courier New',monospace;text-align:right;">${v}</td>`;
+    const th = (v) => `<th style="padding:5px 10px;background:#f1f5f9;border:1px solid #e2e8f0;">${v}</th>`;
+
+    const matrixTable = (mat, label) => {
+      if (!Array.isArray(mat) || !mat.length) return '';
+      const header = mat[0].map((_, j) => th(`c${j+1}`)).join('');
+      const rows   = mat.map(row => `<tr>${row.map(v => td(v)).join('')}</tr>`).join('');
+      return `
+        <div style="margin-bottom:10px;">
+          <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">${label}</div>
+          <table style="border-collapse:collapse;"><thead><tr>${header}</tr></thead><tbody>${rows}</tbody></table>
+        </div>`;
+    };
+
+    const vecRow = (vec, label) => {
+      if (!Array.isArray(vec)) return '';
+      const cells = vec.map(v => td(v)).join('');
+      return `
+        <div style="margin-bottom:8px;">
+          <span style="font-size:11px;font-weight:700;color:#475569;">${label}:</span>
+          <table style="border-collapse:collapse;display:inline-table;margin-left:8px;"><tbody><tr>${cells}</tr></tbody></table>
+        </div>`;
+    };
+
+    let body = '';
+
+    if (q.operation) {
+      body += `<div style="margin-bottom:8px;"><b>Operation:</b> ${q.operation}</div>`;
+    }
+    if (q.method) {
+      body += `<div style="margin-bottom:8px;"><b>Method:</b> ${q.method}</div>`;
+    }
+    if (q.matrix_a) body += matrixTable(q.matrix_a, 'Matrix A');
+    if (q.matrix_b) body += matrixTable(q.matrix_b, 'Matrix B');
+    if (q.matrix)   body += matrixTable(q.matrix,   'Input Matrix A');
+    if (q.scalar !== undefined && q.scalar !== null) {
+      body += `<div style="margin-bottom:8px;"><b>Scalar k:</b> ${q.scalar}</div>`;
+    }
+    if (q.vector_u) body += vecRow(q.vector_u, 'Vector u');
+    if (q.vector_v) body += vecRow(q.vector_v, 'Vector v');
+    if (q.coefficients) {
+      // Linear system [A|b]
+      const n = q.coefficients.length;
+      const varNames = Array.from({length: n}, (_, i) => `x${i+1}`);
+      const headerCells = [...varNames.map(v => th(v)), th('= b')].join('');
+      const rowsHtml = q.coefficients.map((row, i) => {
+        const cells = row.map(v => td(v)).join('');
+        const rhs   = td(q.constants ? q.constants[i] : '?');
+        return `<tr>${cells}${rhs}</tr>`;
+      }).join('');
+      body += `
+        <div style="margin-bottom:10px;">
+          <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">Augmented Matrix [A | b]</div>
+          <table style="border-collapse:collapse;"><thead><tr>${headerCells}</tr></thead><tbody>${rowsHtml}</tbody></table>
+        </div>`;
+    }
+
+    if (!body) return '';
+
+    const borderColor = forPrint ? '#bae6fd' : '#bae6fd';
+    return `
+      <div style="background:#f0f9ff;border:2px solid ${borderColor};border-radius:8px;padding:14px 18px;margin-bottom:18px;">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#0891b2;margin-bottom:10px;">
+          &#x1F4DD; Question / Input Data
+        </div>
+        ${body}
+      </div>`;
   },
 
   // ─── Formula lookup (LaTeX) ─────────────────────────────
@@ -132,7 +208,7 @@ const SolutionExporter = {
             </div>
           </div>
           <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small">
-            <i class="fas fa-check-circle me-1"></i>7 Export Formats Available
+            <i class="fas fa-check-circle me-1"></i>8 Export Formats Available
           </span>
         </div>
 
@@ -170,6 +246,11 @@ const SolutionExporter = {
           <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
             <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadHTML()" title="Download Offline HTML Report">
               <i class="fab fa-html5 text-orange fs-5 mb-1 d-block" style="color:#f97316;"></i><span>HTML Web</span>
+            </button>
+          </div>
+          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadWord()" title="Download Word Document">
+              <i class="fas fa-file-word fs-5 mb-1 d-block" style="color:#2b7cd3;"></i><span>Word (.doc)</span>
             </button>
           </div>
           <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
@@ -676,14 +757,17 @@ const SolutionExporter = {
           </div>
         </div>
 
-        <span class="sec-lbl blue">1 &nbsp;&#xf1de; &nbsp;Governing Formula &amp; Method</span>
+        <span class="sec-lbl blue">1 &nbsp;&#xf1de; &nbsp;Question / Input Data</span>
+        ${this.buildQuestionHtml()}
+
+        <span class="sec-lbl blue">2 &nbsp;&#xf1de; &nbsp;Governing Formula &amp; Method</span>
         <div class="formula-box">${formula || title}</div>
 
-        <span class="sec-lbl amber">2 &nbsp;&#x2261; &nbsp;Step-by-Step Computation</span>
+        <span class="sec-lbl amber">3 &nbsp;&#x2261; &nbsp;Step-by-Step Computation</span>
         <div style="margin-top:10px;">${stepsHtml}</div>
 
         <hr>
-        <span class="sec-lbl green">3 &nbsp;&#x2714; &nbsp;Final Calculated Result</span>
+        <span class="sec-lbl green">4 &nbsp;&#x2714; &nbsp;Final Calculated Result</span>
         <div class="result-box" style="margin-top:10px;">
           <div class="result-label">Result</div>
           ${resultHtml}
@@ -692,6 +776,94 @@ const SolutionExporter = {
         <div class="footer">Linear Algebra Solver &mdash; Detailed Solution Report &mdash; ${date}</div>
       </div>
     </body></html>`;
+  },
+
+  // ─── Word/RTF Document export ──────────────────────────────
+  buildWordHtml() {
+    if (!this.activeData) return '';
+    const d    = this.activeData;
+    const mod  = this.activeModuleName;
+    const op   = d.operation || '';
+    const title = op ? `${mod} — ${op}` : mod;
+    const date  = new Date().toLocaleString();
+    const formula = this.getFormulaPlain(mod, d);
+
+    const h2 = (t) => `<h2 style="color:#16a34a;border-bottom:2px solid #16a34a;padding-bottom:6px;">${t}</h2>`;
+    const box = (content, bg='#f0f9ff', border='#bae6fd') =>
+      `<div style="background:${bg};border:1.5px solid ${border};border-radius:6px;padding:12px 16px;margin-bottom:14px;">${content}</div>`;
+
+    let stepsHtml = '';
+    if (d.steps && d.steps.length > 0) {
+      stepsHtml = d.steps.map((step, idx) => `
+        <div style="background:#f8fafc;border-left:4px solid #16a34a;border:1px solid #e2e8f0;border-radius:5px;padding:10px 14px;margin-bottom:8px;">
+          <b style="color:#0f172a;">Step ${idx+1}: ${step.title}</b><br>
+          ${step.text ? `<span style="color:#475569;font-size:12px;">${this.stripHtml(step.text)}</span><br>` : ''}
+          ${step.list && step.list.length ? '<ul style="margin:4px 0 4px 20px;">' + step.list.map(l => `<li style="font-size:12px;">${this.stripHtml(l)}</li>`).join('') + '</ul>' : ''}
+          ${step.latex ? `<code style="font-size:11px;color:#1e40af;background:#eff6ff;padding:2px 6px;">${step.latex}</code>` : ''}
+        </div>`).join('');
+    } else {
+      stepsHtml = '<p style="color:#888;font-style:italic;">No steps recorded.</p>';
+    }
+
+    let resultHtml = '';
+    const solObj = d.solution || d.solutions;
+    if (d.eigenvalues && Array.isArray(d.eigenvalues)) {
+      resultHtml = d.eigenvalues.map((val, i) => {
+        const vec = d.eigenvectors && d.eigenvectors[i] ? `[${d.eigenvectors[i].join(', ')}]` : '';
+        return `<li><b>\u03bb${i+1} = ${val}</b> &nbsp; v${i+1} = ${vec}</li>`;
+      }).join('');
+      resultHtml = `<ul style="font-family:monospace;">${resultHtml}</ul>`;
+    } else if (solObj && typeof solObj === 'object') {
+      resultHtml = Object.entries(solObj).map(([k,v]) =>
+        `<b>${k}</b> = ${v}`
+      ).join('&nbsp;&nbsp;&nbsp;');
+    } else {
+      const val = d.result_display ?? d.result ?? null;
+      if (val !== null) {
+        resultHtml = Array.isArray(val) && Array.isArray(val[0])
+          ? '<table border="1" cellpadding="6" style="border-collapse:collapse;font-family:monospace;">' +
+            val.map(row => '<tr>' + row.map(c => `<td>${c}</td>`).join('') + '</tr>').join('') +
+            '</table>'
+          : `<b style="font-size:18px;color:#14532d;">${val}</b>`;
+      }
+    }
+    if (d.result_latex) resultHtml += `<br><code style="font-size:10px;color:#64748b;">${d.result_latex}</code>`;
+
+    return `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office'
+            xmlns:w='urn:schemas-microsoft-com:office:word'
+            xmlns='http://www.w3.org/TR/REC-html40'>
+      <head><meta charset="utf-8">
+      <style>
+        body { font-family: Calibri, sans-serif; font-size: 13px; color: #1e293b; margin: 40px; }
+        h1   { font-size: 20px; color: #16a34a; }
+        h2   { font-size: 15px; }
+        table { border-collapse: collapse; }
+        td, th { padding: 5px 10px; border: 1px solid #cbd5e1; }
+        th { background: #f1f5f9; }
+      </style>
+      </head><body>
+        <h1>&#8730; Linear Algebra Solver &mdash; Solution Report</h1>
+        <p style="color:#64748b;font-size:11px;">Generated: ${date} &nbsp;|&nbsp; Solver: <b>${mod}</b>${op ? ' &nbsp;|&nbsp; Operation: <b>'+op+'</b>' : ''}</p>
+        <hr style="border:1.5px solid #16a34a;">
+
+        ${h2('1. Question / Input Data')}
+        ${box(this.buildQuestionHtml() || '<p style="color:#888;">No input data captured.</p>')}
+
+        ${h2('2. Governing Formula &amp; Method')}
+        ${box(`<code>${formula || title}</code>`)}
+
+        ${h2('3. Step-by-Step Computation')}
+        ${stepsHtml}
+
+        <hr style="border:1px solid #e2e8f0;margin:16px 0;">
+        ${h2('4. Final Calculated Result')}
+        ${box(resultHtml || '<p style="color:#888;">No result.</p>', '#f0fdf4', '#86efac')}
+
+        <p style="color:#94a3b8;font-size:10px;margin-top:30px;border-top:1px solid #e2e8f0;padding-top:8px;text-align:center;">
+          Linear Algebra Solver &mdash; ${date}
+        </p>
+      </body></html>`;
   },
 
   // ─── Trigger file download helper ─────────────────────────
@@ -741,6 +913,21 @@ const SolutionExporter = {
   downloadHTML() {
     if (!this.activeData) return;
     this.triggerDownload(this.buildPDFHtml(), `${this.safeName()}_solution.html`, 'text/html');
+  },
+
+  downloadWord() {
+    if (!this.activeData) return;
+    const content = this.buildWordHtml();
+    const blob = new Blob([content], { type: 'application/msword;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `${this.safeName()}_solution.doc`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    if (typeof showToast === 'function') showToast(`Downloaded: ${this.safeName()}_solution.doc`, 'success');
   },
 
   // ─── Clipboard Action Methods ─────────────────────────────
@@ -890,14 +1077,17 @@ const SolutionExporter = {
           <div class="prt-hdr-date">Detailed Solution Report<br>${date}</div>
         </div>
 
-        <div class="prt-sec-lbl prt-blue">1 · Governing Formula &amp; Method</div>
+        <div class="prt-sec-lbl prt-blue">1 · Question / Input Data</div>
+        ${this.buildQuestionHtml(true)}
+
+        <div class="prt-sec-lbl prt-blue">2 · Governing Formula &amp; Method</div>
         <div class="prt-formula">${formula || title}</div>
 
-        <div class="prt-sec-lbl prt-amber">2 · Step-by-Step Computation</div>
+        <div class="prt-sec-lbl prt-amber">3 · Step-by-Step Computation</div>
         <div style="margin-top:10px;">${stepsHtml}</div>
 
         <hr class="prt-hr">
-        <div class="prt-sec-lbl prt-green">3 · Final Calculated Result</div>
+        <div class="prt-sec-lbl prt-green">4 · Final Calculated Result</div>
         <div class="prt-result-box">
           <div class="prt-result-label">Result</div>
           ${resultHtml}

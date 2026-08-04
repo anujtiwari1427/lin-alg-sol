@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.MathJax && window.MathJax.typeset) window.MathJax.typeset();
 
         if (window.SolutionExporter) {
-          SolutionExporter.setSolution(data, 'Vector Operations');
+          SolutionExporter.setSolution(data, 'Vector Calculator', { operation: op, vector_a: va, vector_b: vb });
         }
       } else {
         showToast(data.error, 'danger');

@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.MathJax && window.MathJax.typeset) window.MathJax.typeset();
 
         if (window.SolutionExporter) {
-          SolutionExporter.setSolution(data, 'Linear System Solver');
+          SolutionExporter.setSolution(data, 'Linear System Solver', { coefficients: coeffs, constants: consts, method });
         }
       } else {
         showToast(data.error, 'danger');

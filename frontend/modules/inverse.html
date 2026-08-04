@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.MathJax && window.MathJax.typeset) window.MathJax.typeset();
 
         if (window.SolutionExporter) {
-          SolutionExporter.setSolution(data, 'Matrix Inverse');
+          SolutionExporter.setSolution(data, 'Matrix Inverse', { matrix: mat });
         }
       } else {
         showToast(data.error, 'danger');

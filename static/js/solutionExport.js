@@ -823,31 +823,50 @@ const SolutionExporter = {
 
   printSolution() {
     if (!this.activeData) {
-      if (typeof showToast === 'function') showToast('Please calculate a solution first to print.', 'warning');
+      if (typeof showToast === 'function') showToast('Please calculate a solution first before printing.', 'warning');
       return;
     }
+
     const htmlStr = this.buildPDFHtml();
-    const iframe  = document.createElement('iframe');
-    iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:800px;height:600px;';
-    document.body.appendChild(iframe);
-    iframe.contentDocument.open();
-    iframe.contentDocument.write(htmlStr);
-    iframe.contentDocument.close();
 
-    if (typeof showToast === 'function') showToast('Opening print dialog…', 'info');
+    // 1. Primary approach: Dedicated print window with focus & print trigger
+    const printWin = window.open('', '_blank', 'width=900,height=750,scrollbars=yes');
 
-    setTimeout(() => {
-      try {
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-      } catch (err) {
-        console.error('Print error:', err);
-        window.print();
-      } finally {
-        setTimeout(() => {
-          if (iframe.parentNode) document.body.removeChild(iframe);
-        }, 1000);
+    if (printWin) {
+      printWin.document.open();
+      printWin.document.write(htmlStr);
+      printWin.document.close();
+
+      if (typeof showToast === 'function') showToast('Opening print preview…', 'info');
+
+      const triggerPrint = () => {
+        try {
+          printWin.focus();
+          printWin.print();
+        } catch (e) {
+          console.error('Print trigger error:', e);
+        }
+      };
+
+      printWin.onload = triggerPrint;
+      setTimeout(triggerPrint, 500);
+
+    } else {
+      // 2. Fallback if popup blocker is active: Inject print overlay container
+      if (typeof showToast === 'function') showToast('Opening print dialog…', 'info');
+      let printDiv = document.getElementById('globalPrintSection');
+      if (!printDiv) {
+        printDiv = document.createElement('div');
+        printDiv.id = 'globalPrintSection';
+        document.body.appendChild(printDiv);
       }
-    }, 400);
+      printDiv.innerHTML = htmlStr;
+      window.print();
+      setTimeout(() => {
+        if (printDiv && printDiv.parentNode) {
+          printDiv.parentNode.removeChild(printDiv);
+        }
+      }, 2000);
+    }
   }
 };

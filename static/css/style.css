@@ -908,15 +908,14 @@ h1, h2, h3, h4, h5, h6 {
    Print Media Styles
    --------------------------------------------------------- */
 @media print {
-  body > *:not(#globalPrintSection) {
+  body > *:not(#solutionPrintOverlay) {
     display: none !important;
   }
-  #globalPrintSection {
+  #solutionPrintOverlay {
     display: block !important;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+    position: static !important;
+    overflow: visible !important;
+    width: 100% !important;
     background: #ffffff !important;
     color: #1e293b !important;
     z-index: 9999;

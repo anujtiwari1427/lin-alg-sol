@@ -821,52 +821,175 @@ const SolutionExporter = {
     }, 300);
   },
 
+  // ─── Builds print body content (no outer html/head/body tags) ────
+  buildPrintBodyHtml() {
+    if (!this.activeData) return '';
+    const d    = this.activeData;
+    const mod  = this.activeModuleName;
+    const op   = d.operation || '';
+    const title = op ? `${mod} — ${op}` : mod;
+    const date  = new Date().toLocaleString();
+    const formula = this.getFormulaPlain(mod, d);
+
+    let stepsHtml = '';
+    if (d.steps && d.steps.length > 0) {
+      stepsHtml = d.steps.map((step, idx) => `
+        <div class="prt-step">
+          <div class="prt-step-hdr">
+            <div class="prt-step-num">${idx + 1}</div>
+            <div class="prt-step-title">${step.title}</div>
+          </div>
+          ${step.text ? `<div class="prt-step-text">${this.stripHtml(step.text)}</div>` : ''}
+          ${step.list && step.list.length ? `<ul class="prt-step-list">${step.list.map(l => `<li>${this.stripHtml(l)}</li>`).join('')}</ul>` : ''}
+          ${step.latex ? `<div class="prt-step-formula">${step.latex}</div>` : ''}
+        </div>
+      `).join('');
+    } else {
+      stepsHtml = '<p style="color:#666;font-style:italic;">No computation steps recorded.</p>';
+    }
+
+    let resultHtml = '';
+    const solObj = d.solution || d.solutions;
+
+    if (d.eigenvalues && Array.isArray(d.eigenvalues)) {
+      const rows = d.eigenvalues.map((val, i) => {
+        const vec = d.eigenvectors && d.eigenvectors[i]
+          ? d.eigenvectors[i].map(x => `<td>${x}</td>`).join('')
+          : '<td>—</td>';
+        return `<tr><td>λ${i+1} = ${val}</td>${vec}</tr>`;
+      }).join('');
+      const vecCols = (d.eigenvectors && d.eigenvectors[0])
+        ? d.eigenvectors[0].map((_, j) => `<th>v[${j+1}]</th>`).join('')
+        : '<th>Eigenvector</th>';
+      resultHtml = `<table class="prt-eigen-table"><thead><tr><th>Eigenvalue</th>${vecCols}</tr></thead><tbody>${rows}</tbody></table>`;
+    } else if (solObj && typeof solObj === 'object') {
+      const items = Object.entries(solObj).map(([k, v]) => `
+        <div class="prt-sol-item"><div class="prt-sol-var">${k}</div><div class="prt-sol-val">${v}</div></div>
+      `).join('');
+      resultHtml = `<div class="prt-sol-grid">${items}</div>`;
+    } else if (d.result_display && Array.isArray(d.result_display) && Array.isArray(d.result_display[0])) {
+      const rows = d.result_display.map(row =>
+        '<tr>' + row.map(cell => `<td>${cell}</td>`).join('') + '</tr>'
+      ).join('');
+      resultHtml = `<table class="prt-mat-table">${rows}</table>`;
+    } else {
+      const val = d.result_display ?? d.result ?? null;
+      if (val !== null) resultHtml = `<div class="prt-result-value">${val}</div>`;
+    }
+    if (d.result_latex) {
+      resultHtml += `<div style="font-family:monospace;font-size:11px;color:#666;margin-top:8px;">LaTeX: ${d.result_latex}</div>`;
+    }
+
+    return `
+      <div class="prt-page">
+        <div class="prt-hdr">
+          <div>
+            <div class="prt-hdr-title">Linear Algebra Solver</div>
+            <div class="prt-hdr-sub">${title}</div>
+          </div>
+          <div class="prt-hdr-date">Detailed Solution Report<br>${date}</div>
+        </div>
+
+        <div class="prt-sec-lbl prt-blue">1 · Governing Formula &amp; Method</div>
+        <div class="prt-formula">${formula || title}</div>
+
+        <div class="prt-sec-lbl prt-amber">2 · Step-by-Step Computation</div>
+        <div style="margin-top:10px;">${stepsHtml}</div>
+
+        <hr class="prt-hr">
+        <div class="prt-sec-lbl prt-green">3 · Final Calculated Result</div>
+        <div class="prt-result-box">
+          <div class="prt-result-label">Result</div>
+          ${resultHtml}
+        </div>
+
+        <div class="prt-footer">Linear Algebra Solver — Detailed Solution Report — ${date}</div>
+      </div>`;
+  },
+
   printSolution() {
     if (!this.activeData) {
       if (typeof showToast === 'function') showToast('Please calculate a solution first before printing.', 'warning');
       return;
     }
 
-    const htmlStr = this.buildPDFHtml();
+    // Remove any previous print overlay
+    const existing = document.getElementById('solutionPrintOverlay');
+    if (existing) existing.remove();
 
-    // 1. Primary approach: Dedicated print window with focus & print trigger
-    const printWin = window.open('', '_blank', 'width=900,height=750,scrollbars=yes');
-
-    if (printWin) {
-      printWin.document.open();
-      printWin.document.write(htmlStr);
-      printWin.document.close();
-
-      if (typeof showToast === 'function') showToast('Opening print preview…', 'info');
-
-      const triggerPrint = () => {
-        try {
-          printWin.focus();
-          printWin.print();
-        } catch (e) {
-          console.error('Print trigger error:', e);
+    // Create overlay with scoped inline styles + body content (no nested html docs)
+    const overlay = document.createElement('div');
+    overlay.id = 'solutionPrintOverlay';
+    overlay.innerHTML = `
+      <style>
+        #solutionPrintOverlay {
+          display: none;
+          position: fixed;
+          inset: 0;
+          z-index: 99999;
+          background: #fff;
+          overflow: auto;
+          font-family: 'Segoe UI', system-ui, sans-serif;
+          font-size: 13px;
+          color: #1e293b;
         }
-      };
+        .prt-page { padding: 32px 36px; }
+        .prt-hdr { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #16a34a; padding-bottom: 14px; margin-bottom: 22px; }
+        .prt-hdr-title { font-size: 20px; font-weight: 800; color: #16a34a; }
+        .prt-hdr-sub { font-size: 13px; font-weight: 600; color: #334155; }
+        .prt-hdr-date { font-size: 10px; color: #94a3b8; text-align: right; }
+        .prt-sec-lbl { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; padding: 4px 10px; border-radius: 4px; display: inline-block; margin-top: 18px; margin-bottom: 8px; }
+        .prt-blue  { color: #0891b2; background: #f0f9ff; }
+        .prt-amber { color: #b45309; background: #fffbeb; }
+        .prt-green { color: #15803d; background: #f0fdf4; }
+        .prt-formula { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 12px 16px; font-family: 'Courier New', monospace; font-size: 12px; color: #0c4a6e; word-break: break-all; margin-bottom: 10px; }
+        .prt-step { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #16a34a; border-radius: 6px; padding: 12px 14px; margin-bottom: 10px; }
+        .prt-step-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+        .prt-step-num { width: 24px; height: 24px; border-radius: 50%; background: #16a34a; color: #fff; font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .prt-step-title { font-weight: 700; font-size: 13px; color: #0f172a; }
+        .prt-step-text { font-size: 12px; color: #475569; margin: 4px 0 4px 34px; line-height: 1.5; }
+        .prt-step-list { margin: 4px 0 4px 34px; padding-left: 16px; font-size: 12px; color: #334155; }
+        .prt-step-list li { margin-bottom: 2px; }
+        .prt-step-formula { font-family: 'Courier New', monospace; font-size: 11px; color: #1e40af; background: #eff6ff; border-radius: 4px; padding: 4px 8px; margin: 6px 0 2px 34px; word-break: break-all; }
+        .prt-result-box { background: #f0fdf4; border: 2px solid #86efac; border-radius: 10px; padding: 18px 20px; text-align: center; margin: 10px 0 20px; }
+        .prt-result-value { font-size: 18px; font-weight: 800; color: #14532d; }
+        .prt-result-label { font-size: 10px; color: #15803d; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+        .prt-mat-table { border-collapse: collapse; margin: 8px auto; font-family: 'Courier New', monospace; font-size: 12px; }
+        .prt-mat-table td { padding: 5px 12px; border: 1px solid #cbd5e1; text-align: right; }
+        .prt-sol-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .prt-sol-item { background: #fff; border: 2px solid #16a34a; border-radius: 8px; padding: 8px 16px; text-align: center; min-width: 80px; }
+        .prt-sol-var { font-size: 11px; color: #6b7280; font-weight: 600; }
+        .prt-sol-val { font-size: 16px; font-weight: 800; color: #14532d; }
+        .prt-eigen-table { border-collapse: collapse; width: 100%; font-size: 12px; }
+        .prt-eigen-table th { background: #f1f5f9; color: #475569; font-size: 10px; text-transform: uppercase; padding: 6px 10px; border: 1px solid #e2e8f0; text-align: left; }
+        .prt-eigen-table td { padding: 8px 10px; border: 1px solid #e2e8f0; font-family: 'Courier New', monospace; }
+        .prt-hr { border: none; border-top: 1px solid #e2e8f0; margin: 18px 0; }
+        .prt-footer { margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px; text-align: center; color: #94a3b8; font-size: 10px; }
+        .prt-close-btn {
+          position: fixed; top: 14px; right: 20px; z-index: 100000;
+          background: #ef4444; color: #fff; border: none; border-radius: 6px;
+          padding: 6px 14px; font-size: 13px; font-weight: 700; cursor: pointer;
+          display: flex; align-items: center; gap: 6px;
+        }
+        @media print {
+          .prt-close-btn { display: none !important; }
+          .prt-page { padding: 16px 24px; }
+        }
+      </style>
+      <button class="prt-close-btn" onclick="document.getElementById('solutionPrintOverlay').remove()">
+        ✕ Close
+      </button>
+      ${this.buildPrintBodyHtml()}
+    `;
 
-      printWin.onload = triggerPrint;
-      setTimeout(triggerPrint, 500);
+    document.body.appendChild(overlay);
+    overlay.style.display = 'block';
 
-    } else {
-      // 2. Fallback if popup blocker is active: Inject print overlay container
-      if (typeof showToast === 'function') showToast('Opening print dialog…', 'info');
-      let printDiv = document.getElementById('globalPrintSection');
-      if (!printDiv) {
-        printDiv = document.createElement('div');
-        printDiv.id = 'globalPrintSection';
-        document.body.appendChild(printDiv);
-      }
-      printDiv.innerHTML = htmlStr;
+    if (typeof showToast === 'function') showToast('Opening print dialog…', 'info');
+
+    // Trigger browser print
+    setTimeout(() => {
       window.print();
-      setTimeout(() => {
-        if (printDiv && printDiv.parentNode) {
-          printDiv.parentNode.removeChild(printDiv);
-        }
-      }, 2000);
-    }
+    }, 350);
   }
 };

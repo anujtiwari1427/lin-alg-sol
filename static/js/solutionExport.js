@@ -172,11 +172,19 @@ const SolutionExporter = {
               <i class="fab fa-html5 text-orange fs-5 mb-1 d-block" style="color:#f97316;"></i><span>HTML Web</span>
             </button>
           </div>
+          <div class="col-6 col-sm-4 col-md-3 col-lg-2-4">
+            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.printSolution()" title="Print Solution">
+              <i class="fas fa-print text-info fs-5 mb-1 d-block"></i><span>Print</span>
+            </button>
+          </div>
         </div>
 
         <div class="pt-3 border-top border-secondary-subtle d-flex flex-wrap align-items-center justify-content-between gap-2">
           <span class="small text-secondary fw-semibold"><i class="fas fa-paste me-1"></i>Quick Clipboard Actions:</span>
           <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.printSolution()">
+              <i class="fas fa-print me-1 text-info"></i>Print Solution
+            </button>
             <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyToClipboard()">
               <i class="fas fa-copy me-1"></i>Copy Text
             </button>
@@ -811,5 +819,35 @@ const SolutionExporter = {
         this.downloadTXT();
       });
     }, 300);
+  },
+
+  printSolution() {
+    if (!this.activeData) {
+      if (typeof showToast === 'function') showToast('Please calculate a solution first to print.', 'warning');
+      return;
+    }
+    const htmlStr = this.buildPDFHtml();
+    const iframe  = document.createElement('iframe');
+    iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:800px;height:600px;';
+    document.body.appendChild(iframe);
+    iframe.contentDocument.open();
+    iframe.contentDocument.write(htmlStr);
+    iframe.contentDocument.close();
+
+    if (typeof showToast === 'function') showToast('Opening print dialog…', 'info');
+
+    setTimeout(() => {
+      try {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      } catch (err) {
+        console.error('Print error:', err);
+        window.print();
+      } finally {
+        setTimeout(() => {
+          if (iframe.parentNode) document.body.removeChild(iframe);
+        }, 1000);
+      }
+    }, 400);
   }
 };

@@ -1243,3 +1243,6 @@ const SolutionExporter = {
     }, 350);
   }
 };
+
+window.SolutionExporter = SolutionExporter;
+

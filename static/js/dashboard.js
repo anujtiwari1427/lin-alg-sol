@@ -8,9 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const CHART_THEME = {
   green:     { line: '#79C131', point: '#a8bd86', fill0: 'rgba(121,193,49,0.35)', fill1: 'rgba(121,193,49,0.02)', tick: '#79C131', grid: 'rgba(121,193,49,0.10)', tooltip_bg: '#161616', tooltip_border: '#79C131' },
-  sand:      { line: '#e1b382', point: '#c89666', fill0: 'rgba(225,179,130,0.35)', fill1: 'rgba(225,179,130,0.02)', tick: '#e1b382', grid: 'rgba(225,179,130,0.10)', tooltip_bg: '#12343b', tooltip_border: '#e1b382' },
-  turquoise: { line: '#FFEACF', point: '#2dd4bf', fill0: 'rgba(255,234,207,0.35)', fill1: 'rgba(255,234,207,0.02)', tick: '#FFEACF', grid: 'rgba(255,234,207,0.10)', tooltip_bg: '#06423d', tooltip_border: '#FFEACF' },
-  chocolate: { line: '#FFF363', point: '#e6da48', fill0: 'rgba(255,243,99,0.35)', fill1: 'rgba(255,243,99,0.02)', tick: '#FFF363', grid: 'rgba(255,243,99,0.10)', tooltip_bg: '#1C1810', tooltip_border: '#FFF363' },
+  ocean:     { line: '#16A085', point: '#168777', fill0: 'rgba(22,160,133,0.35)', fill1: 'rgba(22,160,133,0.02)', tick: '#16A085', grid: 'rgba(22,160,133,0.10)', tooltip_bg: '#140C30', tooltip_border: '#16A085' },
   light:     { line: '#79C131', point: '#5d9a25', fill0: 'rgba(121,193,49,0.25)', fill1: 'rgba(121,193,49,0.02)', tick: '#161616', grid: 'rgba(22,22,22,0.08)',    tooltip_bg: '#ffffff', tooltip_border: '#79C131' },
 };
 

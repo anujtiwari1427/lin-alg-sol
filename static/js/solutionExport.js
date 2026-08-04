@@ -925,11 +925,11 @@ const SolutionExporter = {
     // Build the print body HTML (question + formula + steps + result)
     const bodyHtml = this.buildPrintBodyHtml();
 
-    // Create an off-screen styled container for html2pdf to render
+    // Create an in-layout styled container for html2pdf to render
     const pdfContainer = document.createElement('div');
     pdfContainer.id = '__pdfExportContainer';
     pdfContainer.style.cssText = [
-      'position:absolute', 'top:-99999px', 'left:-99999px',
+      'position:fixed', 'top:0', 'left:0', 'z-index:-99999', 'opacity:0.01', 'pointer-events:none',
       'width:794px',          // A4 width in px at 96dpi
       'background:#ffffff',
       'font-family:Segoe UI,system-ui,sans-serif',
@@ -989,23 +989,42 @@ const SolutionExporter = {
     if (typeof html2pdf === 'undefined') {
       // Fallback: open print overlay
       document.body.removeChild(pdfContainer);
-      if (typeof showToast === 'function') showToast('PDF library unavailable \u2014 using print dialog instead.', 'warning');
+      if (typeof showToast === 'function') showToast('PDF library unavailable — opening print dialog.', 'warning');
       this.printSolution();
       return;
     }
+
+    let finished = false;
+
+    // Safety timeout: if html2pdf takes > 5 seconds, fallback to print overlay
+    const pdfTimer = setTimeout(() => {
+      if (!finished) {
+        finished = true;
+        if (document.body.contains(pdfContainer)) document.body.removeChild(pdfContainer);
+        if (typeof showToast === 'function') showToast('PDF generation timed out — opening print dialog.', 'warning');
+        this.printSolution();
+      }
+    }, 5000);
 
     html2pdf()
       .set(opt)
       .from(pdfContainer)
       .save()
       .then(() => {
-        document.body.removeChild(pdfContainer);
+        if (finished) return;
+        finished = true;
+        clearTimeout(pdfTimer);
+        if (document.body.contains(pdfContainer)) document.body.removeChild(pdfContainer);
         if (typeof showToast === 'function') showToast(`Downloaded: ${filename}`, 'success');
       })
       .catch(err => {
         console.error('[SolutionExporter] PDF error:', err);
+        if (finished) return;
+        finished = true;
+        clearTimeout(pdfTimer);
         if (document.body.contains(pdfContainer)) document.body.removeChild(pdfContainer);
-        if (typeof showToast === 'function') showToast('PDF generation failed. Try Print instead.', 'danger');
+        if (typeof showToast === 'function') showToast('PDF generation failed — opening print dialog.', 'warning');
+        this.printSolution();
       });
   },
 

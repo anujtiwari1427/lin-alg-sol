@@ -20,25 +20,14 @@ def calculate():
     op = data.get('operation', '')
     matrix_a_raw = data.get('matrix_a')
     matrix_b_raw = data.get('matrix_b')
-    scalar_raw = data.get('scalar', 1)
-    k_power = data.get('power', 2)
+    scalar_raw   = data.get('scalar', 1)
 
-    if op == 'identity':
-        try:
-            dim = int(data.get('dimension', 3))
-        except Exception:
-            dim = 3
-        result = MatrixService.identity(dim)
-        if result.get('success'):
-            CalculationModel.save(module='Matrix', operation='Identity Matrix', input_data={'dimension': dim}, result_data=result.get('result_display'), steps=result.get('steps'))
-        return jsonify(result)
-
-    # Validate matrix A
+    # Validate matrix A (always required)
     matrix_a, err = validate_matrix(matrix_a_raw, 'matrix_a')
     if err:
         return jsonify({'success': False, 'error': err, 'error_code': 'VALIDATION_ERROR'}), 422
 
-    # Binary ops requiring matrix B
+    # Validate matrix B for binary ops
     dual_ops = {'add', 'subtract', 'multiply'}
     if op in dual_ops:
         matrix_b, err = validate_matrix(matrix_b_raw, 'matrix_b')
@@ -47,7 +36,7 @@ def calculate():
     else:
         matrix_b = matrix_b_raw
 
-    # Scalar validation
+    # Validate scalar
     scalar = scalar_raw
     if op == 'scalar':
         scalar, err = validate_scalar(scalar_raw)
@@ -55,25 +44,13 @@ def calculate():
             return jsonify({'success': False, 'error': err, 'error_code': 'VALIDATION_ERROR'}), 422
 
     ops = {
-        'add': lambda: MatrixService.addition(matrix_a, matrix_b),
-        'subtract': lambda: MatrixService.subtraction(matrix_a, matrix_b),
-        'multiply': lambda: MatrixService.multiplication(matrix_a, matrix_b),
-        'scalar': lambda: MatrixService.scalar_multiplication(matrix_a, scalar),
+        'add':       lambda: MatrixService.addition(matrix_a, matrix_b),
+        'subtract':  lambda: MatrixService.subtraction(matrix_a, matrix_b),
+        'multiply':  lambda: MatrixService.multiplication(matrix_a, matrix_b),
+        'scalar':    lambda: MatrixService.scalar_multiplication(matrix_a, scalar),
         'transpose': lambda: MatrixService.transpose(matrix_a),
-        'trace': lambda: MatrixService.trace(matrix_a),
-        'rank': lambda: MatrixService.rank(matrix_a),
-        'determinant': lambda: MatrixService.determinant(matrix_a),
-        'inverse': lambda: MatrixService.inverse(matrix_a),
-        'adjoint': lambda: MatrixService.adjoint(matrix_a),
-        'cofactor': lambda: MatrixService.cofactor(matrix_a),
-        'power': lambda: MatrixService.power(matrix_a, k_power),
-        'eigenvalues': lambda: MatrixService.eigenvalues(matrix_a),
-        'eigenvectors': lambda: MatrixService.eigenvectors(matrix_a),
-        'diagonalization': lambda: MatrixService.diagonalization(matrix_a),
-        'lu': lambda: MatrixService.lu_decomposition(matrix_a),
-        'qr': lambda: MatrixService.qr_decomposition(matrix_a),
-        'svd': lambda: MatrixService.svd(matrix_a),
-        'cholesky': lambda: MatrixService.cholesky(matrix_a),
+        'trace':     lambda: MatrixService.trace(matrix_a),
+        'rank':      lambda: MatrixService.rank(matrix_a),
     }
 
     if op not in ops:
@@ -86,8 +63,7 @@ def calculate():
                 module='Matrix',
                 operation=result.get('operation', op),
                 input_data={'operation': op, 'matrix_a': matrix_a, 'matrix_b': matrix_b, 'scalar': scalar},
-                result_data={'result': result.get('result_display') or result.get('result')},
-                steps=result.get('steps')
+                result_data={'result': result.get('result_display') or result.get('result')}
             )
         return jsonify(result)
     except Exception as exc:

@@ -43,7 +43,7 @@
   {# ── Stylesheets ──────────────────────────────────────────────────── #}
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.0.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
   {% block extra_css %}{% endblock %}
 
@@ -51,20 +51,12 @@
   <script>
     window.MathJax = {
       tex: {
-        inlineMath:  [['$', '$'], ['\\(', '\\)']],
+        inlineMath:  [['\\(', '\\)']],
         displayMath: [['$$', '$$'], ['\\[', '\\]']],
         packages:    {'[+]': ['ams']}
       },
       options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] },
-      startup: {
-        pageReady: () => {
-          return MathJax.startup.defaultPageReady().then(() => {
-            if (window.SolutionExporter && window.SolutionExporter.activeData) {
-              SolutionExporter.triggerMathJax();
-            }
-          });
-        }
-      }
+      startup:  { typeset: false }   // We call MathJax.typeset() manually after dynamic content
     };
   </script>
 </head>
@@ -110,12 +102,9 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.min.js"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <script src="{{ url_for('static', filename='js/main.js') }}?v=3.0.0"></script>
-  <script src="{{ url_for('static', filename='js/solutionExport.js') }}?v=3.0.0"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/solutionExport.js') }}"></script>
 
   {% block extra_js %}{% endblock %}
 

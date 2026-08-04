@@ -31,14 +31,12 @@ def calculate():
     op = data.get('operation', '')
     va_raw = data.get('vector_a')
     vb_raw = data.get('vector_b')
-    c1 = data.get('c1', 1)
-    c2 = data.get('c2', 1)
 
     va, err = _validate_vector(va_raw, 'vector_a')
     if err:
         return jsonify({'success': False, 'error': err, 'error_code': 'VALIDATION_ERROR'}), 422
 
-    dual_ops = {'dot', 'cross', 'projection', 'angle', 'distance', 'linear_combination', 'orthogonality'}
+    dual_ops = {'dot', 'cross', 'projection', 'angle', 'distance'}
     vb = vb_raw
     if op in dual_ops:
         vb, err = _validate_vector(vb_raw, 'vector_b')
@@ -46,15 +44,13 @@ def calculate():
             return jsonify({'success': False, 'error': err, 'error_code': 'VALIDATION_ERROR'}), 422
 
     ops = {
-        'dot': lambda: VectorService.dot_product(va, vb),
-        'cross': lambda: VectorService.cross_product(va, vb),
-        'magnitude': lambda: VectorService.magnitude(va),
-        'unit': lambda: VectorService.unit_vector(va),
+        'dot':        lambda: VectorService.dot_product(va, vb),
+        'cross':      lambda: VectorService.cross_product(va, vb),
+        'magnitude':  lambda: VectorService.magnitude(va),
+        'unit':       lambda: VectorService.unit_vector(va),
         'projection': lambda: VectorService.projection(va, vb),
-        'angle': lambda: VectorService.angle(va, vb),
-        'linear_combination': lambda: VectorService.linear_combination(va, vb, c1, c2),
-        'orthogonality': lambda: VectorService.orthogonality(va, vb),
-        'distance': lambda: VectorService.distance(va, vb),
+        'angle':      lambda: VectorService.angle(va, vb),
+        'distance':   lambda: VectorService.distance(va, vb),
     }
 
     if op not in ops:
@@ -66,8 +62,7 @@ def calculate():
             CalculationModel.save(
                 module='Vector', operation=result.get('operation', op),
                 input_data={'operation': op, 'vector_a': va, 'vector_b': vb},
-                result_data={'result': str(result.get('result_display'))},
-                steps=result.get('steps')
+                result_data={'result': str(result.get('result_display'))}
             )
         return jsonify(result)
     except Exception as exc:

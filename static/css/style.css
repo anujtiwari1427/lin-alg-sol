@@ -7,7 +7,7 @@
       - Light Yellow: #EDE1AC
    2. Ocean Deep Theme (Navy #0D1F23 → Slate #AFB3B7)
    3. Butter & Forest Green Theme (#FFEFB3 butter + #013E37 green)
-   4. Burgundy & Black Theme (#6D001A burgundy + #000000 black)
+   4. Maroon & Cream Theme (#650108 maroon + #F2E8D2 cream)
    5. Light Mode
    ========================================================= */
 
@@ -101,27 +101,27 @@
 }
 
 /* ---------------------------------------------------------
-   CSS Custom Properties — Burgundy & Black Theme
-   (#000000 jet black + #6D001A deep burgundy + #FFFFFF white)
+   CSS Custom Properties — Maroon & Cream Theme
+   (#650108 deep maroon + #F2E8D2 warm cream)
    --------------------------------------------------------- */
-[data-theme="burgundy"] {
-  --bg-primary:       #0a0000;
-  --bg-secondary:     #1a0008;
-  --bg-card:          rgba(60, 0, 14, 0.80);
-  --bg-glass:         rgba(10, 0, 0, 0.94);
-  --border-color:     rgba(109, 0, 26, 0.40);
-  --border-highlight: #6D001A;
+[data-theme="maroon"] {
+  --bg-primary:       #3a0005;
+  --bg-secondary:     #650108;
+  --bg-card:          rgba(101, 1, 8, 0.80);
+  --bg-glass:         rgba(50, 0, 6, 0.94);
+  --border-color:     rgba(242, 232, 210, 0.25);
+  --border-highlight: #F2E8D2;
 
-  --text-primary:   #ffffff;
-  --text-secondary: #c47a8a;
-  --text-muted:     #7a3040;
+  --text-primary:   #F2E8D2;
+  --text-secondary: #e8d5b7;
+  --text-muted:     #b09070;
 
-  --primary-accent:     #6D001A;
-  --primary-accent-rgb: 109, 0, 26;
-  --primary-gradient:   linear-gradient(135deg, #000000 0%, #6D001A 55%, #a0102e 100%);
-  --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(109,0,26,0.55) 0%, rgba(60,0,14,0.35) 55%, #0a0000 85%);
-  --card-shadow:        0 12px 40px -8px rgba(0,0,0,0.96);
-  --glass-shadow:       0 8px 32px 0 rgba(0,0,0,0.80), 0 0 0 1px rgba(109,0,26,0.12);
+  --primary-accent:     #F2E8D2;
+  --primary-accent-rgb: 242, 232, 210;
+  --primary-gradient:   linear-gradient(135deg, #650108 0%, #8a0110 50%, #F2E8D2 100%);
+  --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(242,232,210,0.30) 0%, rgba(101,1,8,0.50) 55%, #3a0005 85%);
+  --card-shadow:        0 12px 40px -8px rgba(0,0,0,0.92);
+  --glass-shadow:       0 8px 32px 0 rgba(0,0,0,0.75), 0 0 0 1px rgba(242,232,210,0.10);
 }
 
 /* ---------------------------------------------------------

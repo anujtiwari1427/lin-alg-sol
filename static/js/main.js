@@ -1,6 +1,6 @@
 /* =========================================================
    LINEAR ALGEBRA SOLVER - MAIN JAVASCRIPT SYSTEM
-   THEMES: 'green' (Cyber Green & Yellow), 'ocean' (Deep Navy & Slate), 'butter' (Forest Green & Butter), 'burgundy' (Black & Burgundy), 'light'
+   THEMES: 'green' (Cyber Green & Yellow), 'ocean' (Deep Navy & Slate), 'butter' (Forest Green & Butter), 'maroon' (Maroon & Cream), 'light'
    ========================================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   highlightActiveNavLink();
 });
 
-const THEMES = ['green', 'ocean', 'butter', 'burgundy', 'light'];
+const THEMES = ['green', 'ocean', 'butter', 'maroon', 'light'];
 
 function initTheme() {
   const saved = localStorage.getItem('las-theme') || 'green';
@@ -42,9 +42,9 @@ function applyTheme(theme, save = true) {
     } else if (theme === 'butter') {
       icon.className = 'fas fa-sun';
       icon.style.color = '#FFEFB3';
-    } else if (theme === 'burgundy') {
+    } else if (theme === 'maroon') {
       icon.className = 'fas fa-wine-glass';
-      icon.style.color = '#c47a8a';
+      icon.style.color = '#F2E8D2';
 
     } else {
       icon.className = 'fas fa-moon text-primary';

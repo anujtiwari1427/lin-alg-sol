@@ -55,15 +55,25 @@ def init_db(db_path=None):
     # Calculation history table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS calculation_history (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
-            module      TEXT NOT NULL,
-            operation   TEXT NOT NULL,
-            input_data  TEXT NOT NULL,
-            result_data TEXT NOT NULL,
-            steps_json  TEXT,
-            created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            module       TEXT NOT NULL,
+            operation    TEXT NOT NULL,
+            input_data   TEXT NOT NULL,
+            result_data  TEXT NOT NULL,
+            steps_json   TEXT,
+            is_favourite INTEGER DEFAULT 0,
+            export_count INTEGER DEFAULT 0,
+            created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+
+    # Safe migration for existing DB files
+    cursor.execute("PRAGMA table_info(calculation_history)")
+    columns = [col['name'] for col in cursor.fetchall()]
+    if 'is_favourite' not in columns:
+        cursor.execute("ALTER TABLE calculation_history ADD COLUMN is_favourite INTEGER DEFAULT 0")
+    if 'export_count' not in columns:
+        cursor.execute("ALTER TABLE calculation_history ADD COLUMN export_count INTEGER DEFAULT 0")
 
     # User settings / preferences table
     cursor.execute('''

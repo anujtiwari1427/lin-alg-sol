@@ -1,23 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}Matrix Calculator — Add, Multiply, Transpose, Rank | Linear Algebra Solver{% endblock %}
-{% block meta_description %}Free NxN matrix calculator. Compute matrix addition, subtraction, multiplication, scalar multiplication, transpose, rank, and trace with step-by-step LaTeX proofs.{% endblock %}
-{% block og_title %}Matrix Calculator | Linear Algebra Solver{% endblock %}
-
-{% block jsonld %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Matrix Operations Calculator",
-  "applicationCategory": "EducationalApplication",
-  "operatingSystem": "Web",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-  "description": "Free NxN matrix calculator with step-by-step LaTeX proofs for addition, subtraction, multiplication, transpose, rank and trace.",
-  "keywords": "matrix calculator, matrix multiplication, matrix addition, matrix transpose, rank calculator"
-}
-</script>
-{% endblock %}
+{% block title %}Matrix Calculator & Learning Hub — 20 Matrix Operations | Linear Algebra Solver{% endblock %}
+{% block meta_description %}Professional Educational Matrix Calculator: Addition, Subtraction, Multiplication, Transpose, Determinant, Inverse, Rank, Trace, Adjoint, Cofactor, Identity, Power, Eigenvalues, Diagonalization, LU, QR, SVD, Cholesky with detailed proofs and verifications.{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/modules.css') }}">
@@ -29,21 +13,21 @@
     <i class="fas fa-th"></i>
   </div>
   <div>
-    <h3 class="fw-bold mb-1">Matrix Operations</h3>
-    <p class="text-secondary mb-0 small">Perform addition, subtraction, multiplication, scalar multiplication, transpose, trace, and rank calculations with step-by-step proofs.</p>
+    <h3 class="fw-bold mb-1">Matrix Operations &amp; Educational Solver</h3>
+    <p class="text-secondary mb-0 small">20 Advanced Matrix Solvers with full theory, formulas, step-by-step calculations, verifications, copy features, and exports.</p>
   </div>
 </div>
 
 <div class="row g-4">
   <!-- Input Configuration Panel -->
-  <div class="col-lg-6">
+  <div class="col-lg-5">
     <div class="glass-panel p-4 h-100">
       <h5 class="fw-bold mb-3"><i class="fas fa-sliders text-primary me-2"></i>Matrix Setup</h5>
       
       <!-- Preset Dimension Selector -->
       <div class="mb-3">
         <label class="form-label small fw-semibold text-secondary">Matrix Dimensions</label>
-        <div class="d-flex gap-2">
+        <div class="d-flex flex-wrap gap-2">
           <button type="button" class="btn btn-sm btn-secondary-custom dim-btn active" data-rows="2" data-cols="2">2×2</button>
           <button type="button" class="btn btn-sm btn-secondary-custom dim-btn" data-rows="3" data-cols="3">3×3</button>
           <button type="button" class="btn btn-sm btn-secondary-custom dim-btn" data-rows="4" data-cols="4">4×4</button>
@@ -54,7 +38,7 @@
 
       <!-- Matrix Inputs -->
       <div class="row g-3 mb-3">
-        <div class="col-md-6">
+        <div class="col-md-12 col-xl-6" id="matrixASection">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <span class="fw-bold text-primary-accent">Matrix A</span>
             <button class="btn btn-sm text-secondary p-0" id="randomMatA" title="Fill Random"><i class="fas fa-dice me-1"></i>Random</button>
@@ -62,7 +46,7 @@
           <div id="gridContainerA" class="matrix-grid-wrap"></div>
         </div>
 
-        <div class="col-md-6" id="matrixBSection">
+        <div class="col-md-12 col-xl-6" id="matrixBSection">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <span class="fw-bold text-info">Matrix B</span>
             <button class="btn btn-sm text-secondary p-0" id="randomMatB" title="Fill Random"><i class="fas fa-dice me-1"></i>Random</button>
@@ -71,29 +55,54 @@
         </div>
       </div>
 
-      <!-- Scalar Input (Conditional) -->
+      <!-- Scalar Input -->
       <div class="mb-3" id="scalarInputGroup" style="display: none;">
         <label class="form-label small fw-semibold text-secondary">Scalar Multiplier (k)</label>
         <input type="number" id="scalarVal" class="scalar-input" value="2" step="any">
       </div>
 
-      <!-- Operation Selector -->
+      <!-- Matrix Power Input -->
+      <div class="mb-3" id="powerInputGroup" style="display: none;">
+        <label class="form-label small fw-semibold text-secondary">Matrix Power (k)</label>
+        <input type="number" id="powerVal" class="scalar-input" value="2" step="1">
+      </div>
+
+      <!-- Operation Selector (All 20 Matrix Ops) -->
       <div class="mb-3">
-        <label class="form-label small fw-semibold text-secondary">Select Operation</label>
+        <label class="form-label small fw-semibold text-secondary">Select Matrix Operation</label>
         <select id="operationSelect" class="form-select bg-secondary border-secondary text-white">
-          <option value="add">Matrix Addition (A + B)</option>
-          <option value="subtract">Matrix Subtraction (A − B)</option>
-          <option value="multiply" selected>Matrix Multiplication (A × B)</option>
-          <option value="scalar">Scalar Multiplication (k · A)</option>
-          <option value="transpose">Transpose (Aᵀ)</option>
-          <option value="trace">Trace (tr(A))</option>
-          <option value="rank">Rank (rank(A))</option>
+          <optgroup label="Basic Arithmetic">
+            <option value="add">Matrix Addition (A + B)</option>
+            <option value="subtract">Matrix Subtraction (A − B)</option>
+            <option value="multiply" selected>Matrix Multiplication (A × B)</option>
+            <option value="scalar">Scalar Multiplication (k · A)</option>
+            <option value="transpose">Transpose (Aᵀ)</option>
+          </optgroup>
+          <optgroup label="Properties & Analysis">
+            <option value="determinant">Determinant (det(A))</option>
+            <option value="inverse">Inverse Matrix (A⁻¹)</option>
+            <option value="trace">Trace (tr(A))</option>
+            <option value="rank">Rank (rank(A))</option>
+            <option value="adjoint">Adjoint Matrix (adj(A))</option>
+            <option value="cofactor">Cofactor Matrix (C)</option>
+            <option value="identity">Identity Matrix (I_n)</option>
+            <option value="power">Matrix Power (A^k)</option>
+          </optgroup>
+          <optgroup label="Spectral & Decompositions">
+            <option value="eigenvalues">Eigenvalues (λ)</option>
+            <option value="eigenvectors">Eigenvectors (v)</option>
+            <option value="diagonalization">Diagonalization (A = P D P⁻¹)</option>
+            <option value="lu">LU Decomposition (PA = LU)</option>
+            <option value="qr">QR Decomposition (A = QR)</option>
+            <option value="svd">SVD Decomposition (A = U Σ Vᵀ)</option>
+            <option value="cholesky">Cholesky Decomposition (A = L Lᵀ)</option>
+          </optgroup>
         </select>
       </div>
 
       <div class="d-flex gap-2">
         <button id="btnCalculate" class="btn-primary-custom w-100 justify-content-center">
-          <span class="btn-label"><i class="fas fa-calculator me-1"></i> Calculate Result</span>
+          <span class="btn-label"><i class="fas fa-calculator me-1"></i> Compute Educational Report</span>
           <span class="spinner-btn"><i class="fas fa-spinner fa-spin me-1"></i> Calculating...</span>
         </button>
         <button id="btnReset" class="btn-secondary-custom"><i class="fas fa-undo"></i></button>
@@ -101,28 +110,19 @@
     </div>
   </div>
 
-  <!-- Result & Step-by-Step Proof Output -->
-  <div class="col-lg-6">
-    <div class="glass-panel p-4 h-100" id="resultContainer">
-      <div class="text-center py-5 text-muted" id="placeholderResult">
-        <i class="fas fa-square-root-variable fs-1 mb-3 opacity-25"></i>
-        <h6>No Result Generated Yet</h6>
-        <p class="small">Configure your matrix inputs on the left and click <strong>Calculate Result</strong>.</p>
+  <!-- Educational Report & Result Panel -->
+  <div class="col-lg-7">
+    <div class="glass-panel p-4 h-100">
+      <h5 class="fw-bold mb-3"><i class="fas fa-square-root-variable text-success me-2"></i>Educational Report Output</h5>
+
+      <div id="placeholderResult" class="text-center py-5 text-muted">
+        <div class="display-1 text-secondary opacity-25 mb-3"><i class="fas fa-microchip"></i></div>
+        <h6>Ready for Calculation</h6>
+        <p class="small">Configure your matrix inputs and select an operation to generate a complete Wolfram-style report.</p>
       </div>
 
       <div id="outputContent" style="display: none;">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="fw-bold mb-0 text-success"><i class="fas fa-check-circle me-2"></i>Result Output</h5>
-          <button class="btn btn-sm btn-secondary-custom" id="btnCopyResult"><i class="fas fa-copy me-1"></i>Copy</button>
-        </div>
-
-        <div class="text-center mb-4">
-          <div id="mathJaxResult" class="fs-4 my-2"></div>
-        </div>
-
-        <h6 class="fw-bold mb-2 text-secondary"><i class="fas fa-list-ol me-2"></i>Step-by-Step Solution Proof</h6>
-        <div id="stepsAccordion"></div>
-        <div id="downloadPanelContainer"></div>
+        <div id="solutionExportTarget"></div>
       </div>
     </div>
   </div>
@@ -140,9 +140,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const opSelect = document.getElementById('operationSelect');
   const matBSection = document.getElementById('matrixBSection');
   const scalarGroup = document.getElementById('scalarInputGroup');
+  const powerGroup = document.getElementById('powerInputGroup');
 
   function renderGrid(container, rows, cols, prefix) {
-    let html = '<table>';
+    let html = '<table class="matrix-grid-table">';
     for (let r = 0; r < rows; r++) {
       html += '<tr>';
       for (let c = 0; c < cols; c++) {
@@ -160,7 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderGrid(gridB, rowsB, colsB, 'B');
   }
 
-  // Dimension buttons
   document.querySelectorAll('.dim-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.dim-btn').forEach(b => b.classList.remove('active'));
@@ -172,22 +172,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Operation change listener
   opSelect.addEventListener('change', () => {
     const op = opSelect.value;
-    if (op === 'scalar') {
-      matBSection.style.display = 'none';
-      scalarGroup.style.display = 'block';
-    } else if (['transpose', 'trace', 'rank'].includes(op)) {
-      matBSection.style.display = 'none';
-      scalarGroup.style.display = 'none';
-    } else {
-      matBSection.style.display = 'block';
-      scalarGroup.style.display = 'none';
-    }
+    scalarGroup.style.display = (op === 'scalar') ? 'block' : 'none';
+    powerGroup.style.display = (op === 'power') ? 'block' : 'none';
+    matBSection.style.display = ['add', 'subtract', 'multiply'].includes(op) ? 'block' : 'none';
   });
 
-  // Random fillers
   document.getElementById('randomMatA').addEventListener('click', () => fillRandom('A', rowsA, colsA));
   document.getElementById('randomMatB').addEventListener('click', () => fillRandom('B', rowsB, colsB));
 
@@ -213,14 +204,14 @@ document.addEventListener('DOMContentLoaded', () => {
     return mat;
   }
 
-  // Calculate Action
   document.getElementById('btnCalculate').addEventListener('click', () => {
     const op = opSelect.value;
     const matA = getMatrixValues('A', rowsA, colsA);
     const matB = getMatrixValues('B', rowsB, colsB);
     const scalar = parseFloat(document.getElementById('scalarVal').value) || 1;
+    const power = parseInt(document.getElementById('powerVal').value) || 2;
 
-    const payload = { operation: op, matrix_a: matA, matrix_b: matB, scalar: scalar };
+    const payload = { operation: op, matrix_a: matA, matrix_b: matB, scalar: scalar, power: power };
 
     document.getElementById('btnCalculate').classList.add('btn-loading');
 
@@ -233,48 +224,21 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(data => {
       document.getElementById('btnCalculate').classList.remove('btn-loading');
       if (data.success) {
-        displayResults(data);
+        document.getElementById('placeholderResult').style.display = 'none';
+        document.getElementById('outputContent').style.display = 'block';
+        if (window.SolutionExporter) {
+          SolutionExporter.setSolution(data, 'Matrix Operations');
+        }
       } else {
-        showToast(data.error || 'Calculation failed.', 'danger');
+        if (typeof showToast === 'function') showToast(data.error || 'Calculation failed.', 'danger');
+        else alert(data.error);
       }
     })
     .catch(err => {
       document.getElementById('btnCalculate').classList.remove('btn-loading');
-      showToast('Network error occurred.', 'danger');
+      if (typeof showToast === 'function') showToast('Network error occurred.', 'danger');
     });
   });
-
-  function displayResults(data) {
-    document.getElementById('placeholderResult').style.display = 'none';
-    const output = document.getElementById('outputContent');
-    output.style.display = 'block';
-
-    const mathJaxDiv = document.getElementById('mathJaxResult');
-    mathJaxDiv.innerHTML = `\\[ ${data.result_latex} \\]`;
-
-    // Steps rendered directly — no dropdown
-    const accordion = document.getElementById('stepsAccordion');
-    accordion.innerHTML = data.steps.map((step, idx) => `
-      <div class="direct-step-block mb-3 rounded-3 p-3">
-        <div class="d-flex align-items-start gap-2 mb-2">
-          <span class="step-num-badge">${idx + 1}</span>
-          <span class="fw-bold text-primary-accent">${step.title}</span>
-        </div>
-        ${step.text ? `<p class="mb-2 text-secondary small ps-4">${step.text}</p>` : ''}
-        ${step.list ? `<ul class="small font-monospace mb-2 ps-4">${step.list.map(l => `<li>${l}</li>`).join('')}</ul>` : ''}
-        ${step.latex ? `<div class="step-latex">\\[ ${step.latex} \\]</div>` : ''}
-      </div>
-    `).join('');
-
-    if (window.MathJax && window.MathJax.typeset) {
-      window.MathJax.typeset();
-    }
-
-    // Render Download & Export Solution Panel
-    if (window.SolutionExporter) {
-      SolutionExporter.setSolution(data, 'Matrix Operations');
-    }
-  }
 
   document.getElementById('btnReset').addEventListener('click', () => {
     updateGrids();
@@ -284,7 +248,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   updateGrids();
 });
-
-
 </script>
 {% endblock %}

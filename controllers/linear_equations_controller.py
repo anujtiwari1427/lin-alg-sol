@@ -34,8 +34,11 @@ def calculate():
 
     methods = {
         'gaussian': lambda: LinearEquationsService.gaussian(coeffs, consts),
-        'cramer':   lambda: LinearEquationsService.cramer(coeffs, consts),
-        'matrix':   lambda: LinearEquationsService.matrix_method(coeffs, consts),
+        'gauss_jordan': lambda: LinearEquationsService.gauss_jordan(coeffs, consts),
+        'lu_solver': lambda: LinearEquationsService.lu_solver(coeffs, consts),
+        'cramer': lambda: LinearEquationsService.cramers_rule(coeffs, consts),
+        'least_squares': lambda: LinearEquationsService.least_squares(coeffs, consts),
+        'matrix': lambda: LinearEquationsService.lu_solver(coeffs, consts),
     }
 
     if method not in methods:
@@ -44,10 +47,12 @@ def calculate():
     try:
         result = methods[method]()
         if result.get('success'):
+            result['solution'] = result.get('result')
             CalculationModel.save(
-                module='Linear Equations', operation=result.get('method', method),
+                module='Linear Equations', operation=result.get('operation', method),
                 input_data={'method': method, 'coefficients': coeffs, 'constants': consts},
-                result_data={'solution': result.get('solution')}
+                result_data={'result': result.get('result_display') or result.get('result')},
+                steps=result.get('steps')
             )
         return jsonify(result)
     except Exception as exc:

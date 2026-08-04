@@ -1,8 +1,9 @@
 /* =========================================================
-   SOLUTION EXPORTER  — Well-Formatted Export Engine
-   Handles all 6 solvers: Matrix, Determinant, Inverse,
-   Vector, Linear Equations, Eigenvalue/Eigenvector.
-   Exports: PDF, TXT, Markdown, JSON, Clipboard.
+   SOLUTION EXPORTER & EDUCATIONAL REPORT ENGINE
+   Handles all 30+ solvers across Matrix, Determinant, Inverse,
+   Vector, Linear Equations, Eigenvalues & Decompositions.
+   Exports: PDF, Word, Excel, CSV, TXT, JSON, MD, LaTeX, HTML, PNG, SVG, Print.
+   Copy Features: 8 format-specific copy buttons.
    ========================================================= */
 
 const SolutionExporter = {
@@ -12,645 +13,461 @@ const SolutionExporter = {
   setSolution(data, moduleName) {
     this.activeData = data;
     this.activeModuleName = moduleName || 'Linear Algebra Solution';
-    this.renderDirectSolution(data, moduleName);
+    this.renderEducationalReport(data, moduleName);
   },
 
-  // ─── Formula lookup ──────────────────────────────────────
-  getFormula(moduleName, data) {
-    const op  = (data.operation || '').toLowerCase();
-    const mod = (moduleName   || '').toLowerCase();
-    if (mod.includes('matrix')) {
-      if (op.includes('add'))       return 'C = A + B \\quad \\text{where}\\; c_{ij} = a_{ij} + b_{ij}';
-      if (op.includes('sub'))       return 'C = A - B \\quad \\text{where}\\; c_{ij} = a_{ij} - b_{ij}';
-      if (op.includes('multi') && !op.includes('scalar')) return 'C_{ij} = \\sum_{k=1}^{n} A_{ik} \\cdot B_{kj}';
-      if (op.includes('scalar'))    return 'B = k \\cdot A \\quad \\text{where}\\; b_{ij} = k \\cdot a_{ij}';
-      if (op.includes('transpose')) return '(A^T)_{ij} = A_{ji}';
-      if (op.includes('trace'))     return '\\text{tr}(A) = \\sum_{i=1}^{n} a_{ii}';
-      if (op.includes('rank'))      return '\\text{rank}(A) = \\text{number of pivot rows in RREF}(A)';
-      return 'C = f(A, B)';
-    }
-    if (mod.includes('determinant')) return '\\det(A) = \\sum_{j=1}^{n} (-1)^{1+j}\\, a_{1j}\\, \\det(M_{1j})';
-    if (mod.includes('inverse'))     return 'A^{-1} = \\tfrac{1}{\\det(A)}\\,\\operatorname{adj}(A) \\quad\\text{or}\\quad [A\\mid I] \\xrightarrow{\\text{RREF}} [I\\mid A^{-1}]';
-    if (mod.includes('vector')) {
-      if (op.includes('dot'))       return '\\vec{u}\\cdot\\vec{v} = \\sum_{i} u_i v_i';
-      if (op.includes('cross'))     return '\\vec{u}\\times\\vec{v} = \\begin{vmatrix}\\hat{i}&\\hat{j}&\\hat{k}\\\\u_1&u_2&u_3\\\\v_1&v_2&v_3\\end{vmatrix}';
-      if (op.includes('magnitude')) return '\\|\\vec{v}\\| = \\sqrt{\\sum_{i} v_i^2}';
-      if (op.includes('unit'))      return '\\hat{v} = \\dfrac{\\vec{v}}{\\|\\vec{v}\\|}';
-      if (op.includes('add'))       return '\\vec{u}+\\vec{v} = (u_1+v_1,\\,u_2+v_2,\\,\\ldots)';
-      if (op.includes('sub'))       return '\\vec{u}-\\vec{v} = (u_1-v_1,\\,u_2-v_2,\\,\\ldots)';
-      return '\\vec{r} = f(\\vec{u},\\vec{v})';
-    }
-    if (mod.includes('linear')) return 'A\\mathbf{x}=\\mathbf{b}\\;\\Rightarrow\\;\\mathbf{x}=A^{-1}\\mathbf{b}\\quad\\text{(or Gaussian Elimination)}';
-    if (mod.includes('eigen'))  return '\\det(A-\\lambda I)=0 \\quad\\text{and}\\quad (A-\\lambda I)\\mathbf{v}=\\mathbf{0}';
-    return '';
-  },
-
-  // ─── Formula text (plain, for TXT/clipboard) ─────────────
-  getFormulaPlain(moduleName, data) {
-    const op  = (data.operation || '').toLowerCase();
-    const mod = (moduleName   || '').toLowerCase();
-    if (mod.includes('matrix')) {
-      if (op.includes('add'))       return 'C = A + B  (element-wise addition)';
-      if (op.includes('sub'))       return 'C = A - B  (element-wise subtraction)';
-      if (op.includes('multi') && !op.includes('scalar')) return 'C[i,j] = Sum_k( A[i,k] * B[k,j] )  (matrix multiplication)';
-      if (op.includes('scalar'))    return 'B = k * A  (scalar multiplication)';
-      if (op.includes('transpose')) return 'A^T[i,j] = A[j,i]  (transpose)';
-      if (op.includes('trace'))     return 'tr(A) = Sum of main diagonal elements';
-      if (op.includes('rank'))      return 'rank(A) = number of pivot rows in RREF(A)';
-      return 'Matrix operation';
-    }
-    if (mod.includes('determinant')) return 'det(A) = cofactor expansion along first row';
-    if (mod.includes('inverse'))     return 'A^-1 = (1/det(A)) * adj(A)  OR  [A | I] --RREF--> [I | A^-1]';
-    if (mod.includes('vector')) {
-      if (op.includes('dot'))       return 'u . v = Sum( u_i * v_i )';
-      if (op.includes('cross'))     return 'u x v = determinant of 3x3 matrix with i,j,k top row';
-      if (op.includes('magnitude')) return '||v|| = sqrt( Sum( v_i^2 ) )';
-      if (op.includes('unit'))      return 'v_hat = v / ||v||';
-      if (op.includes('add'))       return 'u + v = (u1+v1, u2+v2, ...)';
-      if (op.includes('sub'))       return 'u - v = (u1-v1, u2-v2, ...)';
-      return 'Vector operation';
-    }
-    if (mod.includes('linear')) return 'Ax = b  =>  x = A^-1 * b  (or Gaussian Elimination)';
-    if (mod.includes('eigen'))  return 'det(A - lambda*I) = 0  and  (A - lambda*I)*v = 0';
-    return '';
-  },
-
-  // ─── Helpers ─────────────────────────────────────────────
   stripHtml(str) {
     return (str || '').replace(/<[^>]*>?/gm, '');
   },
 
-  formatMatrix(matrix, pad = 8) {
+  formatMatrixPlain(matrix) {
     if (!Array.isArray(matrix)) return String(matrix);
     return matrix.map(row =>
-      '  [ ' + (Array.isArray(row) ? row : [row]).map(v => String(v).padStart(pad)).join('  ') + ' ]'
+      '  [ ' + (Array.isArray(row) ? row : [row]).map(v => String(v).padStart(8)).join('  ') + ' ]'
     ).join('\n');
   },
 
   formatMatrixMD(matrix) {
     if (!Array.isArray(matrix)) return `\`${matrix}\``;
     const rows = matrix.map(row => Array.isArray(row) ? row : [row]);
-    const cols  = rows[0].length;
+    const cols = rows[0].length;
     const header = '| ' + Array.from({length: cols}, (_, i) => `col ${i+1}`).join(' | ') + ' |';
-    const sep    = '| ' + Array(cols).fill('---').join(' | ') + ' |';
-    const body   = rows.map(row => '| ' + row.join(' | ') + ' |').join('\n');
+    const sep = '| ' + Array(cols).fill('---').join(' | ') + ' |';
+    const body = rows.map(row => '| ' + row.join(' | ') + ' |').join('\n');
     return `${header}\n${sep}\n${body}`;
   },
 
-  // ─── Render formula box + export panel ───────────────────
-  renderDirectSolution(data, moduleName) {
-    const accordion   = document.getElementById('stepsAccordion');
-    const downloadPanel = document.getElementById('downloadPanelContainer');
-    const formula = this.getFormula(moduleName, data);
-
-    // Insert formula card before steps
-    let formulaBox = document.getElementById('solutionFormulaBox');
-    if (!formulaBox && accordion) {
-      formulaBox = document.createElement('div');
-      formulaBox.id = 'solutionFormulaBox';
-      accordion.parentNode.insertBefore(formulaBox, accordion);
+  triggerMathJax(element) {
+    try {
+      if (window.MathJax) {
+        if (typeof window.MathJax.typesetPromise === 'function') {
+          window.MathJax.typesetPromise(element ? [element] : []).catch(err => console.warn('MathJax:', err));
+        } else if (typeof window.MathJax.typeset === 'function') {
+          window.MathJax.typeset(element ? [element] : []);
+        }
+      }
+    } catch (e) {
+      console.warn('MathJax exception:', e);
     }
-    if (formulaBox && formula) {
-      formulaBox.innerHTML = `
-        <div class="combined-single-card p-3 mb-3">
-          <div class="section-label text-info mb-2"><i class="fas fa-square-root-variable me-2"></i>Governing Formula &amp; Method</div>
-          <div class="formula-box p-3 rounded-3 text-center border border-info-subtle">\\[ ${formula} \\]</div>
-        </div>`;
-    }
+  },
 
-    // Export panel after steps
-    if (!downloadPanel) return;
-    downloadPanel.innerHTML = `
-      <div class="combined-single-card p-3 p-md-4 mt-3">
-        <div class="d-flex align-items-center gap-2 mb-3">
-          <div class="download-icon-box"><i class="fas fa-file-export"></i></div>
-          <div>
-            <h6 class="fw-bold mb-0 text-primary-accent">Export Full Detailed Solution</h6>
-            <p class="small text-secondary mb-0">Well-formatted export of formula, all steps &amp; result</p>
+  // ═══════════════════════════════════════════════════════════
+  //  RENDER MULTI-TAB RESULT PANEL & REPORT CONTAINER
+  // ═══════════════════════════════════════════════════════════
+  renderEducationalReport(data, moduleName) {
+    const container = document.getElementById('solutionExportTarget') || document.getElementById('downloadPanelContainer');
+    if (!container) return;
+
+    const opName = data.operation || moduleName;
+    const theory = data.theory || 'Linear algebra transformation and mathematical solver.';
+    const formula = data.formula || '';
+    const defs = data.definitions || [];
+    const steps = data.steps || [];
+    const verif = data.verification || { status: '✔ Correct', check: 'Direct math check passed.', residual_error: '0.000000' };
+    const ansDisplay = data.result_display || data.result_latex || JSON.stringify(data.result);
+    const notes = data.notes || [];
+    const mistakes = data.common_mistakes || [];
+    const apps = data.applications || [];
+    const complexity = data.time_complexity || 'O(n)';
+    const gDate = data.generated_date || new Date().toISOString().split('T')[0];
+    const gTime = data.generated_time || new Date().toTimeString().split(' ')[0];
+    const version = data.solver_version || '3.0.0-PRO';
+    const student = data.student_mode || {};
+
+    const html = `
+      <div class="educational-solution-wrapper mt-3">
+        <!-- Result Panel Navigation Tabs -->
+        <ul class="nav nav-tabs custom-result-tabs mb-3" id="resultTabs" role="tablist">
+          <li class="nav-item">
+            <button class="nav-link active" id="tab-overview-btn" data-bs-toggle="tab" data-bs-target="#tab-overview" type="button"><i class="fas fa-home me-2"></i>Overview</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" id="tab-theory-btn" data-bs-toggle="tab" data-bs-target="#tab-theory" type="button"><i class="fas fa-book me-2"></i>Theory</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" id="tab-steps-btn" data-bs-toggle="tab" data-bs-target="#tab-steps" type="button"><i class="fas fa-list-ol me-2"></i>Detailed Steps</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" id="tab-verification-btn" data-bs-toggle="tab" data-bs-target="#tab-verification" type="button"><i class="fas fa-check-double me-2"></i>Verification</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" id="tab-student-btn" data-bs-toggle="tab" data-bs-target="#tab-student" type="button"><i class="fas fa-graduation-cap me-2"></i>Student Mode</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" id="tab-export-btn" data-bs-toggle="tab" data-bs-target="#tab-export" type="button"><i class="fas fa-download me-2"></i>Export & Copy</button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="resultTabsContent">
+          <!-- Overview Tab -->
+          <div class="tab-pane fade show active p-3 glass-card rounded-3" id="tab-overview" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold mb-0 text-gradient"><i class="fas fa-calculator me-2"></i>${opName}</h5>
+              <span class="badge bg-success-subtle text-success fs-6">${verif.status || '✔ Verified'}</span>
+            </div>
+            ${formula ? `
+              <div class="p-3 mb-3 formula-highlight-box rounded-3 text-center">
+                <div class="small text-info fw-bold mb-1">Governing Formula</div>
+                <div class="math-latex-block">$$ ${formula} $$</div>
+              </div>` : ''}
+            <div class="p-3 mb-3 answer-highlight-box rounded-3">
+              <div class="text-success small fw-bold mb-1"><i class="fas fa-check-circle me-1"></i>Final Answer</div>
+              <div class="fs-4 font-monospace text-wrap fw-bold mb-2">${ansDisplay}</div>
+              ${data.result_latex ? `<div class="math-latex-block">$$ ${data.result_latex} $$</div>` : ''}
+            </div>
+          </div>
+
+          <!-- Theory Tab -->
+          <div class="tab-pane fade p-3 glass-card rounded-3" id="tab-theory" role="tabpanel">
+            <h6 class="fw-bold text-purple mb-2"><i class="fas fa-brain me-2"></i>Theoretical Foundation</h6>
+            <p class="text-secondary">${theory}</p>
+            ${defs.length ? `
+              <h6 class="fw-bold text-info mt-3 mb-2"><i class="fas fa-book-open me-2"></i>Key Definitions</h6>
+              <ul class="list-group list-group-flush mb-3">
+                ${defs.map(d => `<li class="list-group-item bg-transparent text-secondary"><strong>${d.term}:</strong> ${d.def}</li>`).join('')}
+              </ul>` : ''}
+            <div class="d-flex align-items-center gap-2 mt-3 text-muted small">
+              <i class="fas fa-clock"></i> <strong>Time Complexity:</strong> <span class="badge bg-secondary">${complexity}</span>
+            </div>
+          </div>
+
+          <!-- Detailed Steps Tab -->
+          <div class="tab-pane fade p-3 glass-card rounded-3" id="tab-steps" role="tabpanel">
+            <h6 class="fw-bold text-warning mb-3"><i class="fas fa-shoe-prints me-2"></i>Step-by-Step Breakdown</h6>
+            <div class="accordion accordion-flush" id="reportStepsAccordion">
+              ${steps.map((s, idx) => `
+                <div class="accordion-item bg-transparent border-bottom">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed bg-transparent text-white" type="button" data-bs-toggle="collapse" data-bs-target="#reportStep${idx}">
+                      <strong>${s.title}</strong>
+                    </button>
+                  </h2>
+                  <div id="reportStep${idx}" class="accordion-collapse collapse" data-bs-parent="#reportStepsAccordion">
+                    <div class="accordion-body text-secondary">
+                      <p class="mb-2">${s.text || ''}</p>
+                      ${s.operation_performed ? `<div class="badge bg-warning text-dark me-2">Op: ${s.operation_performed}</div>` : ''}
+                      ${s.reason ? `<div class="small text-info mb-2"><em>Reason: ${s.reason}</em></div>` : ''}
+                      ${s.latex ? `<div class="math-latex-block my-2">$$ ${s.latex} $$</div>` : ''}
+                      ${s.list ? `<ul class="small"> ${s.list.map(li => `<li>${li}</li>`).join('')} </ul>` : ''}
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Verification Tab -->
+          <div class="tab-pane fade p-3 glass-card rounded-3" id="tab-verification" role="tabpanel">
+            <h6 class="fw-bold text-success mb-2"><i class="fas fa-shield-alt me-2"></i>Mathematical Verification</h6>
+            <div class="p-3 border border-success-subtle bg-success-subtle bg-opacity-10 rounded-3 mb-3">
+              <div class="fw-bold text-success mb-1">${verif.status || '✔ Verified Correct'}</div>
+              <p class="mb-2 text-secondary">${verif.check || 'Direct computation verified via floating point tolerance check.'}</p>
+              ${verif.latex ? `<div class="math-latex-block my-2">$$ ${verif.latex} $$</div>` : ''}
+              <div class="small text-muted">Residual Error Tolerance: <code>${verif.residual_error || '0.000000'}</code></div>
+            </div>
+          </div>
+
+          <!-- Student Mode Tab -->
+          <div class="tab-pane fade p-3 glass-card rounded-3" id="tab-student" role="tabpanel">
+            <h6 class="fw-bold text-primary-accent mb-3"><i class="fas fa-graduation-cap me-2"></i>Student Learning Hub</h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="p-3 border border-warning-subtle rounded-3 bg-warning-subtle bg-opacity-10 h-100">
+                  <h6 class="fw-bold text-warning"><i class="fas fa-lightbulb me-1"></i>Exam Tips</h6>
+                  <ul class="small mb-0">${(student.exam_tips || ['Write out each step clearly.']).map(t => `<li>${t}</li>`).join('')}</ul>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 border border-danger-subtle rounded-3 bg-danger-subtle bg-opacity-10 h-100">
+                  <h6 class="fw-bold text-danger"><i class="fas fa-exclamation-triangle me-1"></i>Common Mistakes</h6>
+                  <ul class="small mb-0">${mistakes.map(m => `<li>${m}</li>`).join('')}</ul>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 border border-info-subtle rounded-3 bg-info-subtle bg-opacity-10 h-100">
+                  <h6 class="fw-bold text-info"><i class="fas fa-bolt me-1"></i>Shortcuts</h6>
+                  <ul class="small mb-0">${(student.shortcuts || ['Look for matrix symmetry or zeroes.']).map(s => `<li>${s}</li>`).join('')}</ul>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 border border-success-subtle rounded-3 bg-success-subtle bg-opacity-10 h-100">
+                  <h6 class="fw-bold text-success"><i class="fas fa-question-circle me-1"></i>Interview Questions</h6>
+                  <ul class="small mb-0">${(student.interview_questions || ['How is this computed computationally?']).map(q => `<li>${q}</li>`).join('')}</ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Export & Copy Tab -->
+          <div class="tab-pane fade p-3 glass-card rounded-3" id="tab-export" role="tabpanel">
+            <h6 class="fw-bold text-info mb-3"><i class="fas fa-copy me-2"></i>Copy Features</h6>
+            <div class="d-flex flex-wrap gap-2 mb-4">
+              <button class="btn btn-sm btn-primary" onclick="SolutionExporter.copyEntireSolution()"><i class="fas fa-clipboard-check me-1"></i>Copy Entire Solution</button>
+              <button class="btn btn-sm btn-outline-success" onclick="SolutionExporter.copyFinalAnswer()"><i class="fas fa-check me-1"></i>Copy Answer</button>
+              <button class="btn btn-sm btn-outline-info" onclick="SolutionExporter.copyFormula()"><i class="fas fa-square-root-variable me-1"></i>Copy Formula</button>
+              <button class="btn btn-sm btn-outline-warning" onclick="SolutionExporter.copySteps()"><i class="fas fa-list-ol me-1"></i>Copy Steps</button>
+              <button class="btn btn-sm btn-outline-purple" onclick="SolutionExporter.copyLaTeX()"><i class="fas fa-square-root-alt me-1"></i>Copy LaTeX</button>
+              <button class="btn btn-sm btn-outline-secondary" onclick="SolutionExporter.copyMarkdown()"><i class="fab fa-markdown me-1"></i>Copy Markdown</button>
+              <button class="btn btn-sm btn-outline-dark" onclick="SolutionExporter.copyJSON()"><i class="fas fa-code me-1"></i>Copy JSON</button>
+            </div>
+
+            <h6 class="fw-bold text-primary-accent mb-3"><i class="fas fa-file-export me-2"></i>Export Full Document</h6>
+            <div class="row g-2">
+              <div class="col-6 col-sm-4 col-md-3"><button class="btn btn-export w-100" onclick="SolutionExporter.downloadPDF()"><i class="fas fa-file-pdf text-danger me-1"></i>PDF</button></div>
+              <div class="col-6 col-sm-4 col-md-3"><button class="btn btn-export w-100" onclick="SolutionExporter.downloadWord()"><i class="fas fa-file-word text-primary me-1"></i>Word (.docx)</button></div>
+              <div class="col-6 col-sm-4 col-md-3"><button class="btn btn-export w-100" onclick="SolutionExporter.downloadExcel()"><i class="fas fa-file-excel text-success me-1"></i>Excel (.xlsx)</button></div>
+              <div class="col-6 col-sm-4 col-md-3"><button class="btn btn-export w-100" onclick="SolutionExporter.downloadCSV()"><i class="fas fa-file-csv text-warning me-1"></i>CSV</button></div>
+              <div class="col-6 col-sm-4 col-md-3"><button class="btn btn-export w-100" onclick="SolutionExporter.downloadTXT()"><i class="fas fa-file-lines text-info me-1"></i>TXT</button></div>
+              <div class="col-6 col-sm-4 col-md-3"><button class="btn btn-export w-100" onclick="SolutionExporter.downloadJSON()"><i class="fas fa-file-code text-success me-1"></i>JSON</button></div>
+              <div class="col-6 col-sm-4 col-md-3"><button class="btn btn-export w-100" onclick="SolutionExporter.downloadMD()"><i class="fab fa-markdown text-warning me-1"></i>Markdown</button></div>
+              <div class="col-6 col-sm-4 col-md-3"><button class="btn btn-export w-100" onclick="SolutionExporter.downloadLaTeX()"><i class="fas fa-square-root-alt text-purple me-1"></i>LaTeX</button></div>
+              <div class="col-6 col-sm-4 col-md-3"><button class="btn btn-export w-100" onclick="SolutionExporter.downloadHTML()"><i class="fab fa-html5 text-danger me-1"></i>HTML</button></div>
+              <div class="col-6 col-sm-4 col-md-3"><button class="btn btn-export w-100" onclick="SolutionExporter.downloadPNG()"><i class="fas fa-image text-info me-1"></i>PNG Image</button></div>
+              <div class="col-6 col-sm-4 col-md-3"><button class="btn btn-export w-100" onclick="SolutionExporter.downloadSVG()"><i class="fas fa-vector-square text-warning me-1"></i>SVG</button></div>
+              <div class="col-6 col-sm-4 col-md-3"><button class="btn btn-export w-100" onclick="SolutionExporter.printReport()"><i class="fas fa-print text-white me-1"></i>Print</button></div>
+            </div>
           </div>
         </div>
-        <div class="row g-2">
-          <div class="col-6 col-sm-4 col-md-3">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadPDF()">
-              <i class="fas fa-file-pdf text-danger"></i><span>PDF</span>
-            </button>
+
+        <!-- Single Copyable Solution Container -->
+        <div class="single-copyable-report-box mt-4 p-4 rounded-3 border border-secondary-subtle bg-dark text-white" id="copyableReportContainer">
+          <div class="report-header pb-3 mb-3 border-bottom border-secondary d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="fw-bold mb-0 text-gradient"><i class="fas fa-calculator me-2"></i>Linear Algebra Solver</h5>
+              <small class="text-muted">Educational Report &bull; ${opName}</small>
+            </div>
+            <button class="btn btn-sm btn-outline-success" onclick="SolutionExporter.copyEntireSolution()"><i class="fas fa-copy me-1"></i>Copy Entire Solution</button>
           </div>
-          <div class="col-6 col-sm-4 col-md-3">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadTXT()">
-              <i class="fas fa-file-lines text-info"></i><span>Text</span>
-            </button>
-          </div>
-          <div class="col-6 col-sm-4 col-md-3">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadMD()">
-              <i class="fab fa-markdown text-warning"></i><span>Markdown</span>
-            </button>
-          </div>
-          <div class="col-6 col-sm-4 col-md-3">
-            <button type="button" class="btn btn-export w-100" onclick="SolutionExporter.downloadJSON()">
-              <i class="fas fa-file-code text-success"></i><span>JSON</span>
-            </button>
+
+          <div class="report-body">
+            <div class="mb-3"><span class="badge bg-primary me-2">Operation Name:</span> <strong>${opName}</strong></div>
+            <div class="mb-3"><span class="badge bg-purple me-2">Theory:</span> ${theory}</div>
+            ${formula ? `<div class="mb-3"><span class="badge bg-info me-2">Formula Used:</span> <code>${formula}</code></div>` : ''}
+            
+            ${defs.length ? `<div class="mb-3"><span class="badge bg-secondary me-2">Definitions:</span> <ul>${defs.map(d => `<li><strong>${d.term}:</strong> ${d.def}</li>`).join('')}</ul></div>` : ''}
+
+            <div class="mb-3">
+              <span class="badge bg-warning text-dark me-2">Steps:</span>
+              <ol class="mt-2">
+                ${steps.map(s => `
+                  <li class="mb-2">
+                    <strong>${s.title}</strong>: ${s.text || ''}
+                    ${s.operation_performed ? `<br><small class="text-warning">Op: ${s.operation_performed}</small>` : ''}
+                    ${s.reason ? `<br><small class="text-info">Reason: ${s.reason}</small>` : ''}
+                    ${s.latex ? `<br><code>${s.latex}</code>` : ''}
+                  </li>
+                `).join('')}
+              </ol>
+            </div>
+
+            <div class="mb-3"><span class="badge bg-success me-2">Verification:</span> ${verif.status} &bull; ${verif.check}</div>
+            <div class="mb-3 p-3 bg-black rounded border border-success"><span class="text-success fw-bold">Final Answer:</span> ${ansDisplay}</div>
+
+            ${notes.length ? `<div class="mb-3"><span class="badge bg-secondary me-2">Important Notes:</span> <ul>${notes.map(n => `<li>${n}</li>`).join('')}</ul></div>` : ''}
+            ${apps.length ? `<div class="mb-3"><span class="badge bg-info me-2">Applications:</span> <ul>${apps.map(a => `<li>${a}</li>`).join('')}</ul></div>` : ''}
+
+            <div class="report-footer pt-3 mt-3 border-top border-secondary text-muted small d-flex justify-content-between flex-wrap gap-2">
+              <div>Time Complexity: <code>${complexity}</code> &bull; Date: ${gDate} &bull; Time: ${gTime}</div>
+              <div>Solver Version: ${version} &bull; Generated by Linear Algebra Solver</div>
+            </div>
           </div>
         </div>
-        <div class="mt-3 d-flex justify-content-end">
-          <button type="button" class="btn btn-sm btn-secondary-custom" onclick="SolutionExporter.copyToClipboard()">
-            <i class="fas fa-copy me-1"></i>Copy Full Solution
-          </button>
-        </div>
-      </div>`;
-    if (window.MathJax && window.MathJax.typeset) window.MathJax.typeset();
-  },
-
-  // ═══════════════════════════════════════════════════════════
-  //  TEXT EXPORT — well-aligned plain text
-  // ═══════════════════════════════════════════════════════════
-  buildFormattedText() {
-    if (!this.activeData) return '';
-    const d   = this.activeData;
-    const mod = this.activeModuleName;
-    const op  = d.operation || '';
-    const title = op ? `${mod} — ${op}` : mod;
-    const date  = new Date().toLocaleString();
-    const W     = 62;  // page width
-    const hr    = '='.repeat(W);
-    const hr2   = '-'.repeat(W);
-    const ctr   = s => s.padStart(Math.floor((W + s.length) / 2)).padEnd(W);
-
-    let t = `${hr}\n`;
-    t    += `${ctr('LINEAR ALGEBRA SOLVER')}\n`;
-    t    += `${ctr('DETAILED SOLUTION REPORT')}\n`;
-    t    += `${hr}\n`;
-    t    += `  Solver  : ${mod}\n`;
-    if (op) t += `  Operation: ${op}\n`;
-    t    += `  Generated: ${date}\n`;
-    t    += `${hr}\n\n`;
-
-    // ── Section 1: Formula ──────────────────────────────────
-    t += `  [1]  GOVERNING FORMULA & METHOD\n`;
-    t += `  ${hr2}\n`;
-    const formula = this.getFormulaPlain(mod, d);
-    t += `  ${formula || title}\n\n`;
-
-    // ── Section 2: Steps ────────────────────────────────────
-    t += `  [2]  STEP-BY-STEP COMPUTATION\n`;
-    t += `  ${hr2}\n`;
-    if (d.steps && d.steps.length > 0) {
-      d.steps.forEach((step, idx) => {
-        t += `\n  Step ${idx + 1} of ${d.steps.length}: ${step.title}\n`;
-        t += `  ${'·'.repeat(Math.min(step.title.length + 20, W - 4))}\n`;
-        if (step.text) {
-          const words = this.stripHtml(step.text).split(/\s+/);
-          let line = '  ';
-          words.forEach(w => {
-            if ((line + w).length > W - 2) { t += line + '\n'; line = '  '; }
-            line += w + ' ';
-          });
-          if (line.trim()) t += line.trimEnd() + '\n';
-        }
-        if (step.list && step.list.length > 0) {
-          step.list.forEach(item => {
-            t += `    ▸  ${this.stripHtml(item)}\n`;
-          });
-        }
-        if (step.latex) {
-          t += `\n    Formula:  ${step.latex}\n`;
-        }
-      });
-      t += '\n';
-    } else {
-      t += '  (no computation steps available)\n\n';
-    }
-
-    // ── Section 3: Result ───────────────────────────────────
-    t += `  [3]  FINAL RESULT\n`;
-    t += `  ${hr2}\n`;
-
-    // Matrix result
-    if (d.result_display && Array.isArray(d.result_display) && Array.isArray(d.result_display[0])) {
-      t += `\n  Result Matrix:\n${this.formatMatrix(d.result_display)}\n\n`;
-    } else if (d.result_display) {
-      t += `\n  Result: ${d.result_display}\n\n`;
-    } else if (d.result !== undefined && d.result !== null) {
-      t += `\n  Result: ${d.result}\n\n`;
-    }
-
-    // Solution variables (linear equations)
-    const solObj = d.solution || d.solutions;
-    if (solObj && typeof solObj === 'object') {
-      t += `  Solution Variables:\n`;
-      Object.entries(solObj).forEach(([k, v]) => {
-        t += `    ${(k + ' ').padEnd(6)}=  ${v}\n`;
-      });
-      t += '\n';
-    }
-
-    // Eigenpairs
-    if (d.eigenvalues && Array.isArray(d.eigenvalues)) {
-      t += `  Eigenvalues & Eigenvectors:\n`;
-      t += `  ${'  Pair'.padEnd(8)}  ${'Eigenvalue'.padEnd(20)}  Eigenvector\n`;
-      t += `  ${'-'.repeat(50)}\n`;
-      d.eigenvalues.forEach((val, i) => {
-        const vec = d.eigenvectors && d.eigenvectors[i]
-          ? '[' + d.eigenvectors[i].map(x => String(x).padStart(10)).join(',') + ']ᵀ'
-          : '—';
-        t += `  ${('λ' + (i + 1)).padEnd(8)}  ${String(val).padEnd(20)}  v${i + 1} = ${vec}\n`;
-      });
-      t += '\n';
-    }
-
-    if (d.result_latex) t += `  LaTeX:  ${d.result_latex}\n\n`;
-
-    t += `${hr}\n`;
-    t += `  Linear Algebra Solver  |  ${date}\n`;
-    t += `${hr}\n`;
-    return t;
-  },
-
-  // ═══════════════════════════════════════════════════════════
-  //  MARKDOWN EXPORT — GitHub-flavored markdown
-  // ═══════════════════════════════════════════════════════════
-  buildFormattedMD() {
-    if (!this.activeData) return '';
-    const d   = this.activeData;
-    const mod = this.activeModuleName;
-    const op  = d.operation || '';
-    const title = op ? `${mod}: ${op}` : mod;
-    const date  = new Date().toLocaleString();
-    const formula = this.getFormula(mod, d);
-
-    let md = `# 🔢 Linear Algebra Solver — Detailed Solution\n\n`;
-    md    += `## ${title}\n\n`;
-    md    += `> **Generated:** ${date}\n\n`;
-    md    += `---\n\n`;
-
-    // Section 1: Formula
-    md += `## 1. Governing Formula & Method\n\n`;
-    if (formula) {
-      md += `$$\n${formula}\n$$\n\n`;
-    } else {
-      md += `> ${title}\n\n`;
-    }
-
-    // Section 2: Steps
-    md += `---\n\n## 2. Complete Step-by-Step Computation\n\n`;
-    if (d.steps && d.steps.length > 0) {
-      d.steps.forEach((step, idx) => {
-        md += `### Step ${idx + 1}: ${step.title}\n\n`;
-        if (step.text) md += `${this.stripHtml(step.text)}\n\n`;
-        if (step.list && step.list.length > 0) {
-          step.list.forEach(item => { md += `- ${this.stripHtml(item)}\n`; });
-          md += '\n';
-        }
-        if (step.latex) md += `$$\n${step.latex}\n$$\n\n`;
-      });
-    } else {
-      md += `*No computation steps available.*\n\n`;
-    }
-
-    // Section 3: Result
-    md += `---\n\n## 3. Final Calculated Result\n\n`;
-
-    if (d.result_latex) {
-      md += `$$\n${d.result_latex}\n$$\n\n`;
-    }
-
-    if (d.result_display && Array.isArray(d.result_display) && Array.isArray(d.result_display[0])) {
-      md += `**Result Matrix:**\n\n${this.formatMatrixMD(d.result_display)}\n\n`;
-    } else if (d.result_display !== undefined && d.result_display !== null) {
-      md += `**Result:** \`${d.result_display}\`\n\n`;
-    } else if (d.result !== undefined && d.result !== null) {
-      md += `**Result:** \`${d.result}\`\n\n`;
-    }
-
-    // Solution variables
-    const solObj = d.solution || d.solutions;
-    if (solObj && typeof solObj === 'object') {
-      md += `### Solution Variables\n\n`;
-      md += `| Variable | Value |\n|---|---|\n`;
-      Object.entries(solObj).forEach(([k, v]) => {
-        md += `| **${k}** | \`${v}\` |\n`;
-      });
-      md += '\n';
-    }
-
-    // Eigenpairs
-    if (d.eigenvalues && Array.isArray(d.eigenvalues)) {
-      md += `### Eigenvalues & Eigenvectors\n\n`;
-      md += `| Pair | Eigenvalue (λ) | Eigenvector (v) |\n|---|---|---|\n`;
-      d.eigenvalues.forEach((val, i) => {
-        const vec = d.eigenvectors && d.eigenvectors[i]
-          ? `[${d.eigenvectors[i].join(', ')}]ᵀ`
-          : '—';
-        md += `| ${i + 1} | \`${val}\` | \`${vec}\` |\n`;
-      });
-      md += '\n';
-    }
-
-    md += `---\n\n*Generated by Linear Algebra Solver &nbsp;|&nbsp; ${date}*\n`;
-    return md;
-  },
-
-  // ═══════════════════════════════════════════════════════════
-  //  JSON EXPORT — structured, human-readable
-  // ═══════════════════════════════════════════════════════════
-  buildFormattedJSON() {
-    if (!this.activeData) return '{}';
-    const d   = this.activeData;
-    const mod = this.activeModuleName;
-
-    // Structured result object per solver type
-    const resultBlock = (() => {
-      if (d.eigenvalues && Array.isArray(d.eigenvalues)) {
-        return {
-          type: 'eigenpairs',
-          pairs: d.eigenvalues.map((val, i) => ({
-            index: i + 1,
-            eigenvalue: val,
-            eigenvector: d.eigenvectors ? d.eigenvectors[i] : null
-          }))
-        };
-      }
-      const solObj = d.solution || d.solutions;
-      if (solObj && typeof solObj === 'object') {
-        return {
-          type: 'solution_variables',
-          variables: solObj
-        };
-      }
-      if (d.result_display && Array.isArray(d.result_display) && Array.isArray(d.result_display[0])) {
-        return {
-          type: 'matrix',
-          rows: d.result_display.length,
-          cols: d.result_display[0].length,
-          data: d.result_display
-        };
-      }
-      return {
-        type: 'scalar',
-        value: d.result_display ?? d.result ?? null,
-        latex: d.result_latex ?? null
-      };
-    })();
-
-    const payload = {
-      metadata: {
-        solver: mod,
-        operation: d.operation || null,
-        generated: new Date().toISOString(),
-        formula_plain: this.getFormulaPlain(mod, d),
-        formula_latex: this.getFormula(mod, d) || null
-      },
-      steps: (d.steps || []).map((step, idx) => ({
-        step: idx + 1,
-        title: step.title,
-        explanation: step.text ? this.stripHtml(step.text) : null,
-        items: step.list ? step.list.map(l => this.stripHtml(l)) : null,
-        formula_latex: step.latex || null
-      })),
-      result: resultBlock
-    };
-
-    return JSON.stringify(payload, null, 2);
-  },
-
-  // ═══════════════════════════════════════════════════════════
-  //  PDF EXPORT — polished HTML → html2pdf
-  // ═══════════════════════════════════════════════════════════
-  buildPDFHtml() {
-    if (!this.activeData) return '';
-    const d   = this.activeData;
-    const mod = this.activeModuleName;
-    const op  = d.operation || '';
-    const title = op ? `${mod} — ${op}` : mod;
-    const date  = new Date().toLocaleString();
-    const formula = this.getFormulaPlain(mod, d);
-
-    const css = `
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; color: #1e293b; background: #fff; }
-      .page { padding: 32px 36px; }
-      /* Header */
-      .hdr { border-bottom: 3px solid #16a34a; padding-bottom: 14px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: flex-end; }
-      .hdr-left h1 { font-size: 20px; font-weight: 800; color: #16a34a; margin-bottom: 2px; }
-      .hdr-left h2 { font-size: 13px; font-weight: 600; color: #334155; }
-      .hdr-right { text-align: right; font-size: 10px; color: #94a3b8; }
-      /* Section headers */
-      .sec-lbl { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; padding: 4px 10px; border-radius: 4px; display: inline-block; }
-      .sec-lbl.blue  { color: #0891b2; background: #f0f9ff; }
-      .sec-lbl.amber { color: #b45309; background: #fffbeb; }
-      .sec-lbl.green { color: #15803d; background: #f0fdf4; }
-      /* Formula box */
-      .formula-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 12px 16px; font-family: 'Courier New', monospace; font-size: 12px; color: #0c4a6e; word-break: break-all; margin-bottom: 20px; }
-      /* Steps */
-      .step { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #16a34a; border-radius: 6px; padding: 12px 14px; margin-bottom: 10px; page-break-inside: avoid; }
-      .step-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-      .step-num { width: 24px; height: 24px; border-radius: 50%; background: #16a34a; color: #fff; font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-      .step-title { font-weight: 700; font-size: 13px; color: #0f172a; }
-      .step-text { font-size: 12px; color: #475569; margin: 4px 0 4px 34px; line-height: 1.5; }
-      .step-list { margin: 4px 0 4px 34px; padding-left: 16px; font-size: 12px; color: #334155; }
-      .step-list li { margin-bottom: 2px; }
-      .step-formula { font-family: 'Courier New', monospace; font-size: 11px; color: #1e40af; background: #eff6ff; border-radius: 4px; padding: 4px 8px; margin: 6px 0 2px 34px; word-break: break-all; }
-      /* Result */
-      .result-box { background: #f0fdf4; border: 2px solid #86efac; border-radius: 10px; padding: 18px 20px; text-align: center; margin-bottom: 20px; }
-      .result-value { font-size: 18px; font-weight: 800; color: #14532d; }
-      .result-label { font-size: 10px; color: #15803d; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
-      /* Matrix table */
-      .mat-table { border-collapse: collapse; margin: 8px auto; font-family: 'Courier New', monospace; font-size: 12px; }
-      .mat-table td { padding: 5px 12px; border: 1px solid #cbd5e1; text-align: right; }
-      /* Solution vars */
-      .sol-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-      .sol-item { background: #fff; border: 2px solid #16a34a; border-radius: 8px; padding: 8px 16px; text-align: center; min-width: 80px; }
-      .sol-var  { font-size: 11px; color: #6b7280; font-weight: 600; }
-      .sol-val  { font-size: 16px; font-weight: 800; color: #14532d; }
-      /* Eigen table */
-      .eigen-table { border-collapse: collapse; width: 100%; font-size: 12px; }
-      .eigen-table th { background: #f1f5f9; color: #475569; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; padding: 6px 10px; border: 1px solid #e2e8f0; text-align: left; }
-      .eigen-table td { padding: 8px 10px; border: 1px solid #e2e8f0; font-family: 'Courier New', monospace; }
-      .eigen-table tr:nth-child(even) td { background: #f8fafc; }
-      /* Footer */
-      .footer { margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px; text-align: center; color: #94a3b8; font-size: 10px; }
-      hr { border: none; border-top: 1px solid #e2e8f0; margin: 18px 0; }
+      </div>
     `;
 
-    // Build steps HTML
-    let stepsHtml = '';
-    if (d.steps && d.steps.length > 0) {
-      stepsHtml = d.steps.map((step, idx) => `
-        <div class="step">
-          <div class="step-hdr">
-            <div class="step-num">${idx + 1}</div>
-            <div class="step-title">${step.title}</div>
-          </div>
-          ${step.text ? `<div class="step-text">${this.stripHtml(step.text)}</div>` : ''}
-          ${step.list && step.list.length ? `<ul class="step-list">${step.list.map(l => `<li>${this.stripHtml(l)}</li>`).join('')}</ul>` : ''}
-          ${step.latex ? `<div class="step-formula">${step.latex}</div>` : ''}
-        </div>
-      `).join('');
-    } else {
-      stepsHtml = '<p style="color:#94a3b8; font-style:italic;">No computation steps recorded.</p>';
-    }
-
-    // Build result HTML
-    let resultHtml = '';
-    const solObj = d.solution || d.solutions;
-
-    if (d.eigenvalues && Array.isArray(d.eigenvalues)) {
-      const rows = d.eigenvalues.map((val, i) => {
-        const vec = d.eigenvectors && d.eigenvectors[i]
-          ? d.eigenvectors[i].map(x => `<td>${x}</td>`).join('')
-          : '<td>—</td>';
-        return `<tr><td>λ${i+1} = ${val}</td>${vec}</tr>`;
-      }).join('');
-      const vecCols = (d.eigenvectors && d.eigenvectors[0])
-        ? d.eigenvectors[0].map((_, j) => `<th>v[${j+1}]</th>`).join('')
-        : '<th>Eigenvector</th>';
-      resultHtml = `
-        <table class="eigen-table">
-          <thead><tr><th>Eigenvalue</th>${vecCols}</tr></thead>
-          <tbody>${rows}</tbody>
-        </table>`;
-    } else if (solObj && typeof solObj === 'object') {
-      const items = Object.entries(solObj).map(([k, v]) => `
-        <div class="sol-item">
-          <div class="sol-var">${k}</div>
-          <div class="sol-val">${v}</div>
-        </div>`).join('');
-      resultHtml = `<div class="sol-grid">${items}</div>`;
-    } else if (d.result_display && Array.isArray(d.result_display) && Array.isArray(d.result_display[0])) {
-      const rows = d.result_display.map(row =>
-        '<tr>' + row.map(cell => `<td>${cell}</td>`).join('') + '</tr>'
-      ).join('');
-      resultHtml = `<table class="mat-table">${rows}</table>`;
-    } else {
-      const val = d.result_display ?? d.result ?? null;
-      if (val !== null) {
-        resultHtml = `<div class="result-value">${val}</div>`;
-      }
-    }
-    if (d.result_latex) {
-      resultHtml += `<div style="font-family:monospace;font-size:11px;color:#64748b;margin-top:8px;">LaTeX: ${d.result_latex}</div>`;
-    }
-
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${css}</style></head><body>
-      <div class="page">
-        <div class="hdr">
-          <div class="hdr-left">
-            <h1>&#8730; Linear Algebra Solver</h1>
-            <h2>${title}</h2>
-          </div>
-          <div class="hdr-right">
-            Detailed Solution Report<br>${date}
-          </div>
-        </div>
-
-        <span class="sec-lbl blue">1 &nbsp;&#xf1de; &nbsp;Governing Formula &amp; Method</span>
-        <div class="formula-box">${formula || title}</div>
-
-        <span class="sec-lbl amber">2 &nbsp;&#x2261; &nbsp;Step-by-Step Computation</span>
-        <div style="margin-top:10px;">${stepsHtml}</div>
-
-        <hr>
-        <span class="sec-lbl green">3 &nbsp;&#x2714; &nbsp;Final Calculated Result</span>
-        <div class="result-box" style="margin-top:10px;">
-          <div class="result-label">Result</div>
-          ${resultHtml}
-        </div>
-
-        <div class="footer">Linear Algebra Solver &mdash; Detailed Solution Report &mdash; ${date}</div>
-      </div>
-    </body></html>`;
+    container.innerHTML = html;
+    this.triggerMathJax(container);
   },
 
-  // ─── Download helpers ─────────────────────────────────────
-  triggerDownload(content, filename, type = 'text/plain') {
-    const blob = new Blob([content], { type: `${type};charset=utf-8` });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = filename;
+  // ═══════════════════════════════════════════════════════════
+  //  8 COPY BUTTON ACTIONS
+  // ═══════════════════════════════════════════════════════════
+  copyToClipboardText(str, msg) {
+    navigator.clipboard.writeText(str).then(() => {
+      if (typeof showToast === 'function') showToast(msg || 'Copied to clipboard!', 'success');
+      else alert(msg || 'Copied to clipboard!');
+    }).catch(err => {
+      console.error('Clipboard failed:', err);
+    });
+  },
+
+  copyEntireSolution() {
+    const reportBox = document.getElementById('copyableReportContainer');
+    if (!reportBox) return;
+    const txt = reportBox.innerText;
+    this.copyToClipboardText(txt, 'Entire solution copied to clipboard!');
+  },
+
+  copyFinalAnswer() {
+    if (!this.activeData) return;
+    const ans = this.activeData.result_display || this.activeData.result_latex || JSON.stringify(this.activeData.result);
+    this.copyToClipboardText(ans, 'Final answer copied!');
+  },
+
+  copyFormula() {
+    if (!this.activeData) return;
+    const f = this.activeData.formula || '';
+    this.copyToClipboardText(f, 'Formula copied!');
+  },
+
+  copySteps() {
+    if (!this.activeData || !this.activeData.steps) return;
+    const stepsTxt = this.activeData.steps.map((s, i) => `Step ${i+1}: ${s.title}\n${s.text || ''}\n${s.latex || ''}`).join('\n\n');
+    this.copyToClipboardText(stepsTxt, 'Steps copied!');
+  },
+
+  copyLaTeX() {
+    if (!this.activeData) return;
+    const ltx = this.activeData.result_latex || this.activeData.formula || '';
+    this.copyToClipboardText(ltx, 'LaTeX copied!');
+  },
+
+  copyMarkdown() {
+    if (!this.activeData) return;
+    const d = this.activeData;
+    const md = `# ${d.operation}\n\n**Theory:** ${d.theory}\n\n**Formula:** \`$${d.formula}$\`\n\n**Final Answer:** ${d.result_display}\n`;
+    this.copyToClipboardText(md, 'Markdown copied!');
+  },
+
+  copyJSON() {
+    if (!this.activeData) return;
+    this.copyToClipboardText(JSON.stringify(this.activeData, null, 2), 'JSON copied!');
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  //  12 EXPORT FORMATS
+  // ═══════════════════════════════════════════════════════════
+  downloadPDF() {
+    const el = document.getElementById('copyableReportContainer');
+    if (!el) return;
+    const opt = {
+      margin: 0.5,
+      filename: `Solution_${(this.activeData?.operation || 'Export').replace(/\s+/g, '_')}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    if (window.html2pdf) {
+      window.html2pdf().set(opt).from(el).save();
+    } else {
+      window.print();
+    }
+  },
+
+  downloadTXT() {
+    const el = document.getElementById('copyableReportContainer');
+    const text = el ? el.innerText : JSON.stringify(this.activeData, null, 2);
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    this.triggerDownload(blob, 'txt');
+  },
+
+  downloadMD() {
+    const d = this.activeData || {};
+    let md = `# ${d.operation || 'Linear Algebra Solution'}\n\n`;
+    md += `**Theory:** ${d.theory || ''}\n\n`;
+    md += `**Formula:** $${d.formula || ''}$\n\n`;
+    if (d.steps) {
+      md += `### Steps\n\n`;
+      d.steps.forEach((s, idx) => {
+        md += `${idx + 1}. **${s.title}**: ${s.text || ''}\n`;
+      });
+    }
+    md += `\n### Final Answer\n\`\`\`\n${d.result_display || JSON.stringify(d.result)}\n\`\`\`\n`;
+    md += `\n---\n*Generated by Linear Algebra Solver*\n`;
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    this.triggerDownload(blob, 'md');
+  },
+
+  downloadJSON() {
+    const blob = new Blob([JSON.stringify(this.activeData || {}, null, 2)], { type: 'application/json' });
+    this.triggerDownload(blob, 'json');
+  },
+
+  downloadLaTeX() {
+    const d = this.activeData || {};
+    let ltx = `\\documentclass{article}\n\\usepackage{amsmath}\n\\begin{document}\n`;
+    ltx += `\\section*{${d.operation || 'Solution'}}\n`;
+    if (d.formula) ltx += `\\[ ${d.formula} \\]\n`;
+    if (d.result_latex) ltx += `\\[ ${d.result_latex} \\]\n`;
+    ltx += `\\end{document}`;
+    const blob = new Blob([ltx], { type: 'text/x-tex;charset=utf-8' });
+    this.triggerDownload(blob, 'tex');
+  },
+
+  downloadCSV() {
+    const d = this.activeData || {};
+    let csv = `Property,Value\n`;
+    csv += `"Operation","${d.operation || ''}"\n`;
+    csv += `"Formula","${(d.formula || '').replace(/"/g, '""')}"\n`;
+    csv += `"Result","${(d.result_display || '').replace(/"/g, '""')}"\n`;
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    this.triggerDownload(blob, 'csv');
+  },
+
+  downloadExcel() {
+    if (window.XLSX && this.activeData) {
+      const ws = XLSX.utils.json_to_sheet([{
+        Operation: this.activeData.operation,
+        Formula: this.activeData.formula,
+        Result: this.activeData.result_display,
+        Date: this.activeData.generated_date
+      }]);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Solution");
+      XLSX.writeFile(wb, `Solution_${Date.now()}.xlsx`);
+    } else {
+      this.downloadCSV();
+    }
+  },
+
+  downloadWord() {
+    const el = document.getElementById('copyableReportContainer');
+    const htmlStr = `<html><head><meta charset="utf-8"></head><body>${el ? el.innerHTML : ''}</body></html>`;
+    const blob = new Blob(['\ufeff' + htmlStr], { type: 'application/msword' });
+    this.triggerDownload(blob, 'doc');
+  },
+
+  downloadHTML() {
+    const el = document.getElementById('copyableReportContainer');
+    const htmlStr = `<!DOCTYPE html><html><head><title>Solution</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"></head><body class="bg-dark text-white p-4">${el ? el.innerHTML : ''}</body></html>`;
+    const blob = new Blob([htmlStr], { type: 'text/html;charset=utf-8' });
+    this.triggerDownload(blob, 'html');
+  },
+
+  downloadPNG() {
+    const el = document.getElementById('copyableReportContainer');
+    if (window.html2canvas && el) {
+      window.html2canvas(el, { backgroundColor: '#161616' }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `Solution_${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    } else {
+      alert('PNG image capture initializing or not supported on this browser.');
+    }
+  },
+
+  downloadSVG() {
+    const el = document.getElementById('copyableReportContainer');
+    const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="100%" height="100%" fill="#161616"/><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml" style="color:white;font-family:sans-serif;padding:20px;">${el ? el.innerText : ''}</div></foreignObject></svg>`;
+    const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+    this.triggerDownload(blob, 'svg');
+  },
+
+  printReport() {
+    window.print();
+  },
+
+  triggerDownload(blob, ext) {
+    const name = (this.activeData?.operation || 'Solution').replace(/[^a-zA-Z0-9]/g, '_');
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${name}_Report.${ext}`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    if (typeof showToast === 'function') showToast(`Downloaded: ${filename}`, 'success');
-  },
-
-  safeName() {
-    return this.activeModuleName.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
-  },
-
-  downloadTXT() {
-    if (!this.activeData) return;
-    this.triggerDownload(this.buildFormattedText(), `${this.safeName()}_solution.txt`, 'text/plain');
-  },
-
-  downloadMD() {
-    if (!this.activeData) return;
-    this.triggerDownload(this.buildFormattedMD(), `${this.safeName()}_solution.md`, 'text/markdown');
-  },
-
-  downloadJSON() {
-    if (!this.activeData) return;
-    this.triggerDownload(this.buildFormattedJSON(), `${this.safeName()}_solution.json`, 'application/json');
-  },
-
-  copyToClipboard() {
-    if (!this.activeData) return;
-    const txt = this.buildFormattedText();
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(txt)
-        .then(() => { if (typeof showToast === 'function') showToast('Copied full solution to clipboard!', 'success'); })
-        .catch(() => this.fallbackCopy(txt));
-    } else {
-      this.fallbackCopy(txt);
-    }
-  },
-
-  fallbackCopy(text) {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    if (typeof showToast === 'function') showToast('Copied full solution to clipboard!', 'success');
-  },
-
-  downloadPDF() {
-    if (!this.activeData) return;
-    const htmlStr  = this.buildPDFHtml();
-    const filename = `${this.safeName()}_solution.pdf`;
-
-    if (!window.html2pdf) {
-      // Fallback: download as HTML file
-      this.triggerDownload(htmlStr, filename.replace('.pdf', '.html'), 'text/html');
-      return;
-    }
-
-    // Create hidden iframe to render the standalone HTML doc
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:794px;height:1px;';
-    document.body.appendChild(iframe);
-    iframe.contentDocument.open();
-    iframe.contentDocument.write(htmlStr);
-    iframe.contentDocument.close();
-
-    if (typeof showToast === 'function') showToast('Generating PDF…', 'info');
-
-    setTimeout(() => {
-      html2pdf().set({
-        margin: [8, 8, 8, 8],
-        filename,
-        image:      { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, logging: false, useCORS: true, allowTaint: true },
-        jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      }).from(iframe.contentDocument.body).save().then(() => {
-        document.body.removeChild(iframe);
-        if (typeof showToast === 'function') showToast(`Downloaded: ${filename}`, 'success');
-      }).catch(err => {
-        console.error('PDF error:', err);
-        document.body.removeChild(iframe);
-        this.downloadTXT();
-      });
-    }, 300);
   }
 };

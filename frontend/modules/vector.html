@@ -1,24 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}Vector Calculator — Dot Product, Cross Product, Projection | Linear Algebra Solver{% endblock %}
-{% block meta_description %}Free vector calculator. Compute dot product, cross product, magnitude, unit vector, projection, angle between vectors, and Euclidean distance with step-by-step proofs.{% endblock %}
-{% block og_title %}Vector Calculator | Linear Algebra Solver{% endblock %}
-
-{% block jsonld %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Vector Calculator",
-  "applicationCategory": "EducationalApplication",
-  "operatingSystem": "Web",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-  "description": "Free vector calculator for dot product, cross product, magnitude, projection and angle with step-by-step LaTeX proofs.",
-  "keywords": "vector calculator, dot product calculator, cross product calculator, vector magnitude, vector projection"
-}
-</script>
-{% endblock %}
-
+{% block title %}Vector Calculator & Educational Solver — 9 Vector Operations | Linear Algebra Solver{% endblock %}
+{% block meta_description %}Free Vector Calculator: Dot product, cross product, magnitude, unit vector, projection, angle between vectors, linear combination, orthogonality, and distance with step-by-step proofs.{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/modules.css') }}">
@@ -30,13 +13,13 @@
     <i class="fas fa-location-arrow"></i>
   </div>
   <div>
-    <h3 class="fw-bold mb-1">Vector Calculator</h3>
-    <p class="text-secondary mb-0 small">Compute Dot Product, Cross Product, Magnitude, Unit Vector, Projection, Angle, and Distance between vectors.</p>
+    <h3 class="fw-bold mb-1">Vector Operations &amp; Educational Solver</h3>
+    <p class="text-secondary mb-0 small">9 Vector Operations with complete theory, formulas, step-by-step calculations, verifications, copy features, and exports.</p>
   </div>
 </div>
 
 <div class="row g-4">
-  <div class="col-lg-6">
+  <div class="col-lg-5">
     <div class="glass-panel p-4 h-100">
       <h5 class="fw-bold mb-3"><i class="fas fa-sliders text-primary me-2"></i>Vector Inputs</h5>
 
@@ -59,6 +42,18 @@
         <div id="vecBInputs" class="vector-row"></div>
       </div>
 
+      <!-- Linear combination scalars -->
+      <div class="row g-2 mb-3" id="linearCombGroup" style="display: none;">
+        <div class="col-6">
+          <label class="form-label small fw-semibold text-secondary">Scalar c₁</label>
+          <input type="number" id="c1Val" class="form-control bg-secondary text-white" value="2" step="any">
+        </div>
+        <div class="col-6">
+          <label class="form-label small fw-semibold text-secondary">Scalar c₂</label>
+          <input type="number" id="c2Val" class="form-control bg-secondary text-white" value="3" step="any">
+        </div>
+      </div>
+
       <div class="mb-3">
         <label class="form-label small fw-semibold text-secondary">Select Vector Operation</label>
         <select id="operationSelect" class="form-select bg-secondary border-secondary text-white">
@@ -68,13 +63,15 @@
           <option value="unit">Unit Vector (Â)</option>
           <option value="projection">Projection of A onto B (proj_B A)</option>
           <option value="angle">Angle Between Vectors (θ)</option>
+          <option value="linear_combination">Linear Combination (c₁A + c₂B)</option>
+          <option value="orthogonality">Orthogonality Check (A · B = 0)</option>
           <option value="distance">Distance Between A and B (d)</option>
         </select>
       </div>
 
       <div class="d-flex gap-2">
         <button id="btnCalculate" class="btn-primary-custom w-100 justify-content-center">
-          <span class="btn-label"><i class="fas fa-calculator me-1"></i> Calculate Vector</span>
+          <span class="btn-label"><i class="fas fa-calculator me-1"></i> Compute Vector Report</span>
           <span class="spinner-btn"><i class="fas fa-spinner fa-spin me-1"></i> Calculating...</span>
         </button>
         <button id="btnReset" class="btn-secondary-custom"><i class="fas fa-undo"></i></button>
@@ -82,26 +79,18 @@
     </div>
   </div>
 
-  <div class="col-lg-6">
+  <div class="col-lg-7">
     <div class="glass-panel p-4 h-100">
-      <div class="text-center py-5 text-muted" id="placeholderResult">
+      <h5 class="fw-bold mb-3"><i class="fas fa-square-root-variable text-success me-2"></i>Educational Report Output</h5>
+
+      <div id="placeholderResult" class="text-center py-5 text-muted">
         <i class="fas fa-location-arrow fs-1 mb-3 opacity-25"></i>
         <h6>No Vector Calculation Yet</h6>
-        <p class="small">Enter components and click <strong>Calculate Vector</strong>.</p>
+        <p class="small">Enter components and click <strong>Compute Vector Report</strong>.</p>
       </div>
 
       <div id="outputContent" style="display: none;">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="fw-bold mb-0 text-success"><i class="fas fa-check-circle me-2"></i>Vector Output</h5>
-        </div>
-
-        <div class="text-center mb-4">
-          <div id="mathJaxResult" class="fs-4 my-2"></div>
-        </div>
-
-        <h6 class="fw-bold mb-2 text-secondary"><i class="fas fa-list-ol me-2"></i>Derivation Steps</h6>
-        <div id="stepsAccordion"></div>
-        <div id="downloadPanelContainer"></div>
+        <div id="solutionExportTarget"></div>
       </div>
     </div>
   </div>
@@ -112,21 +101,25 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   let dim = 3;
-  const containerA = document.getElementById('vecAInputs');
-  const containerB = document.getElementById('vecBInputs');
+  const vecAContainer = document.getElementById('vecAInputs');
+  const vecBContainer = document.getElementById('vecBInputs');
   const opSelect = document.getElementById('operationSelect');
   const vecBGroup = document.getElementById('vecBGroup');
+  const linGroup = document.getElementById('linearCombGroup');
 
-  function renderVectorInputs() {
-    containerA.innerHTML = '';
-    containerB.innerHTML = '';
+  function renderInputs() {
+    let aHtml = '<div class="d-flex gap-2">';
+    let bHtml = '<div class="d-flex gap-2">';
     const defaultsA = [3, 4, 0, 1];
     const defaultsB = [1, 2, 2, 0];
-
     for (let i = 0; i < dim; i++) {
-      containerA.innerHTML += `<input type="number" step="any" class="matrix-cell" id="vecA_${i}" value="${defaultsA[i] || 0}">`;
-      containerB.innerHTML += `<input type="number" step="any" class="matrix-cell" id="vecB_${i}" value="${defaultsB[i] || 0}">`;
+      aHtml += `<input type="number" step="any" class="form-control bg-secondary text-white text-center" id="A_${i}" value="${defaultsA[i] || 1}">`;
+      bHtml += `<input type="number" step="any" class="form-control bg-secondary text-white text-center" id="B_${i}" value="${defaultsB[i] || 1}">`;
     }
+    aHtml += '</div>';
+    bHtml += '</div>';
+    vecAContainer.innerHTML = aHtml;
+    vecBContainer.innerHTML = bHtml;
   }
 
   document.querySelectorAll('.dim-btn').forEach(btn => {
@@ -134,85 +127,68 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.dim-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       dim = parseInt(btn.dataset.dim);
-      renderVectorInputs();
+      renderInputs();
     });
   });
 
   opSelect.addEventListener('change', () => {
     const op = opSelect.value;
-    if (['magnitude', 'unit'].includes(op)) {
-      vecBGroup.style.display = 'none';
-    } else {
-      vecBGroup.style.display = 'block';
-    }
+    vecBGroup.style.display = ['magnitude', 'unit'].includes(op) ? 'none' : 'block';
+    linGroup.style.display = (op === 'linear_combination') ? 'flex' : 'none';
   });
 
-  function getVectorValues(prefix) {
-    const vec = [];
+  function getVec(prefix) {
+    const arr = [];
     for (let i = 0; i < dim; i++) {
-      vec.push(parseFloat(document.getElementById(`${prefix}_${i}`).value) || 0);
+      const val = parseFloat(document.getElementById(`${prefix}_${i}`).value) || 0;
+      arr.push(val);
     }
-    return vec;
+    return arr;
   }
 
   document.getElementById('btnCalculate').addEventListener('click', () => {
     const op = opSelect.value;
-    const va = getVectorValues('vecA');
-    const vb = getVectorValues('vecB');
+    const va = getVec('A');
+    const vb = getVec('B');
+    const c1 = parseFloat(document.getElementById('c1Val').value) || 1;
+    const c2 = parseFloat(document.getElementById('c2Val').value) || 1;
+
+    const payload = { operation: op, vector_a: va, vector_b: vb, c1: c1, c2: c2 };
 
     document.getElementById('btnCalculate').classList.add('btn-loading');
 
     fetch('/api/vector/calculate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ operation: op, vector_a: va, vector_b: vb })
+      body: JSON.stringify(payload)
     })
-    .then(r => r.json())
+    .then(res => res.json())
     .then(data => {
       document.getElementById('btnCalculate').classList.remove('btn-loading');
       if (data.success) {
         document.getElementById('placeholderResult').style.display = 'none';
         document.getElementById('outputContent').style.display = 'block';
-
-        document.getElementById('mathJaxResult').innerHTML = `\\[ ${data.result_latex} \\]`;
-
-        const accordion = document.getElementById('stepsAccordion');
-        accordion.innerHTML = data.steps.map((step, idx) => `
-          <div class="direct-step-block mb-3 rounded-3 p-3">
-            <div class="d-flex align-items-start gap-2 mb-2">
-              <span class="step-num-badge">${idx + 1}</span>
-              <span class="fw-bold text-primary-accent">${step.title}</span>
-            </div>
-            ${step.text ? `<p class="mb-2 text-secondary small ps-4">${step.text}</p>` : ''}
-            ${step.list ? `<ul class="small font-monospace mb-2 ps-4">${step.list.map(l => `<li>${l}</li>`).join('')}</ul>` : ''}
-            ${step.latex ? `<div class="step-latex">\\[ ${step.latex} \\]</div>` : ''}
-          </div>
-        `).join('');
-
-        if (window.MathJax && window.MathJax.typeset) window.MathJax.typeset();
-
         if (window.SolutionExporter) {
           SolutionExporter.setSolution(data, 'Vector Operations');
         }
       } else {
-        showToast(data.error, 'danger');
+        if (typeof showToast === 'function') showToast(data.error || 'Calculation failed.', 'danger');
+        else alert(data.error);
       }
     })
-    .catch(() => {
+    .catch(err => {
       document.getElementById('btnCalculate').classList.remove('btn-loading');
-      showToast('Error communicating with backend.', 'danger');
+      if (typeof showToast === 'function') showToast('Network error occurred.', 'danger');
     });
   });
 
   document.getElementById('btnReset').addEventListener('click', () => {
-    renderVectorInputs();
+    renderInputs();
     document.getElementById('placeholderResult').style.display = 'block';
     document.getElementById('outputContent').style.display = 'none';
   });
 
-  renderVectorInputs();
+  renderInputs();
 });
-
-function toggleStep(el) {}
 </script>
 {% endblock %}

@@ -1,24 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}Determinant Calculator — Cofactor Expansion & Laplace (NxN) | Linear Algebra Solver{% endblock %}
-{% block meta_description %}Free NxN determinant calculator with step-by-step cofactor expansion and Laplace expansion. Shows every sub-determinant with full LaTeX proofs.{% endblock %}
-{% block og_title %}Determinant Calculator | Linear Algebra Solver{% endblock %}
-
-{% block jsonld %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Matrix Determinant Calculator",
-  "applicationCategory": "EducationalApplication",
-  "operatingSystem": "Web",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-  "description": "Free NxN determinant calculator using cofactor expansion and Laplace expansion with full step-by-step LaTeX proofs.",
-  "keywords": "determinant calculator, cofactor expansion, Laplace expansion, matrix determinant"
-}
-</script>
-{% endblock %}
-
+{% block title %}Determinant Calculator & Educational Engine | Linear Algebra Solver{% endblock %}
+{% block meta_description %}Compute determinants for 2×2, 3×3, and NxN matrices with step-by-step cofactor expansion, Laplace expansion, and Gaussian triangularization.{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/modules.css') }}">
@@ -30,15 +13,15 @@
     <i class="fas fa-square-root-variable"></i>
   </div>
   <div>
-    <h3 class="fw-bold mb-1">Determinant Calculator</h3>
-    <p class="text-secondary mb-0 small">Compute determinants for 2×2, 3×3, and NxN matrices with step-by-step cofactor expansion & Laplace formulas.</p>
+    <h3 class="fw-bold mb-1">Determinant Calculator &amp; Educational Solver</h3>
+    <p class="text-secondary mb-0 small">Compute determinants with Laplace expansion, 2x2/3x3 rules, and Gaussian elimination with full proof reports.</p>
   </div>
 </div>
 
 <div class="row g-4">
-  <div class="col-lg-6">
+  <div class="col-lg-5">
     <div class="glass-panel p-4 h-100">
-      <h5 class="fw-bold mb-3"><i class="fas fa-sliders text-primary me-2"></i>Matrix Input</h5>
+      <h5 class="fw-bold mb-3"><i class="fas fa-sliders text-primary me-2"></i>Matrix Setup</h5>
 
       <div class="mb-3">
         <label class="form-label small fw-semibold text-secondary">Matrix Size</label>
@@ -58,7 +41,7 @@
 
       <div class="d-flex gap-2">
         <button id="btnCalculate" class="btn-primary-custom w-100 justify-content-center">
-          <span class="btn-label"><i class="fas fa-calculator me-1"></i> Calculate det(A)</span>
+          <span class="btn-label"><i class="fas fa-calculator me-1"></i> Compute det(A) Report</span>
           <span class="spinner-btn"><i class="fas fa-spinner fa-spin me-1"></i> Calculating...</span>
         </button>
         <button id="btnReset" class="btn-secondary-custom"><i class="fas fa-undo"></i></button>
@@ -66,26 +49,18 @@
     </div>
   </div>
 
-  <div class="col-lg-6">
+  <div class="col-lg-7">
     <div class="glass-panel p-4 h-100">
-      <div class="text-center py-5 text-muted" id="placeholderResult">
+      <h5 class="fw-bold mb-3"><i class="fas fa-square-root-variable text-success me-2"></i>Educational Report Output</h5>
+
+      <div id="placeholderResult" class="text-center py-5 text-muted">
         <i class="fas fa-square-root-variable fs-1 mb-3 opacity-25"></i>
-        <h6>No Result Generated Yet</h6>
-        <p class="small">Enter values and click <strong>Calculate det(A)</strong>.</p>
+        <h6>No Determinant Generated Yet</h6>
+        <p class="small">Enter values and click <strong>Compute det(A) Report</strong>.</p>
       </div>
 
       <div id="outputContent" style="display: none;">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="fw-bold mb-0 text-success"><i class="fas fa-check-circle me-2"></i>Determinant Result</h5>
-        </div>
-
-        <div class="text-center mb-4">
-          <div id="mathJaxResult" class="fs-3 my-2 gradient-text fw-bold"></div>
-        </div>
-
-        <h6 class="fw-bold mb-2 text-secondary"><i class="fas fa-list-ol me-2"></i>Step-by-Step Proof</h6>
-        <div id="stepsAccordion"></div>
-        <div id="downloadPanelContainer"></div>
+        <div id="solutionExportTarget"></div>
       </div>
     </div>
   </div>
@@ -99,11 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const grid = document.getElementById('gridContainer');
 
   function renderGrid() {
-    let html = '<table>';
+    let html = '<table class="matrix-grid-table">';
+    const sample = [[3, 8], [4, 6]];
     for (let r = 0; r < size; r++) {
       html += '<tr>';
       for (let c = 0; c < size; c++) {
-        const val = (r === c) ? (r + 1) * 2 : (r + c + 1);
+        const val = sample[r]?.[c] ?? (r === c ? 1 : 0);
         html += `<td><input type="number" step="any" class="matrix-cell" id="cell_${r}_${c}" value="${val}"></td>`;
       }
       html += '</tr>';
@@ -122,23 +98,28 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('btnRandom').addEventListener('click', () => {
-    for (let i = 0; i < size; i++) {
-      for (let j = 0; j < size; j++) {
-        document.getElementById(`cell_${i}_${j}`).value = Math.floor(Math.random() * 10) - 4;
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        const el = document.getElementById(`cell_${r}_${c}`);
+        if (el) el.value = Math.floor(Math.random() * 10) - 3;
       }
     }
   });
 
-  document.getElementById('btnCalculate').addEventListener('click', () => {
+  function getMatrix() {
     const mat = [];
-    for (let i = 0; i < size; i++) {
+    for (let r = 0; r < size; r++) {
       const row = [];
-      for (let j = 0; j < size; j++) {
-        row.push(parseFloat(document.getElementById(`cell_${i}_${j}`).value) || 0);
+      for (let c = 0; c < size; c++) {
+        row.push(parseFloat(document.getElementById(`cell_${r}_${c}`).value) || 0);
       }
       mat.push(row);
     }
+    return mat;
+  }
 
+  document.getElementById('btnCalculate').addEventListener('click', () => {
+    const mat = getMatrix();
     document.getElementById('btnCalculate').classList.add('btn-loading');
 
     fetch('/api/determinant/calculate', {
@@ -146,40 +127,23 @@ document.addEventListener('DOMContentLoaded', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ matrix: mat })
     })
-    .then(r => r.json())
+    .then(res => res.json())
     .then(data => {
       document.getElementById('btnCalculate').classList.remove('btn-loading');
       if (data.success) {
         document.getElementById('placeholderResult').style.display = 'none';
         document.getElementById('outputContent').style.display = 'block';
-
-        document.getElementById('mathJaxResult').innerHTML = `\\[ ${data.result_latex} \\]`;
-
-        const accordion = document.getElementById('stepsAccordion');
-        accordion.innerHTML = data.steps.map((step, idx) => `
-          <div class="direct-step-block mb-3 rounded-3 p-3">
-            <div class="d-flex align-items-start gap-2 mb-2">
-              <span class="step-num-badge">${idx + 1}</span>
-              <span class="fw-bold text-primary-accent">${step.title}</span>
-            </div>
-            ${step.text ? `<p class="mb-2 text-secondary small ps-4">${step.text}</p>` : ''}
-            ${step.list ? `<ul class="small font-monospace mb-2 ps-4">${step.list.map(l => `<li>${l}</li>`).join('')}</ul>` : ''}
-            ${step.latex ? `<div class="step-latex">\\[ ${step.latex} \\]</div>` : ''}
-          </div>
-        `).join('');
-
-        if (window.MathJax && window.MathJax.typeset) window.MathJax.typeset();
-
         if (window.SolutionExporter) {
-          SolutionExporter.setSolution(data, 'Determinant Calculation');
+          SolutionExporter.setSolution(data, 'Determinant Calculator');
         }
       } else {
-        showToast(data.error, 'danger');
+        if (typeof showToast === 'function') showToast(data.error || 'Calculation failed.', 'danger');
+        else alert(data.error);
       }
     })
-    .catch(() => {
+    .catch(err => {
       document.getElementById('btnCalculate').classList.remove('btn-loading');
-      showToast('Error communicating with backend.', 'danger');
+      if (typeof showToast === 'function') showToast('Network error occurred.', 'danger');
     });
   });
 
@@ -191,7 +155,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderGrid();
 });
-
-function toggleStep(el) {}
 </script>
 {% endblock %}

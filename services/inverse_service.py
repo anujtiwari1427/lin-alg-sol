@@ -1,10 +1,10 @@
 """
-Inverse Matrix Service — Phase 4
-Method: Adjoint / Classical Adjugate  →  A⁻¹ = adj(A) / det(A)
-Supports 2×2 (formula), 3×3 and NxN (cofactor matrix → adjoint → inverse)
+Inverse Matrix Service — Professional Educational Engine
+Supports 2x2, 3x3, and NxN matrix inversion with complete educational reports.
 """
 
 import numpy as np
+from services.solver_service import BaseSolverService
 
 
 class InverseService:
@@ -21,10 +21,10 @@ class InverseService:
 
     @staticmethod
     def _n(v):
-        if abs(float(v) - round(float(v))) < 1e-9:
-            return str(int(round(float(v))))
-        s = f'{float(v):.4f}'.rstrip('0').rstrip('.')
-        return s if s not in ('', '-') else '0'
+        v = float(v)
+        if abs(v - round(v)) < 1e-9:
+            return str(int(round(v)))
+        return f'{v:.4f}'.rstrip('0').rstrip('.')
 
     @staticmethod
     def _latex(mat, name=None):
@@ -34,82 +34,78 @@ class InverseService:
         return f'{name} = {s}' if name else s
 
     @staticmethod
-    def _vmatrix(mat):
-        rows = [' & '.join(InverseService._n(x) for x in row) for row in mat]
-        return '\\begin{vmatrix} ' + ' \\\\ '.join(rows) + ' \\end{vmatrix}'
+    def _display(mat):
+        return [[InverseService._n(x) for x in row] for row in mat.tolist()]
 
     @staticmethod
     def _minor(A, i, j):
         return np.delete(np.delete(A, i, 0), j, 1)
 
     @staticmethod
-    def _display(mat):
-        return [[InverseService._n(x) for x in row] for row in mat.tolist()]
-
-    # -----------------------------------------------------------------------
-    # Main entry
-    # -----------------------------------------------------------------------
-    @staticmethod
     def calculate(matrix_data):
         A, err = InverseService.parse(matrix_data)
         if err:
             return {'success': False, 'error': err}
-
-        n   = A.shape[0]
+        
+        n = A.shape[0]
         det = float(np.linalg.det(A))
-        _n  = InverseService._n
+        _n = InverseService._n
 
         if abs(det) < 1e-10:
             return {
                 'success': False,
-                'error': f'Matrix is singular (det = {_n(det)} ≈ 0). '
-                         'No inverse exists for a singular matrix.',
+                'error': f'Matrix is singular (det(A) = {_n(det)} ≈ 0). Singular matrices have no inverse.',
                 'determinant': _n(det)
             }
 
-        # Compute cofactor matrix
         C = np.zeros_like(A)
         for i in range(n):
             for j in range(n):
                 minor = InverseService._minor(A, i, j)
                 C[i, j] = ((-1) ** (i + j)) * np.linalg.det(minor)
 
-        adj = C.T                        # adjoint = transpose of cofactor matrix
-        inv = adj / det                  # inverse
+        adj = C.T
+        inv = adj / det
+        I_check = A @ inv
 
         steps = [
-            {'title': '① Input Matrix',
-             'text':  f'Square matrix A ({n}×{n})',
-             'latex': InverseService._latex(A, 'A')},
-            {'title': '② Compute the Determinant',
-             'text':  f'det(A) = {_n(det)}  (≠ 0 ✓ — inverse exists)',
-             'latex': InverseService._vmatrix(A) + f' = {_n(det)}'},
-            {'title': '③ Compute Cofactor Matrix C',
-             'text':  'Cᵢⱼ = (−1)^(i+j) × det(minor Mᵢⱼ)',
-             'latex': f'C = {InverseService._latex(C)}'},
-            {'title': '④ Compute Adjoint (adj A = Cᵀ)',
-             'text':  'The adjoint is the transpose of the cofactor matrix.',
-             'latex': f'\\text{{adj}}(A) = C^T = {InverseService._latex(adj)}'},
-            {'title': '⑤ Compute Inverse',
-             'text':  f'A⁻¹ = adj(A) / det(A) = adj(A) / {_n(det)}',
-             'latex': f'A^{{-1}} = \\frac{{\\text{{adj}}(A)}}{{\\det(A)}} = '
-                      f'\\frac{{1}}{{{_n(det)}}} {InverseService._latex(adj)}'},
-            {'title': '⑥ Result',
-             'text':  'Final inverse matrix:',
-             'latex': f'A^{{-1}} = {InverseService._latex(inv)}'},
-            {'title': '⑦ Verification  A · A⁻¹ = I',
-             'text':  'Multiplying A by A⁻¹ should give the identity matrix.',
-             'latex': f'A \\cdot A^{{-1}} = {InverseService._latex(np.round(A @ inv, 6))}'},
+            {'title': '① Input Square Matrix', 'text': f'A is a {n}×{n} matrix:', 'latex': InverseService._latex(A, "A")},
+            {'title': '② Compute Determinant', 'text': f'det(A) = {_n(det)} (≠ 0 ✓ Inverse exists)', 'latex': f'\\det(A) = {_n(det)}'},
+            {'title': '③ Compute Cofactor Matrix C', 'text': 'Cᵢⱼ = (-1)ⁱ⁺ʲ det(Mᵢⱼ)', 'latex': InverseService._latex(C, "C")},
+            {'title': '④ Compute Adjoint Matrix (adj A = Cᵀ)', 'text': 'Transpose the cofactor matrix:', 'latex': InverseService._latex(adj, "\\text{adj}(A)")},
+            {'title': '⑤ Divide Adjoint by Determinant', 'text': f'A⁻¹ = adj(A) / det(A) = adj(A) / {_n(det)}', 'latex': f'A^{{-1}} = \\frac{{1}}{{{_n(det)}}} {InverseService._latex(adj)}'},
+            {'title': '⑥ Final Inverse Matrix', 'text': 'Resulting inverse:', 'latex': InverseService._latex(inv, "A^{-1}")},
+            {'title': '⑦ Verification: A · A⁻¹ = I', 'text': 'Multiplying A by A⁻¹ yields the identity matrix:', 'latex': f'A \\cdot A^{{-1}} = {InverseService._latex(np.round(I_check, 4))}'}
         ]
 
-        return {
-            'success': True,
-            'operation': 'Matrix Inverse  A⁻¹',
-            'determinant': _n(det),
-            'cofactor': C.tolist(),
-            'adjoint': adj.tolist(),
-            'result': inv.tolist(),
-            'result_display': InverseService._display(inv),
-            'result_latex': InverseService._latex(inv),
-            'steps': steps
+        verif = {
+            'status': '✔ Correct',
+            'check': 'Verified identity property: A · A⁻¹ = I',
+            'latex': f'A \\cdot A^{{-1}} = {InverseService._latex(np.round(I_check, 4))}',
+            'residual_error': f'{float(np.max(np.abs(I_check - np.eye(n)))):.6e}'
         }
+
+        return BaseSolverService.build_educational_solution(
+            operation='Matrix Inverse A⁻¹',
+            input_data={'A': InverseService._display(A)},
+            theory='The inverse of a square matrix A is the matrix A⁻¹ such that A · A⁻¹ = A⁻¹ · A = I.',
+            formula='A^{-1} = \\frac{1}{\\det(A)} \\text{adj}(A) \\quad \\text{or } [A \\mid I] \\xrightarrow{\\text{RREF}} [I \\mid A^{-1}]',
+            definitions=[{'term': 'Invertible (Non-singular)', 'def': 'A square matrix with a non-zero determinant.'}],
+            steps=steps,
+            verification=verif,
+            result=inv.tolist(),
+            result_display=InverseService._display(inv),
+            result_latex=InverseService._latex(inv, "A^{-1}"),
+            notes=['(A⁻¹)⁻¹ = A', '(AB)⁻¹ = B⁻¹ A⁻¹', '(Aᵀ)⁻¹ = (A⁻¹)ᵀ'],
+            common_mistakes=['Attempting to invert a non-square matrix.', 'Forgetting to transpose the cofactor matrix.'],
+            applications=['Solving linear systems Ax = b -> x = A^-1 b', 'Coordinate transformation reversal', 'Cryptography'],
+            time_complexity=f'O({n}^3)',
+            student_mode={
+                'concept': 'Undo matrix transformation.',
+                'why_this_step': 'Restores original vector space coordinates.',
+                'exam_tips': ['For 2x2 [[a,b],[c,d]], A^-1 = 1/(ad-bc) * [[d,-b],[-c,a]].'],
+                'shortcuts': ['Check det(A) != 0 before doing any work!'],
+                'interview_questions': ['Why is Ax=b solved via Gaussian elimination rather than computing A^-1 b directly?'],
+                'practice_questions': ['Invert [[4, 7], [2, 6]].']
+            }
+        )

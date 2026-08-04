@@ -129,3 +129,73 @@ class CalculationModel:
             conn.commit()
         finally:
             conn.close()
+
+    @classmethod
+    def delete_by_id(cls, record_id):
+        conn = get_db_connection(cls._get_path())
+        try:
+            conn.execute('DELETE FROM calculation_history WHERE id = ?', (record_id,))
+            conn.commit()
+            return True
+        finally:
+            conn.close()
+
+    @classmethod
+    def toggle_favourite(cls, record_id):
+        conn = get_db_connection(cls._get_path())
+        try:
+            cursor = conn.cursor()
+            cursor.execute('SELECT is_favourite FROM calculation_history WHERE id = ?', (record_id,))
+            row = cursor.fetchone()
+            if not row:
+                return None
+            new_val = 0 if row['is_favourite'] else 1
+            cursor.execute('UPDATE calculation_history SET is_favourite = ? WHERE id = ?', (new_val, record_id))
+            conn.commit()
+            return bool(new_val)
+        finally:
+            conn.close()
+
+    @classmethod
+    def search_history(cls, query, limit=50):
+        conn = get_db_connection(cls._get_path())
+        try:
+            cursor = conn.cursor()
+            like_q = f'%{query}%'
+            cursor.execute(
+                '''
+                SELECT * FROM calculation_history
+                WHERE module LIKE ? OR operation LIKE ? OR input_data LIKE ? OR result_data LIKE ?
+                ORDER BY created_at DESC LIMIT ?
+                ''',
+                (like_q, like_q, like_q, like_q, limit)
+            )
+            rows = cursor.fetchall()
+        finally:
+            conn.close()
+
+        results = []
+        for row in rows:
+            item = dict(row)
+            for field in ('input_data', 'result_data'):
+                try:
+                    item[field] = json.loads(item[field])
+                except (json.JSONDecodeError, TypeError):
+                    pass
+            if item.get('steps_json'):
+                try:
+                    item['steps_json'] = json.loads(item['steps_json'])
+                except (json.JSONDecodeError, TypeError):
+                    pass
+            results.append(item)
+        return results
+
+    @classmethod
+    def increment_export(cls, record_id):
+        conn = get_db_connection(cls._get_path())
+        try:
+            conn.execute('UPDATE calculation_history SET export_count = export_count + 1 WHERE id = ?', (record_id,))
+            conn.commit()
+        finally:
+            conn.close()
+

@@ -1,24 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}Linear System Solver — Gaussian Elimination, Cramer's Rule | Linear Algebra Solver{% endblock %}
-{% block meta_description %}Free linear system solver using Gaussian elimination, Cramer's Rule, and matrix inverse method. Supports NxN systems with step-by-step LaTeX proofs.{% endblock %}
-{% block og_title %}Linear System Solver | Linear Algebra Solver{% endblock %}
-
-{% block jsonld %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Linear System Solver",
-  "applicationCategory": "EducationalApplication",
-  "operatingSystem": "Web",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-  "description": "Free linear system solver supporting Gaussian elimination, Cramer's Rule, and matrix inverse method with step-by-step LaTeX proofs.",
-  "keywords": "linear system solver, Gaussian elimination, Cramer's Rule, system of equations calculator"
-}
-</script>
-{% endblock %}
-
+{% block title %}System of Linear Equations Solver & Educational Engine | Linear Algebra Solver{% endblock %}
+{% block meta_description %}Solve linear equation systems with Gaussian Elimination, Gauss-Jordan, LU Decomposition Solver, Cramer's Rule, and Least Squares with step-by-step row operation reasons.{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/modules.css') }}">
@@ -30,39 +13,44 @@
     <i class="fas fa-equals"></i>
   </div>
   <div>
-    <h3 class="fw-bold mb-1">Linear System Solver</h3>
-    <p class="text-secondary mb-0 small">Solve system of linear equations using Gaussian Elimination timeline, Cramer's Rule, and Matrix Inverse method.</p>
+    <h3 class="fw-bold mb-1">System of Linear Equations</h3>
+    <p class="text-secondary mb-0 small">Solve Ax = b systems using Gaussian Elimination, Gauss-Jordan, LU Solver, Cramer's Rule, and Least Squares with detailed row operation steps.</p>
   </div>
 </div>
 
 <div class="row g-4">
-  <div class="col-lg-6">
+  <div class="col-lg-5">
     <div class="glass-panel p-4 h-100">
       <h5 class="fw-bold mb-3"><i class="fas fa-sliders text-primary me-2"></i>System Setup</h5>
 
       <div class="mb-3">
-        <label class="form-label small fw-semibold text-secondary">Number of Variables</label>
+        <label class="form-label small fw-semibold text-secondary">Number of Equations / Variables</label>
         <div class="d-flex gap-2">
-          <button type="button" class="btn btn-sm btn-secondary-custom vars-btn active" data-vars="2">2 Variables (x, y)</button>
-          <button type="button" class="btn btn-sm btn-secondary-custom vars-btn" data-vars="3">3 Variables (x, y, z)</button>
+          <button type="button" class="btn btn-sm btn-secondary-custom dim-btn active" data-vars="2">2 Variables</button>
+          <button type="button" class="btn btn-sm btn-secondary-custom dim-btn" data-vars="3">3 Variables</button>
+          <button type="button" class="btn btn-sm btn-secondary-custom dim-btn" data-vars="4">4 Variables</button>
         </div>
       </div>
 
       <div class="mb-3">
-        <label class="form-label small fw-semibold text-secondary">Solver Method</label>
+        <label class="form-label small fw-semibold text-primary-accent">Augmented System [A | b]</label>
+        <div id="systemGridContainer" class="matrix-grid-wrap"></div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-secondary">Solving Method</label>
         <select id="methodSelect" class="form-select bg-secondary border-secondary text-white">
-          <option value="gaussian" selected>Gaussian Elimination</option>
-          <option value="cramer">Cramer's Rule</option>
-          <option value="matrix">Matrix Inverse Method (x = A⁻¹b)</option>
+          <option value="gaussian" selected>Gaussian Elimination (REF + Back Substitution)</option>
+          <option value="gauss_jordan">Gauss-Jordan Elimination (RREF)</option>
+          <option value="lu_solver">LU Decomposition Solver (PA = LU)</option>
+          <option value="cramer">Cramer's Rule (Determinant Ratios)</option>
+          <option value="least_squares">Least Squares (Normal Equations AᵀAx = Aᵀb)</option>
         </select>
       </div>
 
-      <label class="form-label small fw-semibold text-secondary mb-2">Equations Matrix [ A | b ]</label>
-      <div id="systemGridContainer" class="matrix-grid-wrap mb-4"></div>
-
       <div class="d-flex gap-2">
         <button id="btnCalculate" class="btn-primary-custom w-100 justify-content-center">
-          <span class="btn-label"><i class="fas fa-calculator me-1"></i> Solve Linear System</span>
+          <span class="btn-label"><i class="fas fa-calculator me-1"></i> Compute System Report</span>
           <span class="spinner-btn"><i class="fas fa-spinner fa-spin me-1"></i> Solving...</span>
         </button>
         <button id="btnReset" class="btn-secondary-custom"><i class="fas fa-undo"></i></button>
@@ -70,28 +58,18 @@
     </div>
   </div>
 
-  <div class="col-lg-6">
+  <div class="col-lg-7">
     <div class="glass-panel p-4 h-100">
-      <div class="text-center py-5 text-muted" id="placeholderResult">
+      <h5 class="fw-bold mb-3"><i class="fas fa-square-root-variable text-success me-2"></i>Educational Report Output</h5>
+
+      <div id="placeholderResult" class="text-center py-5 text-muted">
         <i class="fas fa-equals fs-1 mb-3 opacity-25"></i>
         <h6>No System Solved Yet</h6>
-        <p class="small">Setup equations and click <strong>Solve Linear System</strong>.</p>
+        <p class="small">Configure equation coefficients and constants, then click <strong>Compute System Report</strong>.</p>
       </div>
 
       <div id="outputContent" style="display: none;">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="fw-bold mb-0 text-success"><i class="fas fa-check-circle me-2"></i>System Solution</h5>
-        </div>
-
-        <div id="solutionCardsContainer" class="solution-card"></div>
-
-        <div class="text-center mb-4">
-          <div id="mathJaxResult" class="fs-4 my-2"></div>
-        </div>
-
-        <h6 class="fw-bold mb-2 text-secondary"><i class="fas fa-list-ol me-2"></i>Step-by-Step Elimination Timeline</h6>
-        <div id="stepsAccordion"></div>
-        <div id="downloadPanelContainer"></div>
+        <div id="solutionExportTarget"></div>
       </div>
     </div>
   </div>
@@ -101,120 +79,92 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  let varsCount = 2;
-  const grid = document.getElementById('systemGridContainer');
+  let vars = 2;
+  const gridContainer = document.getElementById('systemGridContainer');
+  const methodSelect = document.getElementById('methodSelect');
 
-  function renderSystemGrid() {
-    let html = '<table>';
-    const defaultsA = [
-      [2, 1, 5],
-      [1, -1, 1],
-      [1, 2, 3]
-    ];
-    const defaultsB = [8, 1, 14];
+  function renderSystem() {
+    let html = '<table class="matrix-grid-table">';
+    const sampleA = [[2, 1, -1, 1], [-3, -1, 2, 0], [-2, 1, 2, 1], [1, 1, 1, 1]];
+    const sampleB = [8, -11, -3, 6];
 
-    for (let r = 0; r < varsCount; r++) {
+    for (let r = 0; r < vars; r++) {
       html += '<tr>';
-      for (let c = 0; c < varsCount; c++) {
-        const val = defaultsA[r][c] || 1;
-        html += `<td><input type="number" step="any" class="matrix-cell" id="coeff_${r}_${c}" value="${val}"></td>`;
+      for (let c = 0; c < vars; c++) {
+        const val = sampleA[r][c] || (r === c ? 1 : 0);
+        html += `<td><input type="number" step="any" class="matrix-cell" id="A_${r}_${c}" value="${val}"></td>`;
       }
-      html += `<td class="px-2 text-muted fw-bold">=</td>`;
-      html += `<td><input type="number" step="any" class="matrix-cell border-info text-info" id="const_${r}" value="${defaultsB[r] || 0}"></td>`;
+      html += `<td class="px-2 text-warning fw-bold">|</td>`;
+      html += `<td><input type="number" step="any" class="matrix-cell border-warning" id="b_${r}" value="${sampleB[r] || 1}"></td>`;
       html += '</tr>';
     }
     html += '</table>';
-    grid.innerHTML = html;
+    gridContainer.innerHTML = html;
   }
 
-  document.querySelectorAll('.vars-btn').forEach(btn => {
+  document.querySelectorAll('.dim-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.vars-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.dim-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      varsCount = parseInt(btn.dataset.vars);
-      renderSystemGrid();
+      vars = parseInt(btn.dataset.vars);
+      renderSystem();
     });
   });
 
-  function getSystemData() {
-    const coeffs = [];
-    const consts = [];
-    for (let r = 0; r < varsCount; r++) {
+  function getSystemValues() {
+    const A = [];
+    const b = [];
+    for (let i = 0; i < vars; i++) {
       const row = [];
-      for (let c = 0; c < varsCount; c++) {
-        row.push(parseFloat(document.getElementById(`coeff_${r}_${c}`).value) || 0);
+      for (let j = 0; j < vars; j++) {
+        row.push(parseFloat(document.getElementById(`A_${i}_${j}`).value) || 0);
       }
-      coeffs.push(row);
-      consts.push(parseFloat(document.getElementById(`const_${r}`).value) || 0);
+      A.push(row);
+      b.push(parseFloat(document.getElementById(`b_${i}`).value) || 0);
     }
-    return { coeffs, consts };
+    return { A, b };
   }
 
   document.getElementById('btnCalculate').addEventListener('click', () => {
-    const { coeffs, consts } = getSystemData();
-    const method = document.getElementById('methodSelect').value;
+    const method = methodSelect.value;
+    const sys = getSystemValues();
+
+    const payload = { method: method, coefficients: sys.A, constants: sys.b };
 
     document.getElementById('btnCalculate').classList.add('btn-loading');
 
     fetch('/api/linear-equations/calculate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ method, coefficients: coeffs, constants: consts })
+      body: JSON.stringify(payload)
     })
-    .then(r => r.json())
+    .then(res => res.json())
     .then(data => {
       document.getElementById('btnCalculate').classList.remove('btn-loading');
       if (data.success) {
         document.getElementById('placeholderResult').style.display = 'none';
         document.getElementById('outputContent').style.display = 'block';
-
-        const solCards = document.getElementById('solutionCardsContainer');
-        solCards.innerHTML = Object.entries(data.solution).map(([key, val]) => `
-          <div class="solution-var">
-            <div class="var-name">${key}</div>
-            <div class="var-val">${val}</div>
-          </div>
-        `).join('');
-
-        document.getElementById('mathJaxResult').innerHTML = `\\[ ${data.result_latex} \\]`;
-
-        const accordion = document.getElementById('stepsAccordion');
-        accordion.innerHTML = data.steps.map((step, idx) => `
-          <div class="direct-step-block mb-3 rounded-3 p-3">
-            <div class="d-flex align-items-start gap-2 mb-2">
-              <span class="step-num-badge">${idx + 1}</span>
-              <span class="fw-bold text-primary-accent">${step.title}</span>
-            </div>
-            ${step.text ? `<p class="mb-2 text-secondary small ps-4">${step.text}</p>` : ''}
-            ${step.list ? `<ul class="small font-monospace mb-2 ps-4">${step.list.map(l => `<li>${l}</li>`).join('')}</ul>` : ''}
-            ${step.latex ? `<div class="step-latex">\\[ ${step.latex} \\]</div>` : ''}
-          </div>
-        `).join('');
-
-        if (window.MathJax && window.MathJax.typeset) window.MathJax.typeset();
-
         if (window.SolutionExporter) {
-          SolutionExporter.setSolution(data, 'Linear System Solver');
+          SolutionExporter.setSolution(data, 'System of Equations');
         }
       } else {
-        showToast(data.error, 'danger');
+        if (typeof showToast === 'function') showToast(data.error || 'Calculation failed.', 'danger');
+        else alert(data.error);
       }
     })
-    .catch(() => {
+    .catch(err => {
       document.getElementById('btnCalculate').classList.remove('btn-loading');
-      showToast('Error communicating with backend.', 'danger');
+      if (typeof showToast === 'function') showToast('Network error occurred.', 'danger');
     });
   });
 
   document.getElementById('btnReset').addEventListener('click', () => {
-    renderSystemGrid();
+    renderSystem();
     document.getElementById('placeholderResult').style.display = 'block';
     document.getElementById('outputContent').style.display = 'none';
   });
 
-  renderSystemGrid();
+  renderSystem();
 });
-
-function toggleStep(el) {}
 </script>
 {% endblock %}

@@ -47,7 +47,8 @@ function applyTheme(theme, save = true) {
       icon.style.color = '#F2E8D2';
 
     } else {
-      icon.className = 'fas fa-moon text-primary';
+      icon.className = 'fas fa-tree';
+      icon.style.color = '#1F3D28';
     }
   });
 

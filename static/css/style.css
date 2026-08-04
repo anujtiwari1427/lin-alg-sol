@@ -8,7 +8,7 @@
    2. Ocean Deep Theme (Navy #0D1F23 → Slate #AFB3B7)
    3. Butter & Forest Green Theme (#FFEFB3 butter + #013E37 green)
    4. Maroon & Cream Theme (#650108 maroon + #F2E8D2 cream)
-   5. Light Mode
+   5. Forest Stone Theme (#1F3D28 forest green + #D7D2C8 warm stone)
    ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap');
@@ -125,28 +125,27 @@
 }
 
 /* ---------------------------------------------------------
-   CSS Custom Properties — Light Mode Override
+   CSS Custom Properties — Forest Stone Theme
+   (#D7D2C8 warm stone bg + #1F3D28 forest green accent)
    --------------------------------------------------------- */
 [data-theme="light"] {
-  --bg-primary:       #f0f2f5;
-  --bg-secondary:     #ffffff;
-  --bg-card:          rgba(255, 255, 255, 0.95);
-  --bg-glass:         rgba(255, 255, 255, 0.92);
-  --border-color:     rgba(121, 193, 49, 0.22);
-  --border-highlight: #59a322;
+  --bg-primary:       #D7D2C8;
+  --bg-secondary:     #e4e0d8;
+  --bg-card:          rgba(232, 228, 220, 0.92);
+  --bg-glass:         rgba(215, 210, 200, 0.96);
+  --border-color:     rgba(31, 61, 40, 0.18);
+  --border-highlight: #1F3D28;
 
-  --text-primary:   #1a1c1e;
-  --text-secondary: #437a18;
-  --text-muted:     #6b8060;
+  --text-primary:   #1F3D28;
+  --text-secondary: #2d5438;
+  --text-muted:     #5a7260;
 
-  --primary-accent:     #59a322;
-  --primary-accent-rgb: 89, 163, 34;
-  --primary-gradient:   linear-gradient(135deg, #59a322 0%, #79C131 50%, #a8e040 100%);
-  --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(121,193,49,0.22) 0%, rgba(237,225,172,0.10) 50%, #f0f2f5 85%);  
-  --card-shadow:        0 4px 20px -4px rgba(0,0,0,0.12);
-  --glass-shadow:       0 4px 20px 0 rgba(0,0,0,0.08), 0 0 0 1px rgba(121,193,49,0.08);
-  --card-shadow:      0 10px 30px -10px rgba(22, 22, 22, 0.12);
-  --glass-shadow:     0  8px 32px   0  rgba(22, 22, 22, 0.08);
+  --primary-accent:     #1F3D28;
+  --primary-accent-rgb: 31, 61, 40;
+  --primary-gradient:   linear-gradient(135deg, #1F3D28 0%, #2d5438 50%, #D7D2C8 100%);
+  --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(31,61,40,0.18) 0%, rgba(215,210,200,0.30) 55%, #D7D2C8 85%);
+  --card-shadow:        0 4px 20px -4px rgba(31,61,40,0.14);
+  --glass-shadow:       0 4px 20px 0 rgba(31,61,40,0.10), 0 0 0 1px rgba(31,61,40,0.08);
 }
 
 /* ---------------------------------------------------------

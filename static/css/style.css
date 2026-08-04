@@ -8,7 +8,8 @@
    2. Ocean Deep Theme (Navy #0D1F23 → Slate #AFB3B7)
    3. Butter & Forest Green Theme (#FFEFB3 butter + #013E37 green)
    4. Maroon & Cream Theme (#650108 maroon + #F2E8D2 cream)
-   5. Forest Stone Theme (#1F3D28 forest green + #D7D2C8 warm stone)
+   5. Navy & Champagne Theme (#202632 deep navy + #F4E8D2 champagne)
+   6. Forest Stone Theme (#1F3D28 forest green + #D7D2C8 warm stone)
    ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap');
@@ -122,6 +123,30 @@
   --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(242,232,210,0.30) 0%, rgba(101,1,8,0.50) 55%, #3a0005 85%);
   --card-shadow:        0 12px 40px -8px rgba(0,0,0,0.92);
   --glass-shadow:       0 8px 32px 0 rgba(0,0,0,0.75), 0 0 0 1px rgba(242,232,210,0.10);
+}
+
+/* ---------------------------------------------------------
+   CSS Custom Properties — Navy & Champagne Theme
+   (#202632 deep navy + #F4E8D2 warm champagne)
+   --------------------------------------------------------- */
+[data-theme="navy"] {
+  --bg-primary:       #202632;
+  --bg-secondary:     #2a3240;
+  --bg-card:          rgba(32, 38, 50, 0.84);
+  --bg-glass:         rgba(20, 24, 32, 0.94);
+  --border-color:     rgba(244, 232, 210, 0.20);
+  --border-highlight: #F4E8D2;
+
+  --text-primary:   #F4E8D2;
+  --text-secondary: #e0cead;
+  --text-muted:     #9c8f78;
+
+  --primary-accent:     #F4E8D2;
+  --primary-accent-rgb: 244, 232, 210;
+  --primary-gradient:   linear-gradient(135deg, #202632 0%, #2a3240 45%, #F4E8D2 100%);
+  --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(244,232,210,0.30) 0%, rgba(42,50,64,0.40) 55%, #202632 85%);
+  --card-shadow:        0 12px 40px -8px rgba(0,0,0,0.90);
+  --glass-shadow:       0 8px 32px 0 rgba(0,0,0,0.68), 0 0 0 1px rgba(244,232,210,0.08);
 }
 
 /* ---------------------------------------------------------

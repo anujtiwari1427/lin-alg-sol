@@ -11,6 +11,7 @@ const CHART_THEME = {
   ocean:     { line: '#69818D', point: '#5A636A', fill0: 'rgba(105,129,141,0.35)', fill1: 'rgba(105,129,141,0.02)', tick: '#AFB3B7', grid: 'rgba(105,129,141,0.10)', tooltip_bg: '#0D1F23', tooltip_border: '#69818D' },
   butter:    { line: '#FFEFB3', point: '#ffe87a', fill0: 'rgba(255,239,179,0.35)', fill1: 'rgba(255,239,179,0.02)', tick: '#FFEFB3', grid: 'rgba(255,239,179,0.10)', tooltip_bg: '#012a25', tooltip_border: '#FFEFB3' },
   maroon:    { line: '#F2E8D2', point: '#e8d5b7', fill0: 'rgba(242,232,210,0.35)', fill1: 'rgba(242,232,210,0.02)', tick: '#F2E8D2', grid: 'rgba(242,232,210,0.12)', tooltip_bg: '#3a0005', tooltip_border: '#F2E8D2' },
+  navy:      { line: '#F4E8D2', point: '#e0cead', fill0: 'rgba(244,232,210,0.35)', fill1: 'rgba(244,232,210,0.02)', tick: '#F4E8D2', grid: 'rgba(244,232,210,0.12)', tooltip_bg: '#202632', tooltip_border: '#F4E8D2' },
   light:     { line: '#1F3D28', point: '#2d5438', fill0: 'rgba(31,61,40,0.30)', fill1: 'rgba(31,61,40,0.02)', tick: '#1F3D28', grid: 'rgba(31,61,40,0.10)', tooltip_bg: '#D7D2C8', tooltip_border: '#1F3D28' },
 };
 

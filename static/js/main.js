@@ -38,7 +38,7 @@ function applyTheme(theme, save = true) {
       icon.className = 'fas fa-leaf text-success';
     } else if (theme === 'ocean') {
       icon.className = 'fas fa-water';
-      icon.style.color = '#16A085';
+      icon.style.color = '#69818D';
 
     } else {
       icon.className = 'fas fa-moon text-primary';

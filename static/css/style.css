@@ -52,26 +52,26 @@
 
 /* ---------------------------------------------------------
    CSS Custom Properties — Ocean Deep Theme
-   (#140C30 deep navy → #16A085 bright teal)
+   (#0D1F23 dark teal-black → #AFB3B7 slate grey)
    --------------------------------------------------------- */
 [data-theme="ocean"] {
-  --bg-primary:       #140C30;
-  --bg-secondary:     #14253E;
-  --bg-card:          rgba(21, 61, 76, 0.84);
-  --bg-glass:         rgba(20, 12, 48, 0.94);
-  --border-color:     rgba(22, 160, 133, 0.22);
-  --border-highlight: #16A085;
+  --bg-primary:       #0D1F23;
+  --bg-secondary:     #132E35;
+  --bg-card:          rgba(45, 74, 83, 0.84);
+  --bg-glass:         rgba(13, 31, 35, 0.94);
+  --border-color:     rgba(105, 129, 141, 0.22);
+  --border-highlight: #69818D;
 
-  --text-primary:   #d4f5ee;
-  --text-secondary: #16A085;
-  --text-muted:     #168777;
+  --text-primary:   #AFB3B7;
+  --text-secondary: #69818D;
+  --text-muted:     #5A636A;
 
-  --primary-accent:     #16A085;
-  --primary-accent-rgb: 22, 160, 133;
-  --primary-gradient:   linear-gradient(135deg, #14253E 0%, #15565B 40%, #16A085 100%);
-  --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(22,160,133,0.45) 0%, rgba(21,86,91,0.35) 55%, #140C30 85%);
+  --primary-accent:     #69818D;
+  --primary-accent-rgb: 105, 129, 141;
+  --primary-gradient:   linear-gradient(135deg, #132E35 0%, #2D4A53 45%, #69818D 100%);
+  --hero-gradient:      radial-gradient(ellipse at 50% -10%, rgba(105,129,141,0.40) 0%, rgba(45,74,83,0.30) 55%, #0D1F23 85%);
   --card-shadow:        0 12px 40px -8px rgba(0,0,0,0.92);
-  --glass-shadow:       0 8px 32px 0 rgba(0,0,0,0.70), 0 0 0 1px rgba(22,160,133,0.08);
+  --glass-shadow:       0 8px 32px 0 rgba(0,0,0,0.70), 0 0 0 1px rgba(105,129,141,0.08);
 }
 
 /* ---------------------------------------------------------

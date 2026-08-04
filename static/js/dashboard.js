@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const CHART_THEME = {
   green:     { line: '#79C131', point: '#a8bd86', fill0: 'rgba(121,193,49,0.35)', fill1: 'rgba(121,193,49,0.02)', tick: '#79C131', grid: 'rgba(121,193,49,0.10)', tooltip_bg: '#161616', tooltip_border: '#79C131' },
-  ocean:     { line: '#16A085', point: '#168777', fill0: 'rgba(22,160,133,0.35)', fill1: 'rgba(22,160,133,0.02)', tick: '#16A085', grid: 'rgba(22,160,133,0.10)', tooltip_bg: '#140C30', tooltip_border: '#16A085' },
+  ocean:     { line: '#69818D', point: '#5A636A', fill0: 'rgba(105,129,141,0.35)', fill1: 'rgba(105,129,141,0.02)', tick: '#AFB3B7', grid: 'rgba(105,129,141,0.10)', tooltip_bg: '#0D1F23', tooltip_border: '#69818D' },
   light:     { line: '#79C131', point: '#5d9a25', fill0: 'rgba(121,193,49,0.25)', fill1: 'rgba(121,193,49,0.02)', tick: '#161616', grid: 'rgba(22,22,22,0.08)',    tooltip_bg: '#ffffff', tooltip_border: '#79C131' },
 };
 

@@ -57,3 +57,29 @@ def learning_module():
     ctx.update({'active_module': 'learning',
                 'notice': 'Learning Center coming in Phase 8! (Theory, Quizzes, Flashcards, Progress Tracker)'})
     return render_template('dashboard.html', **ctx)
+
+
+@main_bp.route('/api/export/pdf', methods=['POST'])
+def export_pdf():
+    try:
+        from services.pdf_service import PDFService
+        import io
+        from flask import send_file
+
+        req = request.get_json() or {}
+        solution_data = req.get('solution_data', {})
+        module_name   = req.get('module_name', 'Linear Algebra Solution')
+        question_data = req.get('question_data', {})
+
+        pdf_bytes = PDFService.generate_pdf(solution_data, module_name, question_data)
+        safe_name = module_name.lower().replace(' ', '_')
+
+        return send_file(
+            io.BytesIO(pdf_bytes),
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name=f'{safe_name}_solution.pdf'
+        )
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+

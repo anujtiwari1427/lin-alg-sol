@@ -906,7 +906,7 @@ const SolutionExporter = {
 
   // ─── Export Action Trigger Methods ────────────────────────
 
-  // Real PDF export using html2pdf.js (already loaded in base.html)
+  // PDF export via Server-side ReportLab API (/api/export/pdf)
   downloadPDF() {
     if (!this.activeData) {
       const btnCalc = document.getElementById('btnCalculate');
@@ -922,110 +922,35 @@ const SolutionExporter = {
 
     if (typeof showToast === 'function') showToast('Generating PDF\u2026', 'info');
 
-    // Build the print body HTML (question + formula + steps + result)
-    const bodyHtml = this.buildPrintBodyHtml();
-
-    // Create an in-layout styled container for html2pdf to render
-    const pdfContainer = document.createElement('div');
-    pdfContainer.id = '__pdfExportContainer';
-    pdfContainer.style.cssText = [
-      'position:fixed', 'top:0', 'left:0', 'z-index:-99999', 'opacity:0.01', 'pointer-events:none',
-      'width:794px',          // A4 width in px at 96dpi
-      'background:#ffffff',
-      'font-family:Segoe UI,system-ui,sans-serif',
-      'font-size:13px', 'color:#1e293b', 'line-height:1.5'
-    ].join(';');
-
-    // Inject scoped print styles so html2pdf renders correctly
-    pdfContainer.innerHTML = `
-      <style>
-        #__pdfExportContainer .prt-page { padding: 28px 36px; }
-        #__pdfExportContainer .prt-hdr { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #16a34a; padding-bottom: 14px; margin-bottom: 20px; }
-        #__pdfExportContainer .prt-hdr-title { font-size: 20px; font-weight: 800; color: #16a34a; }
-        #__pdfExportContainer .prt-hdr-sub { font-size: 13px; font-weight: 600; color: #334155; }
-        #__pdfExportContainer .prt-hdr-date { font-size: 10px; color: #94a3b8; text-align: right; }
-        #__pdfExportContainer .prt-sec-lbl { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; padding: 4px 10px; border-radius: 4px; display: inline-block; margin-top: 16px; margin-bottom: 8px; }
-        #__pdfExportContainer .prt-blue  { color: #0891b2; background: #f0f9ff; }
-        #__pdfExportContainer .prt-amber { color: #b45309; background: #fffbeb; }
-        #__pdfExportContainer .prt-green { color: #15803d; background: #f0fdf4; }
-        #__pdfExportContainer .prt-formula { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 10px 14px; font-family: 'Courier New', monospace; font-size: 12px; color: #0c4a6e; word-break: break-all; margin-bottom: 8px; }
-        #__pdfExportContainer .prt-step { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #16a34a; border-radius: 6px; padding: 10px 14px; margin-bottom: 8px; page-break-inside: avoid; }
-        #__pdfExportContainer .prt-step-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-        #__pdfExportContainer .prt-step-num { width: 22px; height: 22px; border-radius: 50%; background: #16a34a; color: #fff; font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        #__pdfExportContainer .prt-step-title { font-weight: 700; font-size: 13px; color: #0f172a; }
-        #__pdfExportContainer .prt-step-text { font-size: 12px; color: #475569; margin: 4px 0 4px 32px; }
-        #__pdfExportContainer .prt-step-list { margin: 4px 0 4px 32px; padding-left: 14px; font-size: 12px; color: #334155; }
-        #__pdfExportContainer .prt-step-formula { font-family: 'Courier New', monospace; font-size: 11px; color: #1e40af; background: #eff6ff; border-radius: 4px; padding: 3px 8px; margin: 4px 0 2px 32px; word-break: break-all; }
-        #__pdfExportContainer .prt-result-box { background: #f0fdf4; border: 2px solid #86efac; border-radius: 10px; padding: 16px 20px; text-align: center; margin: 8px 0 16px; page-break-inside: avoid; }
-        #__pdfExportContainer .prt-result-value { font-size: 18px; font-weight: 800; color: #14532d; }
-        #__pdfExportContainer .prt-result-label { font-size: 10px; color: #15803d; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
-        #__pdfExportContainer .prt-mat-table { border-collapse: collapse; margin: 8px auto; font-family: 'Courier New', monospace; font-size: 12px; }
-        #__pdfExportContainer .prt-mat-table td { padding: 4px 10px; border: 1px solid #cbd5e1; text-align: right; }
-        #__pdfExportContainer .prt-sol-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-        #__pdfExportContainer .prt-sol-item { background: #fff; border: 2px solid #16a34a; border-radius: 8px; padding: 6px 14px; text-align: center; min-width: 70px; }
-        #__pdfExportContainer .prt-sol-var { font-size: 11px; color: #6b7280; font-weight: 600; }
-        #__pdfExportContainer .prt-sol-val { font-size: 15px; font-weight: 800; color: #14532d; }
-        #__pdfExportContainer .prt-eigen-table { border-collapse: collapse; width: 100%; font-size: 12px; }
-        #__pdfExportContainer .prt-eigen-table th { background: #f1f5f9; color: #475569; font-size: 10px; text-transform: uppercase; padding: 5px 10px; border: 1px solid #e2e8f0; }
-        #__pdfExportContainer .prt-eigen-table td { padding: 7px 10px; border: 1px solid #e2e8f0; font-family: 'Courier New', monospace; }
-        #__pdfExportContainer .prt-hr { border: none; border-top: 1px solid #e2e8f0; margin: 16px 0; }
-        #__pdfExportContainer .prt-footer { margin-top: 24px; border-top: 1px solid #e2e8f0; padding-top: 8px; text-align: center; color: #94a3b8; font-size: 10px; }
-        #__pdfExportContainer .prt-close-btn { display: none !important; }
-      </style>
-      ${bodyHtml}`;
-
-    document.body.appendChild(pdfContainer);
-
-    const filename = `${this.safeName()}_solution.pdf`;
-    const opt = {
-      margin:       [8, 8, 8, 8],   // mm
-      filename,
-      image:        { type: 'jpeg', quality: 0.97 },
-      html2canvas:  { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
-    };
-
-    if (typeof html2pdf === 'undefined') {
-      // Fallback: open print overlay
-      document.body.removeChild(pdfContainer);
-      if (typeof showToast === 'function') showToast('PDF library unavailable — opening print dialog.', 'warning');
-      this.printSolution();
-      return;
-    }
-
-    let finished = false;
-
-    // Safety timeout: if html2pdf takes > 5 seconds, fallback to print overlay
-    const pdfTimer = setTimeout(() => {
-      if (!finished) {
-        finished = true;
-        if (document.body.contains(pdfContainer)) document.body.removeChild(pdfContainer);
-        if (typeof showToast === 'function') showToast('PDF generation timed out — opening print dialog.', 'warning');
-        this.printSolution();
-      }
-    }, 5000);
-
-    html2pdf()
-      .set(opt)
-      .from(pdfContainer)
-      .save()
-      .then(() => {
-        if (finished) return;
-        finished = true;
-        clearTimeout(pdfTimer);
-        if (document.body.contains(pdfContainer)) document.body.removeChild(pdfContainer);
-        if (typeof showToast === 'function') showToast(`Downloaded: ${filename}`, 'success');
+    fetch('/api/export/pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        solution_data: this.activeData,
+        module_name: this.activeModuleName,
+        question_data: this.activeQuestion
       })
-      .catch(err => {
-        console.error('[SolutionExporter] PDF error:', err);
-        if (finished) return;
-        finished = true;
-        clearTimeout(pdfTimer);
-        if (document.body.contains(pdfContainer)) document.body.removeChild(pdfContainer);
-        if (typeof showToast === 'function') showToast('PDF generation failed — opening print dialog.', 'warning');
-        this.printSolution();
-      });
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('PDF service HTTP ' + res.status);
+      return res.blob();
+    })
+    .then(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${this.safeName()}_solution.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      if (typeof showToast === 'function') showToast(`Downloaded: ${this.safeName()}_solution.pdf`, 'success');
+    })
+    .catch(err => {
+      console.warn('[SolutionExporter] Server PDF fallback to print dialog:', err);
+      if (typeof showToast === 'function') showToast('Opening print dialog for PDF export…', 'info');
+      this.printSolution();
+    });
   },
 
   downloadTXT() {
